@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Viren Patel's Portfolio - Product Engineer at Micron Technology">
+  <title>Portfolio - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html" class="active">Portfolio</a></li>
+        <!--<li><a href="podcast.html">Podcast</a></li>-->
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-content">
+      <h1 class="gradient-text">Viren Patel</h1>
+      <p class="hero-subtitle fade-in">Product Development Engineer 2 @ Micron Technology</p>
+      <p class="portfolio-hero-description fade-in">
+        I am a Product Development Engineer at Micron Technology, Singapore, specializing in the life cycle management and optimization of semiconductor products. My expertise includes electrical and functional testing, material reviews for automotive-grade MCP modules, and process improvements. I collaborate across departments and leverage Python, C++, and data analytics for AI scripting.
+      </p>
+      <div class="hero-actions fade-in">
+        <a href="contact.html" class="btn-primary">Get in Touch</a>
+        <a href="podcast.html" class="btn-secondary">Listen to Podcast</a>
+      </div>
+    </div>
+  </section>
+
+  
+  </section>
+  
+  <!-- Certifications & Achievements Section 
+  <section id="achievements" class="achievements-section">
+    <div class="achievements-container">
+      <div class="section-header">
+        <h2>Certifications & Achievements</h2>
+        <p class="section-subtitle">Professional credentials and recognitions</p>
+      </div>-->
+
+      <!-- Certifications Grid -->
+      <div class="achievements-grid">
+        
+        <!-- Certification Card Template 
+        <div class="achievement-card certification">
+          <div class="achievement-icon">
+            <img src="assets/images/certifications/cert-logo-1.png" alt="Certification Name">
+          </div>
+          <div class="achievement-content">
+            <h3>Certification Name</h3>
+            <p class="issuer">Issuing Organization</p>
+            <p class="date">Issued: Month Year</p>
+            <a href="#" class="verify-link" target="_blank">Verify Credential →</a>
+          </div>
+        </div>-->
+
+        <!-- Achievement Card Template 
+        <div class="achievement-card award">
+          <div class="achievement-icon">
+            <img src="assets/images/achievements/award-logo-1.png" alt="Achievement Name">
+          </div>
+          <div class="achievement-content">
+            <h3>Achievement Title</h3>
+            <p class="issuer">Awarding Body</p>
+            <p class="date">Received: Month Year</p>
+            <p class="description">Brief description of the achievement</p>
+          </div>
+        </div>-->
+
+        <!-- Add more cards as needed -->
+        
+      </div>
+
+      <!-- Optional: Featured Badges Row 
+      <div class="badge-showcase">
+        <h3>Professional Badges</h3>
+        <div class="badge-row">
+          <img src="assets/images/badges/badge-1.png" alt="Badge 1" class="badge-img">
+          <img src="assets/images/badges/badge-2.png" alt="Badge 2" class="badge-img">
+          <img src="assets/images/badges/badge-3.png" alt="Badge 3" class="badge-img">
+          <img src="assets/images/badges/badge-4.png" alt="Badge 4" class="badge-img">
+        </div>
+      </div>
+    </div>-->
+  </section>
+
+  <style>
+    /* Achievements Section Styling */
+    .achievements-section {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 40px 28px;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(32px, 5vw, 42px);
+      margin: 0 0 12px 0;
+      background: linear-gradient(135deg, #6b6bff, #b99df0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .section-subtitle {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 16px;
+      margin: 0;
+    }
+
+    /* Achievements Grid */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .achievement-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(8px) saturate(120%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .achievement-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #6b6bff, #b99df0);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .achievement-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(107, 107, 255, 0.15);
+      border-color: rgba(185, 157, 240, 0.3);
+    }
+
+    .achievement-card:hover::before {
+      opacity: 1;
+    }
+
+    .achievement-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .achievement-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .achievement-content h3 {
+      font-size: 20px;
+      color: #e6dbff;
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+
+    .achievement-content .issuer {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      margin: 0 0 4px 0;
+      font-weight: 500;
+    }
+
+    .achievement-content .date {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      margin: 0 0 12px 0;
+    }
+
+    .achievement-content .description {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 12px 0 0 0;
+    }
+
+    .verify-link {
+      display: inline-flex;
+      align-items: center;
+      color: #b99df0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 12px;
+      transition: color 0.2s ease;
+    }
+
+    .verify-link:hover {
+      color: #6b6bff;
+    }
+
+    /* Badge Showcase */
+    .badge-showcase {
+      text-align: center;
+      padding: 32px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .badge-showcase h3 {
+      font-size: 22px;
+      color: #dcd6ff;
+      margin: 0 0 24px 0;
+      font-weight: 600;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .badge-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      filter: grayscale(20%);
+    }
+
+    .badge-img:hover {
+      transform: scale(1.15);
+      filter: grayscale(0%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .achievements-section {
+        margin: 40px auto;
+        padding: 28px 18px;
+      }
+
+      .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .achievement-card {
+        padding: 24px;
+      }
+
+      .badge-row {
+        gap: 20px;
+      }
+
+      .badge-img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .section-header h2 {
+        font-size: 28px;
+      }
+
+      .achievement-icon {
+        width: 64px;
+        height: 64px;
+      }
+
+      .badge-img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+
+
+
+
+  <!-- CV -->
+   <section id="cv" aria-label="Curriculum Vitae" class="cv-section">
+  <style>
+    /* Accordion CV - themed for blue → purple gradient page */
+    .cv-section {
+      max-width: 1000px;
+      margin: 48px auto;
+      padding: 28px;
+      backdrop-filter: blur(6px) saturate(120%);
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 30px rgba(3,10,30,0.45);
+      color: rgba(255,255,255,0.95);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    .cv-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .cv-header h2 {
+      font-size: 36px;
+      margin: 0 0 8px 0;
+      color: #b99df0; /* lavender accent */
+      letter-spacing: -0.5px;
+    }
+    .cv-header p {
+      margin: 0;
+      color: rgba(255,255,255,0.78);
+    }
+
+    .accordion-item {
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .accordion-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 18px 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      cursor: pointer;
+      outline: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 18px;
+      transition: box-shadow .25s ease, transform .12s ease;
+    }
+
+    /* Expand panel on hover */
+    .accordion-item:hover .accordion-panel {
+      max-height: 100px; /* big enough to show content */
+      padding: 18px 22px 22px 22px;
+    }
+
+
+    .accordion-button:hover {
+      box-shadow: 0 6px 20px rgba(121, 78, 255, 0.12), 0 2px 8px rgba(45, 100, 255, 0.06);
+      transform: translateY(-3px);
+    }
+
+    .accordion-button .arrow {
+      width: 28px;
+      height: 28px;
+      display: inline-grid;
+      place-items: center;
+      background: linear-gradient(90deg,#6b6bff,#b99df0);
+      border-radius: 999px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .accordion-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .36s ease, padding .24s ease;
+      background: rgba(255,255,255,0.01);
+      border-top: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .accordion-panel.open {
+      padding: 18px 22px 22px 22px;
+    }
+
+    .section-content {
+      color: rgba(255,255,255,0.9);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .meta {
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    ul.bullets {
+      margin: 8px 0 0 18px;
+      padding: 0;
+      list-style: disc;
+      color: rgba(255,255,255,0.93);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .skill-block {
+      background: rgba(0,0,0,0.18);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .skill-block h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: #dcd6ff;
+    }
+    .skill-block p {
+      margin: 0;
+      color: rgba(255,255,255,0.82);
+      font-size: 13px;
+    }
+
+    /* Container grid for logos inside each skill-block */
+    .skill-logos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    /* Individual logo + caption */
+    .skill-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+    }
+
+    .skill-logo img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin-bottom: 4px;
+    }
+
+
+
+
+    /* small screens */
+    @media (max-width: 720px) {
+      .cv-section { padding: 18px; margin: 20px; }
+      .cv-header h2 { font-size: 28px; }
+      .accordion-button { padding: 14px; font-size: 16px; }
+    }
+  </style>
+
+
+
+
+  <!-- EXPERIENCE -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-exp" id="btn-exp">
+      Experience
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-exp" class="accordion-panel" role="region" aria-labelledby="btn-exp">
+      <div class="section-content">
+        <!-- Micron (APR format) -->
+        <div style="margin-bottom:14px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+            <img src="assets/images/micron_logo.png" alt="Micron Logo" width="75" height="75" style="border-radius: 8px; object-fit: cover;">
+            <div>
+              <div style="font-weight:700; color:#e6dbff;">Product Owner / Product Engineer — Micron Technology, Inc.</div>
+              <div class="meta">11/2020 – Present [5 Years] • Singapore</div>
+            </div>
+          </div>
+
+          <ul class="bullets">
+            <li><strong>Action:</strong> Led electrical & functional test strategy and material reviews for an automotive-grade MCP module. <strong>Project/Problem:</strong> High-volume production reliability and test coverage gaps. <strong>Result:</strong> Shipped 20M+ units with near-zero DPM and improved HVM yield.</li>
+            <li><strong>Action:</strong> Owned customer-return investigations and failure analyses (functional & physical). <strong>Project/Problem:</strong> Reduce field returns and analyze NVMe/UFS failures. <strong>Result:</strong> Identified root causes and implemented corrective actions that improved product reliability and customer satisfaction.</li>
+            <li><strong>Action:</strong> Implemented data-driven automation scripts (Python, C++, Perl, HTML) for data collection and visualization. <strong>Project/Problem:</strong> Manual data collection slowed analysis cycles. <strong>Result:</strong> Reduced data collection-to-analysis time by ~90%.</li>
+            <li><strong>Action:</strong> Led cross-functional improvement projects—Shift-Left testing, test-coverage improvements, and test-time reduction on ATE. <strong>Project/Problem:</strong> High assembly and test costs with long cycle times. <strong>Result:</strong> Reduced test time and operational cost while improving defect detection earlier in the flow.</li>
+            <li><strong>Action:</strong> Performed rigorous root-cause investigations using 8D, DFMEA, DOE and advanced FA techniques. <strong>Project/Problem:</strong> Complex, intermittent failures requiring multi-modal analysis. <strong>Result:</strong> Faster, more accurate failure resolution through structured FA workflows.</li>
+            <li><strong>Action:</strong> Ensured safe operation in ESD-prone clean room environments and maintained equipment qualification. <strong>Project/Problem:</strong> ESD risks and device sensitivity. <strong>Result:</strong> Maintained lab safety standards and consistent testing throughput.</li>
+          </ul>
+        </div>
+
+        <!-- Teaching Assistant (APR-style) -->
+        <div style="margin-bottom:14px;">
+          <div style="height: 1px; background-color: rgba(255,255,255,0.3); margin-bottom: 5px;"></div>
+          <div style="height: 1px; background-color: rgba(255,255,255,0.3); margin-bottom: 25px;"></div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+            <img src="assets/images/iitb_logo.png" alt="IITB Logo" width="75" height="75" style="border-radius: 8px; object-fit: cover;">
+            <div>
+              <div style="font-weight:700; color:#e6dbff;">Teaching Assistant — IIT Bombay</div>
+              <div class="meta">05/2019 – 06/2020 [2 Months] • Mumbai, India</div>
+            </div>
+          </div>
+          <ul class="bullets">
+            <li><strong>Action:</strong> Designed tutorials and led review sessions for undergraduate courses. <strong>Project/Problem:</strong> Students struggling with core engineering concepts. <strong>Result:</strong> Improved comprehension and grades through targeted mentorship and timely feedback.</li>
+            <li><strong>Action:</strong> Managed grading and transitioned content for online teaching. <strong>Project/Problem:</strong> Shift to remote learning and fair evaluation. <strong>Result:</strong> Maintained assessment integrity and student engagement during remote semesters.</li>
+          </ul>
+        </div>
+
+        <!-- Intern (APR-style) -->
+        <div style="margin-bottom:10px;">
+          <div style="height: 1px; background-color: rgba(255,255,255,0.3); margin-bottom: 5px;"></div>
+          <div style="height: 1px; background-color: rgba(255,255,255,0.3); margin-bottom: 25px;"></div>
+
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+            <img src="assets/images/applied_materials_logo.png" alt="Applied Materials Logo" width="75" height="75" style="border-radius: 8px; object-fit: cover;">
+            <div>
+              <div style="font-weight:700; color:#e6dbff;">Intern Engineer — Applied Materials</div>
+          <div class="meta">05/2018 – 06/2018 [1 Year]• Mumbai, India</div>
+            </div>
+          </div>
+
+          <ul class="bullets">
+            <li><strong>Action:</strong> Conducted technology landscape analysis and dissolution studies for a proprietary coating applied to pharma APIs. <strong>Project/Problem:</strong> Delayed-release formulation requiring new coating solutions. <strong>Result:</strong> Recommended and validated a coating approach; highest-rated intern with direct senior management feedback.</li>
+            <li><strong>Action:</strong> Performed HPLC dissolution testing and translated semiconductor coating techniques to pharma processes. <strong>Project/Problem:</strong> Demonstrate cross-domain application of semiconductor equipment tech. <strong>Result:</strong> Demonstrated feasibility and improved understanding of process-transference methods.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-edu" id="btn-edu">
+      Education
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-edu" class="accordion-panel" role="region" aria-labelledby="btn-edu">
+      <div class="section-content">
+
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+            <img src="assets/images/iitb_logo.png" alt="IITB Logo" width="75" height="75" style="border-radius: 8px; object-fit: cover;">
+            <div>
+              <div style="font-weight:700; color:#e6dbff;">Master of Technology (Dual/Integrated) — IIT Bombay</div>
+              <div class="meta"> Graduated in 07/2020 • Metallurgical Eng. & Materials Science (Process Engineering)</div>
+            </div>
+        </div>
+        
+        <ul class="bullets">
+          <li>Thesis: DFT & Solvation Simulation of Supercapacitor electrode (graphene-like 2D materials). Graduated with 8.48 CPI; 9.58 CPI for Masters Project.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-skills" id="btn-skills">
+      Skills
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-skills" class="accordion-panel" role="region" aria-labelledby="btn-skills">
+      <div class="section-content">
+        <div class="skills-grid">
+          <div class="skills-grid">
+            <!-- CAD & 3D / Scientific -->
+            <div class="skill-block">
+              <h4>CAD & 3D / Scientific</h4>
+              <div class="skill-logos-grid">
+                <div class="skill-logo">
+                  <img src="assets/images/skills/auto_cad.png" alt="AutoCAD">
+                  <p>AutoCAD</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/solidworks.png" alt="Solidworks">
+                  <p>Solidworks</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Fusion360.webp" alt="Fusion360">
+                  <p>Fusion360</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Blender.png" alt="Blender">
+                  <p>Blender</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/FreeCAD.svg" alt="FreeCAD">
+                  <p>FreeCAD</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/JDFTx.png" alt="JDFTx">
+                  <p>JDFTx</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/VASP.jpeg" alt="VASP">
+                  <p>VASP</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/EasyScope.png" alt="EasyScope">
+                  <p>EasyScope</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Programming & Data -->
+            <div class="skill-block">
+              <h4>Programming & Data</h4>
+              <div class="skill-logos-grid">
+                <div class="skill-logo">
+                  <img src="assets/images/skills/python.webp" alt="Python">
+                  <p>Python</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/c++.png" alt="C++">
+                  <p>C++</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Csharp.png" alt="C#">
+                  <p>C#</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Perl.svg" alt="Perl">
+                  <p>Perl</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/R.png" alt="R">
+                  <p>R</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Origin.png" alt="Origin 9.1">
+                  <p>Origin 9.1</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/VS.png" alt="Visual Studio">
+                  <p>Visual Studio</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Matlab.png" alt="Matlab">
+                  <p>Matlab</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/jmp.jpg" alt="JMP">
+                  <p>JMP</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Tableau.png" alt="Tableau">
+                  <p>Tableau</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/PowerBI.png" alt="Power BI">
+                  <p>Power BI</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/excel.png" alt="Excel">
+                  <p>Excel</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tools & Processes -->
+            <div class="skill-block">
+              <h4>Tools & Processes</h4>
+              <div class="skill-logos-grid">
+                <div class="skill-logo">
+                  <img src="assets/images/skills/AJira.png" alt="JIRA">
+                  <p>Atlassina JIRA</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/ACon.png" alt="Atlassina Confluence">
+                  <p>Atlassina Confluence</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/MSOffice.png" alt="MSOffice">
+                  <p>MS Office 365</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/ATE.png" alt="ATE">
+                  <p>Advantest</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Thermo.jpg" alt="FLIR">
+                  <p>FLIR Thermography</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/Osc.png" alt="Oscilloscopes">
+                  <p>Oscilloscope</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Failure Analysis Tools -->
+            <div class="skill-block">
+              <h4>Failure Analysis</h4>
+              <div class="skill-logos-grid">
+                <div class="skill-logo">
+                  <img src="assets/images/skills/rca.jpg" alt="Root Cause Analysis">
+                  <p>Root Cause Analysis</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/fmea.webp" alt="FMEA">
+                  <p>FMEA</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/sem.png" alt="SEM">
+                  <p>(SEM) Scanning Electron Microscopy</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/edx.png" alt="EDX">
+                  <p>Energy-Dispersive X-ray spectroscopy</p>
+                </div>
+                <div class="skill-logo">
+                  <img src="assets/images/skills/3dxray.webp" alt="X-Ray">
+                  <p>2/3 D X-Ray</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COURSES & CERTIFICATIONS -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-certs" id="btn-certs">
+      Courses & Certifications
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-certs" class="accordion-panel" role="region" aria-labelledby="btn-certs">
+      <div class="section-content">
+        <ul class="bullets">
+          <li><strong>Micron Data Science Program</strong> (10/2024 – Present): Data Science Methodology, Big Data & ML Fundamentals, Tableau, SQL for Data Science.</li>
+          <li><strong>Six Sigma Black Belt Courses</strong> (07/2024 – 01/2025): Lean & Six Sigma, Process Metrics, SPC, FMEA, DFSS.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS / RESEARCH -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-projects" id="btn-projects">
+      Projects & Research
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-projects" class="accordion-panel" role="region" aria-labelledby="btn-projects">
+      <div class="section-content">
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:700; color:#e6dbff;">Masters Project — DFT & Solvation Simulation</div>
+          <div class="meta">06/2018 – 08/2020 • Guide: Prof. Sumit Saxena</div>
+          <ul class="bullets">
+            <li>Performed ab-initio modeling of g-CN for supercapacitor electrodes using JDFTx; simulated electrolyte-electrode interactions to optimize electrode-electrolyte combinations.</li>
+            <li>Applied DFT and solvation models to predict material electrochemical response and optimize design choices.</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <div style="font-weight:700; color:#e6dbff;">FDTD Micro-Hole Simulations</div>
+          <div class="meta">06/2017 – 08/2018</div>
+          <ul class="bullets">
+            <li>Simulated nano/micro optical lenses using FDTD and plasmonic theory; analyzed device response and proposed explanatory frameworks.</li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-weight:700; color:#e6dbff;">Optical Device Simulation (Solar Cells)</div>
+          <div class="meta">06/2016 – 08/2017</div>
+          <ul class="bullets">
+            <li>Modeled photonic-electronic generation to improve solar cell efficiency using Synopsys TCAD and 3D device design tools.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLUNTEER -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-vol" id="btn-vol">
+      Volunteer Experience
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-vol" class="accordion-panel" role="region" aria-labelledby="btn-vol">
+      <div class="section-content">
+        <p class="meta">Micron Technology, Inc. — Singapore</p>
+        <ul class="bullets">
+          <li>Beach cleaning: organized and participated in cleaning 2 km twice a year.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERESTS -->
+  <div class="accordion-item">
+    <button class="accordion-button" aria-expanded="false" aria-controls="panel-int" id="btn-int">
+      Interests
+      <span class="arrow">+</span>
+    </button>
+    <div id="panel-int" class="accordion-panel" role="region" aria-labelledby="btn-int">
+      <div class="section-content">
+        <ul class="bullets">
+          <li>Art & Craft, DIY Projects, Video Games, Chess, Painting/Drawing</li>
+          <li>Volunteering, Coding & Simulations, Reading, Cooking, Robotics</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Minimal accessible accordion JS
+    (function () {
+      const items = document.querySelectorAll('.accordion-item');
+      items.forEach(item => {
+        const btn = item.querySelector('.accordion-button');
+        const panel = item.querySelector('.accordion-panel');
+        const arrow = btn.querySelector('.arrow');
+
+        btn.addEventListener('click', () => {
+          const expanded = btn.getAttribute('aria-expanded') === 'true';
+          // close all other panels if you want only one open at a time:
+          items.forEach(i => {
+            const b = i.querySelector('.accordion-button');
+            const p = i.querySelector('.accordion-panel');
+            const a = b.querySelector('.arrow');
+            if (i !== item) {
+              b.setAttribute('aria-expanded', 'false');
+              p.style.maxHeight = null;
+              p.classList.remove('open');
+              if (a) a.textContent = '+';
+            }
+          });
+
+          if (!expanded) {
+            btn.setAttribute('aria-expanded', 'true');
+            panel.classList.add('open');
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            arrow.textContent = '−';
+          } else {
+            btn.setAttribute('aria-expanded', 'false');
+            panel.classList.remove('open');
+            panel.style.maxHeight = null;
+            arrow.textContent = '+';
+          }
+        });
+      });
+
+      // ensure panels collapse on load
+      window.addEventListener('load', () => {
+        document.querySelectorAll('.accordion-panel').forEach(p => {
+          p.style.maxHeight = null;
+        });
+      });
+    })();
+  </script>
+</section>
+
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

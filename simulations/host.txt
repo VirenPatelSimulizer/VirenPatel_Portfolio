@@ -1,0 +1,3 @@
+sim1@Boids Flocking Simulation@Classic flocking behavior demonstrating separation, alignment, and cohesion rules in bird-like agents
+sim2@Ant Colony Optimization@Watch intelligent ants find the shortest path using pheromone trails and collective decision making
+sim3@Cellular Automata@Explore Conway's Game of Life and other fascinating cellular patterns that emerge from simple rules

@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Simulations - Explore agent-based behavior and swarm intelligence">
+  <title>Simulations - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/simulations.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script type="module" src="js/gallery-loader.js"></script>
+  <script type="module" src="js/gallery-ui.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../index.html">Viren Patel</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../portfolio.html">Portfolio</a></li>
+        <li><a href="index.html" class="active">Simulations</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Category Sidebar -->
+  <div class="category-sidebar" id="category-sidebar">
+    <div class="sidebar-header">
+      <h3>Categories</h3>
+      <button class="close-sidebar" id="close-sidebar">×</button>
+    </div>
+    <div class="category-list" id="category-list">
+      <!-- Category buttons will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" id="sidebar-toggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Main Container -->
+  <section id="simulations">
+    <div class="container">
+      <h1>Welcome to the World of</h1>
+      <h2>Simulations</h2>
+      <p class="subtitle">Interactive Simulations by Viren Patel</p>
+      <p class="description">Explore complex systems through interactive demonstrations. Select a category to view simulations.</p>
+
+
+      <!-- Simulation View (dynamic content injected here) -->
+      <div class="simulation-grid">
+        <!-- Simulation category cards will be dynamically inserted here by gallery-loader.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/gallery-ui.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Device detection and grid setup
+  function setupGrid() {
+    const galleryGrid = document.querySelector('.simulation-grid');
+    if (!galleryGrid) return;
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+      galleryGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    } else {
+      galleryGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    }
+  }
+  
+  setupGrid();
+  window.addEventListener('resize', setupGrid);
+  
+  // Standard effects
+  // The animation delay is now handled by CSS using --card-index
+  
+  // Elements
+  const categorySidebar = document.getElementById('categorySidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const galleryView = document.getElementById('galleryView');
+  const categoryButtons = document.querySelectorAll('.category-btn');
+  const backButtons = document.querySelectorAll('.back-btn');
+
+  // Use event delegation for dynamically added cards
+  document.querySelector('.simulation-grid').addEventListener('click', function(e) {
+    const card = e.target.closest('.gallery-card');
+    if (card) {
+      const category = card.getAttribute('data-category');
+      
+      // Show sidebar and adjust layout
+      categorySidebar.classList.add('active');
+      sidebarToggle.style.display = 'flex';
+      document.querySelector('.container').style.marginLeft = '320px';
+      document.querySelector('.container').style.transition = 'margin-left 0.4s ease';
+      
+      // Show category view
+      showCategoryView(category);
+      
+      // Update sidebar button
+      categoryButtons.forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-category="${category}"]`).classList.add('active');
+    }
+  });
+
+  // Sidebar category buttons
+  categoryButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const category = btn.getAttribute('data-category');
+      
+      categoryButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (category === 'gallery') {
+        showGalleryViewWithSidebar();
+      } else {
+        showCategoryView(category);
+      }
+    });
+  });
+
+  // Back buttons - return to ORIGINAL state
+  backButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Hide sidebar completely
+      categorySidebar.classList.remove('active');
+      sidebarToggle.style.display = 'none';
+      
+      // Reset container margin
+      document.querySelector('.container').style.marginLeft = '0';
+      
+      // Show gallery view
+      document.querySelectorAll('.content-view').forEach(view => {
+        view.classList.add('hidden');
+        view.style.display = 'none';
+      });
+      
+      galleryView.classList.remove('hidden');
+      galleryView.style.display = 'block';
+      
+      // Reset sidebar buttons
+      categoryButtons.forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-category="gallery"]').classList.add('active');
+    });
+  });
+
+  // Show gallery with sidebar (from sidebar navigation)
+  function showGalleryViewWithSidebar() {
+    document.querySelectorAll('.content-view').forEach(view => {
+      view.classList.add('hidden');
+      view.style.display = 'none';
+    });
+    
+    galleryView.classList.remove('hidden');
+    galleryView.style.display = 'block';
+  }
+
+  // Show category view
+  function showCategoryView(category) {
+    document.querySelectorAll('.content-view').forEach(view => {
+      view.classList.add('hidden');
+      view.style.display = 'none';
+    });
+    
+    const targetView = document.getElementById(category + 'View');
+    if (targetView) {
+      targetView.classList.remove('hidden');
+      targetView.style.display = 'block';
+      
+      const simCards = targetView.querySelectorAll('.sim-card');
+      simCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fadeInUp');
+      });
+    }
+  }
+
+  // Sidebar toggle
+  sidebarToggle.addEventListener('click', function() {
+    categorySidebar.classList.toggle('active');
+  });
+
+  closeSidebar.addEventListener('click', function() {
+    categorySidebar.classList.remove('active');
+  });
+
+  // Initially hide sidebar toggle
+  sidebarToggle.style.display = 'none';
+});
+</script>
+
+  <style>
+    #simulations {
+      min-height: 100vh;
+      padding: 8rem 0 4rem;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    #simulations h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .description {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin-bottom: 4rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .content-view {
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .simulation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .gallery-card {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      position: relative;
+      top: 0;
+      animation: fadeInUp 0.6s ease-out both;
+      animation-delay: calc(var(--card-index) * 0.1s);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      height: 420px;
+    }
+
+    .gallery-card:nth-child(1) { --card-index: 1; }
+    .gallery-card:nth-child(2) { --card-index: 2; }
+    .gallery-card:nth-child(3) { --card-index: 3; }
+    .gallery-card:nth-child(4) { --card-index: 4; }
+    .gallery-card:nth-child(5) { --card-index: 5; }
+
+    .gallery-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+      z-index: 1;
+    }
+
+    .gallery-card:hover::before {
+      left: 100%;
+    }
+
+    .gallery-card:hover {
+      top: -15px;
+      transform: scale(1.1);
+      border-color: #3b82f6;
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
+    }
+
+    .gallery-preview {
+      height: 200px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-preview::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-preview::after {
+      opacity: 1;
+    }
+
+    .gallery-icon {
+      font-size: 4rem;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .gallery-card:hover .gallery-icon {
+      transform: scale(1.1) rotate(5deg);
+      opacity: 1;
+    }
+
+    .gallery-info {
+      padding: 2rem;
+      text-align: left;
+      position: relative;
+      z-index: 2;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-info h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+      transition: color 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-info h3 {
+      color: #60a5fa;
+    }
+
+    .gallery-info p {
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      transition: color 0.3s ease;
+      flex-grow: 1;
+    }
+
+    .gallery-card:hover .gallery-info p {
+      color: #cbd5e1;
+    }
+
+    .sim-count {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .gallery-card:hover .sim-count {
+      background: rgba(96, 165, 250, 0.3);
+      color: #93c5fd;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .back-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .back-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #f1f5f9;
+    }
+
+    .simulations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .sim-card {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      position: relative;
+      top: 0;
+      animation: fadeInUp 0.6s ease-out both;
+      animation-delay: calc(var(--card-index) * 0.1s);
+      display: flex;
+      flex-direction: column;
+      height: 420px;
+    }
+
+    .sim-card:nth-child(1) { --card-index: 1; }
+    .sim-card:nth-child(2) { --card-index: 2; }
+    .sim-card:nth-child(3) { --card-index: 3; }
+
+    .sim-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+      z-index: 1;
+    }
+
+    .sim-card:hover::before {
+      left: 100%;
+    }
+
+    .sim-card:hover {
+      top: -15px;
+      transform: scale(1.1);
+      border-color: #3b82f6;
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
+    }
+
+    .sim-preview {
+      height: 200px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sim-preview::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sim-card:hover .sim-preview::after {
+      opacity: 1;
+    }
+
+    .preview-placeholder {
+      font-size: 4rem;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .sim-card:hover .preview-placeholder {
+      transform: scale(1.1) rotate(5deg);
+      opacity: 1;
+    }
+
+    .sim-info {
+      padding: 2rem;
+      text-align: left;
+      position: relative;
+      z-index: 2;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sim-info h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+      transition: color 0.3s ease;
+    }
+
+    .sim-card:hover .sim-info h3 {
+      color: #60a5fa;
+    }
+
+    .sim-info p {
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      transition: color 0.3s ease;
+      flex-grow: 1;
+    }
+
+    .sim-card:hover .sim-info p {
+      color: #cbd5e1;
+    }
+
+    .sim-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sim-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      transition: left 0.3s ease;
+      z-index: -1;
+    }
+
+    .sim-btn:hover::before {
+      left: 0;
+    }
+
+    .sim-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Floating animation for emojis */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-10px) rotate(2deg); }
+      66% { transform: translateY(5px) rotate(-1deg); }
+    }
+
+    .preview-placeholder span {
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+      animation-delay: calc(var(--card-index) * 0.5s);
+    }
+
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Subtle background pattern */
+    #simulations::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0.1, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Category Sidebar Styles */
+    .category-sidebar {
+      position: fixed;
+      top: 0;
+      left: -350px;
+      width: 300px;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2rem 1.5rem;
+      z-index: 1000;
+      transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-header h3 {
+      color: #f1f5f9;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .close-sidebar {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close-sidebar:hover {
+      color: #f1f5f9;
+    }
+
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .category-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      color: #94a3b8;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .category-btn:hover {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      color: #f1f5f9;
+    }
+
+    .category-btn.active {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+
+    .category-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Sidebar Toggle Button */
+    .sidebar-toggle {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      width: 40px;
+      height: 40px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+    }
+
+    .sidebar-toggle span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #f1f5f9;
+      margin: 3px 0;
+      transition: all 0.3s ease;
+    }
+
+    /* Show sidebar when active */
+    .category-sidebar.active {
+      left: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .category-sidebar {
+        width: 100%;
+        left: -100%;
+      }
+
+      .sidebar-toggle {
+        left: 1rem;
+        top: 1rem;
+      }
+
+      #simulations h1 {
+        font-size: 2.5rem;
+      }
+      
+      .simulation-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .simulations-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .container {
+        padding: 0 1rem;
+      }
+
+      .sim-card:hover {
+        transform: translateY(-10px) scale(1.01);
+      }
+    }
+
+    /* Add these styles to the existing <style> section */
+
+    /* Layout changes for sidebar mode */
+    .container.sidebar-mode {
+      margin-left: 320px;
+      transition: margin-left 0.4s ease;
+    }
+
+    /* Sidebar always visible in sidebar mode */
+    .category-sidebar.persistent {
+      left: 0;
+      position: fixed;
+    }
+
+    /* Hide sidebar toggle when not needed */
+    .sidebar-toggle.hidden {
+      display: none !important;
+    }
+
+    /* Responsive layout for sidebar mode */
+    @media (max-width: 768px) {
+      .container.sidebar-mode {
+        margin-left: 0;
+      }
+      
+      .category-sidebar.persistent {
+        left: -100%;
+      }
+      
+      .category-sidebar.persistent.active {
+        left: 0;
+      }
+    }
+
+    /* Tag Filters Styles */
+    .tag-filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .tag-filter-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      padding: 0.5rem 1.25rem;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .tag-filter-btn:hover,
+    .tag-filter-btn.active {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+    
+    /* Fix for simulation counts showing 0 */
+    .sim-count {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+    }
+  </style>
+  <script src="js/config.js"></script>
+  <script src="js/gallery-loader.js"></script>
+  <script src="js/simulations.js" type="module"></script>
+  // ... existing code
+      .sim-count {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: absolute;
+        bottom: 1.5rem;
+        right: 2rem;
+      }
+    </style>
+    <script src="js/config.js"></script>
+    <script src="js/gallery-loader.js"></script>
+    <script>
+      // This script will handle navigating from a category card to the gallery page.
+      document.addEventListener('DOMContentLoaded', () => {
+        // The gallery-loader.js script creates the cards. We need to wait for them.
+        // We'll use a MutationObserver to detect when the cards are added to the DOM.
+        
+        const gridContainer = document.getElementById('simulations'); // Assuming this is the main container
+        if (!gridContainer) {
+          console.error('Main container with ID "simulations" not found.');
+          return;
+        }
+  
+        const handleCardClick = (event) => {
+          const card = event.target.closest('.gallery-card');
+          if (card && card.dataset.categoryId) {
+            const categoryId = card.dataset.categoryId;
+            // Navigate to the gallery page with the category ID as a URL parameter
+            window.location.href = `gallery.html?category=${categoryId}`;
+          }
+        };
+  
+        // Use event delegation on the container. This is more efficient and works for dynamic content.
+        gridContainer.addEventListener('click', handleCardClick);
+  
+        // Fallback: If cards are already present when this script runs
+        const existingCards = gridContainer.querySelectorAll('.gallery-card');
+        if (existingCards.length > 0) {
+          // The listener is already attached, so we're good.
+          console.log('Category card listener attached.');
+        } else {
+          // If not, we can use an observer as a robust way to wait for them.
+          const observer = new MutationObserver((mutationsList, obs) => {
+            for (const mutation of mutationsList) {
+              if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                if (gridContainer.querySelector('.gallery-card')) {
+                  console.log('Category cards detected and listener is active.');
+                  obs.disconnect(); // Stop observing once we find the cards
+                  return;
+                }
+              }
+            }
+          });
+  
+          observer.observe(gridContainer, { childList: true, subtree: true });
+        }
+      });
+    </script>
+  
+  </body>
+  </html>
+
+</body>
+</html>

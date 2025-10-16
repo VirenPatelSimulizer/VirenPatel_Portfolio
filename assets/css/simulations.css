@@ -1,0 +1,437 @@
+
+/* Simulations Page Specific Styles */
+
+#simulations {
+  min-height: 100vh;
+  padding: 8rem 0 4rem;
+  position: relative;
+}
+
+.simulations-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+#simulations h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.simulations-subtitle {
+  font-size: 1.5rem;
+  color: #06b6d4;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.simulations-description {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin-bottom: 4rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+/* Category Styles */
+.simulation-category {
+  margin-bottom: 4rem;
+  position: relative;
+  padding: 0 60px; /* Add padding to accommodate scroll buttons */
+}
+
+.category-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+.category-icon {
+  font-size: 2.5rem;
+}
+
+/* Scrollable Grid Container */
+.simulation-grid-container {
+  position: relative;
+  overflow: visible;
+  margin: 0 -60px;
+  padding: 0 60px;
+  /* Remove fixed height */
+}
+
+.simulation-grid {
+  display: flex;
+  gap: 1rem; /* Reduced gap for better spacing */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 2rem 0; /* Increased padding for scaled cards */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory; /* Enable snap scrolling */
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  /* Remove height: 100% */
+}
+
+.simulation-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll Buttons */
+.scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(59, 130, 246, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.scroll-button:hover {
+  background: rgba(59, 130, 246, 1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.scroll-button.left {
+  left: 0;
+}
+
+.scroll-button.right {
+  right: 0;
+}
+
+.scroll-button svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Hide scroll buttons when not needed */
+.scroll-button.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Card Styles with Carousel Effect */
+.simulation-card {
+  flex: 0 0 280px; /* Base width */
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  animation: fadeInUp 1s ease-out 0.6s both;
+  transform: scale(0.85); /* Default scale for side cards */
+  opacity: 0.7;
+  scroll-snap-align: center;
+  position: relative;
+  z-index: 1;
+  /* Remove fixed height */
+  height: 320px; /* Base height - will scale with transform */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Center card (active) styling */
+.simulation-card.center {
+  transform: scale(1); /* Scale up the center card */
+  opacity: 1;
+  z-index: 2;
+  border-color: #3b82f6;
+  box-shadow: 0 25px 50px rgba(59, 130, 246, 0.2);
+}
+
+.simulation-card:hover {
+  transform: scale(0.9); /* Slightly larger on hover for side cards */
+  border-color: #3b82f6;
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+}
+
+.simulation-card.center:hover {
+  transform: scale(1.05); /* Even bigger on hover when centered */
+  box-shadow: 0 30px 60px rgba(59, 130, 246, 0.25);
+}
+
+.simulation-preview {
+  position: relative;
+  width: 100%;
+  height: 160px; /* Reduced height */
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.video-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.preview-icon {
+  font-size: 2.5rem; /* Slightly smaller icon */
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.simulation-card.center .preview-icon {
+  font-size: 3rem; /* Larger icon for center card */
+}
+
+.simulation-details {
+  padding: 1.2rem; /* Slightly reduced padding */
+  text-align: left;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.simulation-details h3 {
+  font-size: 1.3rem; /* Slightly smaller title */
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+.simulation-card.center .simulation-details h3 {
+  font-size: 1.5rem; /* Larger title for center card */
+}
+
+.simulation-details p {
+  color: #94a3b8;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.simulation-card.center .simulation-details p {
+  font-size: 1rem; /* Larger text for center card */
+}
+
+.simulation-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-top: auto;
+}
+
+.simulation-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* About Section */
+.simulation-about {
+  margin-top: 6rem;
+  padding: 3rem;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.simulation-about h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #f1f5f9;
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 3rem;
+  text-align: left;
+}
+
+.about-text p {
+  color: #94a3b8;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.about-features h3 {
+  color: #f1f5f9;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.about-features ul {
+  list-style: none;
+  padding: 0;
+}
+
+.about-features li {
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.about-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #simulations h1 {
+    font-size: 2.5rem;
+  }
+  
+  .simulations-container {
+    padding: 0 1rem;
+  }
+  
+  .simulation-card {
+    flex: 0 0 240px; /* Smaller cards on mobile */
+    /* Remove height */
+  }
+  
+  .about-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .scroll-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .scroll-button.left {
+    left: 0;
+  }
+  
+  .scroll-button.right {
+    right: 0;
+  }
+  
+  .simulation-category {
+    padding: 0 45px; /* Reduce padding on mobile */
+  }
+  
+  .simulation-grid-container {
+    margin: 0 -45px;
+    padding: 0 45px;
+    /* Remove height */
+  }
+  
+  .simulation-preview {
+    height: 140px;
+  }
+  
+  .preview-icon {
+    font-size: 2rem;
+  }
+  
+  .simulation-card.center .preview-icon {
+    font-size: 2.5rem;
+  }
+  
+  .simulation-details h3 {
+    font-size: 1.2rem;
+  }
+  
+  .simulation-card.center .simulation-details h3 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .simulation-card {
+    flex: 0 0 200px; /* Even smaller on very small screens */
+    /* Remove height */
+  }
+  
+  .category-title {
+    font-size: 1.5rem;
+  }
+  
+  .scroll-button {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .scroll-button.left {
+    left: 0;
+  }
+  
+  .scroll-button.right {
+    right: 0;
+  }
+  
+  .simulation-category {
+    padding: 0 40px; /* Further reduce on very small screens */
+  }
+  
+  .simulation-grid-container {
+    margin: 0 -40px;
+    padding: 0 40px;
+    /* Remove height */
+  }
+  
+  .simulation-preview {
+    height: 120px;
+  }
+  
+  .simulation-card.center {
+    transform: scale(1); /* Back to original scaling */
+  }
+  
+  .simulation-card.center:hover {
+    transform: scale(1.05); /* Back to original scaling */
+  }
+}
