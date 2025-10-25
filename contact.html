@@ -55,7 +55,7 @@
       </div>
 
       <!-- Contact Form -->
-      <div class="contact-form fade-in">
+      <!--div class="contact-form fade-in">
         <h2>Or Send a Message</h2>
         <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
           <div class="form-group">
@@ -70,6 +70,43 @@
           <button type="submit" class="btn-primary">
             <span>Send Message</span>
           </button>
+        </form>
+      </div-->
+      <div class="contact-form fade-in">
+        <h2>Or Send a Message</h2>
+        <form action="https://api.web3forms.com/submit" method="POST" id="contact-form">
+
+          <!-- Your Web3Forms Access Key -->
+          <input type="hidden" name="access_key" value="c1a155b0-a3bd-4584-a2e6-fc7dcbd85b6a">
+
+          <!-- Optional: Email subject for notifications -->
+          <input type="hidden" name="subject" value="New Message from Viren Patel Portfolio">
+
+          <!-- Optional: From name -->
+          <input type="hidden" name="from_name" value="Viren Patel Portfolio">
+
+          <!-- Optional: Redirect URL after submission -->
+          <input type="hidden" name="redirect" value="https://virenpatelsimulizer.github.io/VirenPatel_Portfolio/contact-success.html">
+
+          <!-- Botcheck for basic spam protection (hidden) -->
+          <input type="checkbox" name="botcheck" style="display:none;">
+
+          <!-- Form fields -->
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" placeholder="Your Message" required></textarea>
+          </div>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn-primary">
+            <span>Send Message</span>
+          </button>
+
         </form>
       </div>
     </div>
