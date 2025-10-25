@@ -1,0 +1,969 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Viren Patel - Technology enthusiast, podcast host, and simulation developer. Explore my portfolio of projects and listen to Decoded with Viren.">
+  <title>Viren Patel - Portfolio & Technology Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    /* Simulation Container */
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      min-height: calc(100vh - 80px - 100px);
+      margin-top: 70px; /* space below navbar */
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .simulation-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 300px;
+      height: 100%;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      /*overflow-y: auto;*/
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+
+    .simulation-sidebar.collapsed {
+      transform: translateX(-300px);
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      right: -41px;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(20, 20, 40, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      transition: background 0.2s;
+      z-index: 101;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(30, 30, 50, 0.95);
+    }
+    
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #b0b0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-value {
+      float: right;
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .control-input {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .control-input::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-input::-moz-range-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Canvas Styles */
+    .simulation-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      /*transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); removed to fix the canvas */  
+    }
+
+    /*
+    .simulation-canvas-wrapper.sidebar-visible {
+      margin-left: 300px;
+    }*/
+
+    #simulationCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* Overlay Controls */
+    .simulation-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .simulation-overlay.active {
+      display: flex;
+    }
+
+    .overlay-button {
+      padding: 15px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .overlay-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+    }
+
+    .overlay-button.play {
+      background: rgba(74, 158, 255, 0.2);
+      border-color: #4a9eff;
+    }
+
+    .overlay-button.reset {
+      background: rgba(255, 74, 74, 0.2);
+      border-color: #ff4a4a;
+    }
+
+    /* Stats Display */
+    .simulation-stats {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      font-size: 12px;
+      line-height: 1.6;
+      z-index: 50;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .stat-value {
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    /* Back Button */
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateX(-3px);
+      color: #4a9eff;
+    }
+
+    .back-arrow {
+      font-size: 18px;
+      transition: transform 0.3s;
+    }
+
+    .back-button:hover .back-arrow {
+      transform: translateX(-3px);
+    }
+
+    
+
+    @media (max-width: 768px) {
+      .back-button {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 12px;
+      }
+      
+      .back-text {
+        display: none;
+      }
+      
+      .back-arrow {
+        font-size: 20px;
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .simulation-sidebar {
+        width: 250px;
+      }
+
+      .simulation-sidebar.collapsed {
+        transform: translateX(-250px);
+      }
+
+      .simulation-canvas-wrapper.sidebar-visible {
+        margin-left: 250px;
+      }
+
+      .overlay-button {
+        padding: 12px 30px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .simulation-sidebar {
+        width: 200px;
+      }
+
+      .simulation-sidebar.collapsed {
+        transform: translateX(-200px);
+      }
+
+      .simulation-canvas-wrapper.sidebar-visible {
+        margin-left: 200px;
+      }
+
+      .simulation-stats {
+        font-size: 10px;
+        padding: 10px 12px;
+      }
+    }
+
+
+    /* Help Icon */
+    .help-icon {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      background: rgba(74, 158, 255, 0.2);
+      border: 2px solid #4a9eff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+      transition: all 0.3s ease;
+      margin-left: 1rem;
+    }
+
+    .help-icon span {
+      color: #4a9eff;
+      font-size: 18px;
+      font-weight: 700;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .help-icon:hover {
+      background: rgba(74, 158, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    /* Help Tooltip */
+    .help-tooltip {
+      position: absolute;
+      top: calc(100% + 15px);
+      right: 0;
+      width: 350px;
+      background: rgba(20, 20, 40, 0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(74, 158, 255, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .help-tooltip::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid rgba(74, 158, 255, 0.3);
+    }
+
+    .help-icon:hover .help-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .help-tooltip h3 {
+      color: #4a9eff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .help-tooltip p {
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .help-tooltip ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .help-tooltip li {
+      color: #b0b0b0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+
+    .help-tooltip li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #4a9eff;
+    }
+
+    .help-tooltip strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .help-controls {
+      background: rgba(74, 158, 255, 0.1);
+      border-left: 3px solid #4a9eff;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 0 !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .help-tooltip {
+        width: 280px;
+        right: -10px;
+      }
+      
+      .help-icon {
+        margin-left: 0.5rem;
+        width: 28px;
+        height: 28px;
+      }
+      
+      .help-icon span {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .help-tooltip {
+        width: calc(100vw - 40px);
+        right: -20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+ 
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel</a>
+      </div>
+      <div class="logo">
+        <a>Gravitational N-Body Simulation</a>
+      </div>
+      <div class="help-icon" id="helpIcon">
+          <span>?</span>
+          <div class="help-tooltip" id="helpTooltip">
+            <h3>About This Simulation</h3>
+            <p><strong>Gravitational N-Body Simulation</strong></p>
+            <ul>
+              <li><strong>Gravity:</strong> Particles attract each other based on mass and distance</li>
+              <li><strong>Collisions:</strong> Particles bounce with energy transfer to heat</li>
+              <li><strong>Thermal Energy:</strong> Blue (cold) → Orange (hot) color transition</li>
+              <li><strong>Radiation:</strong> Hot particles gradually cool down over time</li>
+            </ul>
+            <p class="help-controls"><strong>Controls:</strong> Click canvas to pause. Adjust parameters in the sidebar to see different behaviors.</p>
+          </div>
+        </div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <!--<li><a href="podcast.html">Podcast</a></li>-->
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+ 
+  <!--  Add Simulation below here  -->
+  <div class="simulation-container">
+    <!-- Sidebar -->
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+      <div class="sidebar-title">Simulation Controls</div>
+      
+      <div class="control-group">
+        <label class="control-label">
+          Particle Count
+          <span class="control-value" id="particleCountValue">100</span>
+        </label>
+        <input type="range" class="control-input" id="particleCount" min="1" max="1000" value="100">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Speed
+          <span class="control-value" id="speedValue">2.0</span>
+        </label>
+        <input type="range" class="control-input" id="speed" min="1" max="5" step="0.1" value="2">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Gravity Strength
+          <span class="control-value" id="gravityStrengthValue">100</span>
+        </label>
+        <input type="range" class="control-input" id="gravityStrength" min="1" max="1000" value="100">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Elasticity
+          <span class="control-value" id="elasticityValue">0.50</span>
+        </label>
+        <input type="range" class="control-input" id="elasticity" min="0" max="1" step="0.01" value="0.5">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Radiation Loss
+          <span class="control-value" id="radiationLossValue">0.01</span>
+        </label>
+        <input type="range" class="control-input" id="radiationLoss" min="0" max="1" step="0.001" value="0.01">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Thermal Threshold
+          <span class="control-value" id="thermalThresholdValue">50</span>
+        </label>
+        <input type="range" class="control-input" id="thermalThreshold" min="0" max="100" value="50">
+      </div>
+    </div>
+    <!-- Add this right after the sidebar div closes -->
+    <a href="../index.html" class="back-button" id="backButton">
+      <span class="back-arrow">←</span>
+      <span class="back-text">Back to Simulations</span>
+    </a>
+    <!-- Canvas Wrapper -->
+      
+      <canvas id="simulationCanvas"></canvas>
+      
+      <!-- Stats Display -->
+      <div class="simulation-stats" id="statsDisplay">
+        <div class="stat-item">
+          <span>FPS:</span>
+          <span class="stat-value" id="fpsValue">60</span>
+        </div>
+        <div class="stat-item">
+          <span>Particles:</span>
+          <span class="stat-value" id="activeParticles">100</span>
+        </div>
+        <div class="stat-item">
+          <span>Avg Thermal:</span>
+          <span class="stat-value" id="avgThermal">0.0</span>
+        </div>
+      </div>
+
+      <!-- Overlay Controls -->
+      <div class="simulation-overlay" id="simulationOverlay">
+        <button class="overlay-button play" id="playButton">Play</button>
+        <button class="overlay-button reset" id="resetButton">Reset</button>
+      </div>
+    </div>
+  </div>
+  <!--  Add Simulation End here  -->
+ 
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * Particle Physics Simulation Framework
+     * A modular, reusable simulation system with gravitational attraction,
+     * collision detection, thermal energy tracking, and radiation cooling.
+     */
+
+    // Global simulation parameters
+    const params = {
+      particleCount: 100,
+      speed: 2.0,
+      gravityStrength: 100,
+      elasticity: 0.5,
+      radiationLoss: 0.01,
+      thermalThreshold: 50
+    };
+
+    // Particle class representing individual simulation entities
+    class Particle {
+      constructor(x, y, vx, vy, mass = 1) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.mass = mass;
+        this.radius = Math.sqrt(mass) * 3;
+        this.thermalEnergy = 0;
+      }
+
+      // Update particle position based on velocity
+      update(dt) {
+          this.x += this.vx * dt;
+          this.y += this.vy * dt;
+
+          // ADD THESE LINES - Clamp velocity to prevent spiraling
+          const maxVelocity = 500; // Adjust this value as needed
+          const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+          if (speed > maxVelocity) {
+          this.vx = (this.vx / speed) * maxVelocity;
+          this.vy = (this.vy / speed) * maxVelocity;
+          }
+          // ADD THIS - Space friction/drag
+          const damping = 0.9999;
+          this.vx *= damping;
+          this.vy *= damping;
+          // Apply radiation cooling
+          this.thermalEnergy *= (1 - params.radiationLoss);
+          if (this.thermalEnergy < 0.01) this.thermalEnergy = 0;
+
+
+          }
+
+      // Apply gravitational force from another particle
+      applyGravity(other, dt) {
+          const dx = other.x - this.x;
+          const dy = other.y - this.y;
+          const distSq = dx * dx + dy * dy;
+          const dist = Math.sqrt(distSq);
+
+          // CHANGE: Add max distance cutoff for realistic gravity
+          const minDist = this.radius + other.radius;
+          const maxDist = 800; // Particles too far don't interact
+          if (dist < minDist || dist > maxDist) return;
+
+          // CHANGE: Add softening to prevent extreme forces (galaxy simulation standard)
+          const softening = 30; // Adjust this value (20-50 works well)
+          const softenedDistSq = distSq + softening * softening;
+          
+          // Compute gravitational force with softening
+          const force = (params.gravityStrength * this.mass * other.mass) / softenedDistSq;
+
+          // Compute force components
+          const fx = (force * dx) / dist;
+          const fy = (force * dy) / dist;
+
+          // Apply acceleration (F = ma -> a = F/m)
+          this.vx += (fx / this.mass) * dt;
+          this.vy += (fy / this.mass) * dt;
+          }
+
+
+      // Handle collision with another particle
+      collide(other) {
+          const dx = other.x - this.x;
+          const dy = other.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minDist = this.radius + other.radius;
+
+          if (dist < minDist && dist > 0) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+
+          // Separate particles first
+          const overlap = minDist - dist;
+          const separationX = nx * overlap * 0.52;
+          const separationY = ny * overlap * 0.52;
+          this.x -= separationX;
+          this.y -= separationY;
+          other.x += separationX;
+          other.y += separationY;
+
+          // Velocity handling
+          const dvx = this.vx - other.vx;
+          const dvy = this.vy - other.vy;
+          const relVelNormal = dvx * nx + dvy * ny;
+
+          if (relVelNormal < 0) {
+               // Calculate impulse
+               const impulse = (2 * relVelNormal) / (this.mass + other.mass);
+
+               // CHANGE: Apply elasticity directly to velocities (energy loss)
+               const restitution = params.elasticity;
+               this.vx -= impulse * other.mass * nx * restitution;
+               this.vy -= impulse * other.mass * ny * restitution;
+               other.vx += impulse * this.mass * nx * restitution;
+               other.vy += impulse * this.mass * ny * restitution;
+
+               // ADD: Apply additional damping for inelastic collision
+               const dampingFactor = 1 - (1 - params.elasticity) * 0.1;
+               this.vx *= dampingFactor;
+               this.vy *= dampingFactor;
+               other.vx *= dampingFactor;
+               other.vy *= dampingFactor;
+
+               // Convert lost kinetic energy to thermal
+               const kineticLoss = (1 - params.elasticity) * Math.abs(relVelNormal) * 0.5;
+               const thermalGain = kineticLoss * 10;
+               this.thermalEnergy += thermalGain;
+               other.thermalEnergy += thermalGain;
+          }
+          }
+          }
+
+      // Bounce off canvas boundaries
+      // Add this method to the Particle class or modify the existing bounceOffWalls method
+
+     // Bounce off canvas boundaries with elastic collision
+     bounceOffWalls(width, height) {
+     // Left boundary
+     if (this.x - this.radius < 0) {
+     this.x = this.radius;
+     this.vx = Math.abs(this.vx) * params.elasticity;
+     } 
+     // Right boundary
+     else if (this.x + this.radius > width) {
+     this.x = width - this.radius;
+     this.vx = -Math.abs(this.vx) * params.elasticity;
+     }
+
+     // Top boundary
+     if (this.y - this.radius < 0) {
+     this.y = this.radius;
+     this.vy = Math.abs(this.vy) * params.elasticity;
+     } 
+     // Bottom boundary
+     else if (this.y + this.radius > height) {
+     this.y = height - this.radius;
+     this.vy = -Math.abs(this.vy) * params.elasticity;
+     }
+     }
+
+      // Render particle with thermal color gradient
+      draw(ctx) {
+        const thermalRatio = Math.min(this.thermalEnergy / params.thermalThreshold, 1);
+        
+        // Color transition from blue (cold) to red (hot)
+        const r = Math.floor(thermalRatio * 255);           // Red: 0 → 255
+          const g = Math.floor(255 - thermalRatio * 150);      // Green: 255 → 165
+          const b = Math.floor(255 - thermalRatio * 255);     // Blue: 255 → 0
+
+
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.fill();
+
+        // Add glow effect for hot particles
+        /*
+        if (thermalRatio > 0.5) {
+          ctx.shadowBlur = thermalRatio * 20;
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.8)`;
+        } else {
+          ctx.shadowBlur = 0;
+        } */
+      }
+    }
+
+    // Main Simulation object
+    const Simulation = {
+      canvas: null,
+      ctx: null,
+      particles: [],
+      isPaused: true,
+      lastTime: 0,
+      fps: 60,
+      frameCount: 0,
+      fpsTime: 0,
+
+      // Initialize simulation
+      init(canvasElement, initialParams) {
+        this.canvas = canvasElement;
+        this.ctx = this.canvas.getContext('2d');
+        
+        // Set canvas size
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        // Apply initial parameters
+        Object.assign(params, initialParams);
+
+        // Create initial particles
+        this.createParticles();
+
+        // Start animation loop
+        this.lastTime = performance.now();
+        this.animate();
+      },
+
+      // Resize canvas to fit container
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+      },
+
+      // Create particle array based on current parameters
+      createParticles() {
+        this.particles = [];
+        for (let i = 0; i < params.particleCount; i++) {
+          const spawnLimit = 0.5;
+
+          // horizontal (x) range
+          const x = this.canvas.width * (1 - spawnLimit) / 2 + Math.random() * this.canvas.width * spawnLimit;
+
+          // vertical (y) range
+          const y = this.canvas.height * (1 - spawnLimit) / 2 + Math.random() * this.canvas.height * spawnLimit;
+
+          const angle = Math.random() * Math.PI * 2;
+          const speed = (Math.random() * 0.5 + 0.5) * params.speed * 10;
+          const vx = Math.cos(angle) * speed;
+          const vy = Math.sin(angle) * speed;
+          const mass = Math.random() * 2 + 1;
+          
+          this.particles.push(new Particle(x, y, vx, vy, mass));
+        }
+      },
+
+      // Main animation loop
+      animate() {
+        requestAnimationFrame(() => this.animate());
+
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
+        this.lastTime = currentTime;
+
+        // Calculate FPS
+        this.frameCount++;
+        this.fpsTime += deltaTime;
+        if (this.fpsTime >= 1) {
+          this.fps = Math.round(this.frameCount / this.fpsTime);
+          this.frameCount = 0;
+          this.fpsTime = 0;
+        }
+
+        if (!this.isPaused) {
+          this.update(deltaTime);
+        }
+
+        this.draw();
+        this.updateStats();
+      },
+
+      // Update simulation physics
+      update(dt) {
+        // Clamp delta time to prevent large jumps
+        dt = Math.min(dt, 0.033);
+
+        // Apply gravity between all particle pairs
+        for (let i = 0; i < this.particles.length; i++) {
+          for (let j = i + 1; j < this.particles.length; j++) {
+            this.particles[i].applyGravity(this.particles[j], dt);
+            this.particles[j].applyGravity(this.particles[i], dt);
+          }
+        }
+
+        // Update particle positions and handle collisions
+        for (let i = 0; i < this.particles.length; i++) {
+          this.particles[i].update(dt);
+          this.particles[i].bounceOffWalls(this.canvas.width, this.canvas.height);
+
+          // Check collisions with other particles
+          for (let j = i + 1; j < this.particles.length; j++) {
+            this.particles[i].collide(this.particles[j]);
+          }
+        }
+      },
+
+      // Render simulation
+      draw() {
+        // Clear canvas with fade effect
+        this.ctx.fillStyle = 'rgba(10, 10, 10, 0.3)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw all particles
+        for (const particle of this.particles) {
+          particle.draw(this.ctx);
+        }
+      },
+
+      // Update stats display
+      updateStats() {
+        document.getElementById('fpsValue').textContent = this.fps;
+        document.getElementById('activeParticles').textContent = this.particles.length;
+
+        // Calculate average thermal energy
+        const avgThermal = this.particles.reduce((sum, p) => sum + p.thermalEnergy, 0) / this.particles.length;
+        document.getElementById('avgThermal').textContent = avgThermal.toFixed(2);
+      },
+
+      // Reset simulation
+      reset() {
+        this.pause();
+        this.createParticles();
+        this.draw();
+      },
+
+      // Pause simulation
+      pause() {
+        this.isPaused = true;
+      },
+
+      // Resume simulation
+      play() {
+        this.isPaused = false;
+        this.lastTime = performance.now();
+      },
+
+      // Toggle pause state
+      togglePause() {
+        if (this.isPaused) {
+          this.play();
+        } else {
+          this.pause();
+        }
+      }
+    };
+
+    // Initialize everything on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('simulationCanvas');
+      Simulation.init(canvas, params);
+      UIController.init();
+    });
+  </script>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

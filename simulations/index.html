@@ -8,645 +8,83 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rel="stylesheet" href="../assets/css/simulations.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <script type="module" src="js/gallery-loader.js"></script>
-  <script type="module" src="js/gallery-ui.js"></script>
-</head>
-<body>
-  <!-- Navbar -->
-  <header>
-    <nav>
-      <div class="logo">
-        <a href="../index.html">Viren Patel</a>
-      </div>
-      <ul class="nav-links">
-        <li><a href="../index.html">Home</a></li>
-        <li><a href="../portfolio.html">Portfolio</a></li>
-        <li><a href="index.html" class="active">Simulations</a></li>
-        <li><a href="../contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <!-- Category Sidebar -->
-  <div class="category-sidebar" id="category-sidebar">
-    <div class="sidebar-header">
-      <h3>Categories</h3>
-      <button class="close-sidebar" id="close-sidebar">×</button>
-    </div>
-    <div class="category-list" id="category-list">
-      <!-- Category buttons will be dynamically inserted here -->
-    </div>
-  </div>
-
-  <!-- Sidebar Toggle Button -->
-  <button class="sidebar-toggle" id="sidebar-toggle">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <!-- Main Container -->
-  <section id="simulations">
-    <div class="container">
-      <h1>Welcome to the World of</h1>
-      <h2>Simulations</h2>
-      <p class="subtitle">Interactive Simulations by Viren Patel</p>
-      <p class="description">Explore complex systems through interactive demonstrations. Select a category to view simulations.</p>
-
-
-      <!-- Simulation View (dynamic content injected here) -->
-      <div class="simulation-grid">
-        <!-- Simulation category cards will be dynamically inserted here by gallery-loader.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
-      <div class="social-links">
-        <a href="mailto:virenp.jobs@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
-        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="js/gallery-ui.js"></script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Device detection and grid setup
-  function setupGrid() {
-    const galleryGrid = document.querySelector('.simulation-grid');
-    if (!galleryGrid) return;
-    const isMobile = window.innerWidth <= 768;
-    
-    if (isMobile) {
-      galleryGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-    } else {
-      galleryGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    }
-  }
-  
-  setupGrid();
-  window.addEventListener('resize', setupGrid);
-  
-  // Standard effects
-  // The animation delay is now handled by CSS using --card-index
-  
-  // Elements
-  const categorySidebar = document.getElementById('categorySidebar');
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const closeSidebar = document.getElementById('closeSidebar');
-  const galleryView = document.getElementById('galleryView');
-  const categoryButtons = document.querySelectorAll('.category-btn');
-  const backButtons = document.querySelectorAll('.back-btn');
-
-  // Use event delegation for dynamically added cards
-  document.querySelector('.simulation-grid').addEventListener('click', function(e) {
-    const card = e.target.closest('.gallery-card');
-    if (card) {
-      const category = card.getAttribute('data-category');
-      
-      // Show sidebar and adjust layout
-      categorySidebar.classList.add('active');
-      sidebarToggle.style.display = 'flex';
-      document.querySelector('.container').style.marginLeft = '320px';
-      document.querySelector('.container').style.transition = 'margin-left 0.4s ease';
-      
-      // Show category view
-      showCategoryView(category);
-      
-      // Update sidebar button
-      categoryButtons.forEach(b => b.classList.remove('active'));
-      document.querySelector(`[data-category="${category}"]`).classList.add('active');
-    }
-  });
-
-  // Sidebar category buttons
-  categoryButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const category = btn.getAttribute('data-category');
-      
-      categoryButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      if (category === 'gallery') {
-        showGalleryViewWithSidebar();
-      } else {
-        showCategoryView(category);
-      }
-    });
-  });
-
-  // Back buttons - return to ORIGINAL state
-  backButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      // Hide sidebar completely
-      categorySidebar.classList.remove('active');
-      sidebarToggle.style.display = 'none';
-      
-      // Reset container margin
-      document.querySelector('.container').style.marginLeft = '0';
-      
-      // Show gallery view
-      document.querySelectorAll('.content-view').forEach(view => {
-        view.classList.add('hidden');
-        view.style.display = 'none';
-      });
-      
-      galleryView.classList.remove('hidden');
-      galleryView.style.display = 'block';
-      
-      // Reset sidebar buttons
-      categoryButtons.forEach(b => b.classList.remove('active'));
-      document.querySelector('[data-category="gallery"]').classList.add('active');
-    });
-  });
-
-  // Show gallery with sidebar (from sidebar navigation)
-  function showGalleryViewWithSidebar() {
-    document.querySelectorAll('.content-view').forEach(view => {
-      view.classList.add('hidden');
-      view.style.display = 'none';
-    });
-    
-    galleryView.classList.remove('hidden');
-    galleryView.style.display = 'block';
-  }
-
-  // Show category view
-  function showCategoryView(category) {
-    document.querySelectorAll('.content-view').forEach(view => {
-      view.classList.add('hidden');
-      view.style.display = 'none';
-    });
-    
-    const targetView = document.getElementById(category + 'View');
-    if (targetView) {
-      targetView.classList.remove('hidden');
-      targetView.style.display = 'block';
-      
-      const simCards = targetView.querySelectorAll('.sim-card');
-      simCards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-        card.classList.add('fadeInUp');
-      });
-    }
-  }
-
-  // Sidebar toggle
-  sidebarToggle.addEventListener('click', function() {
-    categorySidebar.classList.toggle('active');
-  });
-
-  closeSidebar.addEventListener('click', function() {
-    categorySidebar.classList.remove('active');
-  });
-
-  // Initially hide sidebar toggle
-  sidebarToggle.style.display = 'none';
-});
-</script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <style>
-    #simulations {
-      min-height: 100vh;
-      padding: 8rem 0 4rem;
-      display: flex;
-      align-items: center;
-      position: relative;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      text-align: center;
-    }
-
-    #simulations h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    .subtitle {
-      font-size: 1.5rem;
-      color: #94a3b8;
-      margin-bottom: 1rem;
-      animation: fadeInUp 0.8s ease-out 0.2s both;
-    }
-
-    .description {
-      font-size: 1.1rem;
-      color: #64748b;
-      margin-bottom: 4rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      animation: fadeInUp 0.8s ease-out 0.4s both;
-    }
-
-    .content-view {
-      display: block;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .simulation-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .gallery-card {
-      background: rgba(30, 41, 59, 0.8);
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(20px);
-      position: relative;
-      top: 0;
-      animation: fadeInUp 0.6s ease-out both;
-      animation-delay: calc(var(--card-index) * 0.1s);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      height: 420px;
-    }
-
-    .gallery-card:nth-child(1) { --card-index: 1; }
-    .gallery-card:nth-child(2) { --card-index: 2; }
-    .gallery-card:nth-child(3) { --card-index: 3; }
-    .gallery-card:nth-child(4) { --card-index: 4; }
-    .gallery-card:nth-child(5) { --card-index: 5; }
-
-    .gallery-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.6s ease;
-      z-index: 1;
-    }
-
-    .gallery-card:hover::before {
-      left: 100%;
-    }
-
-    .gallery-card:hover {
-      top: -15px;
-      transform: scale(1.1);
-      border-color: #3b82f6;
-      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
-    }
-
-    .gallery-preview {
-      height: 200px;
-      background: linear-gradient(135deg, #1e293b, #334155);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .gallery-preview::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .gallery-card:hover .gallery-preview::after {
-      opacity: 1;
-    }
-
-    .gallery-icon {
-      font-size: 4rem;
-      opacity: 0.7;
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 2;
-    }
-
-    .gallery-card:hover .gallery-icon {
-      transform: scale(1.1) rotate(5deg);
-      opacity: 1;
-    }
-
-    .gallery-info {
-      padding: 2rem;
-      text-align: left;
-      position: relative;
-      z-index: 2;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .gallery-info h3 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #f1f5f9;
-      transition: color 0.3s ease;
+      min-height: 100vh;
     }
 
-    .gallery-card:hover .gallery-info h3 {
-      color: #60a5fa;
+    /* Navbar */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
     }
 
-    .gallery-info p {
-      color: #94a3b8;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-      transition: color 0.3s ease;
-      flex-grow: 1;
-    }
-
-    .gallery-card:hover .gallery-info p {
-      color: #cbd5e1;
-    }
-
-    .sim-count {
-      position: absolute;
-      bottom: 1.5rem;
-      right: 2rem;
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      padding: 0.25rem 0.75rem;
-      border-radius: 50px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .gallery-card:hover .sim-count {
-      background: rgba(96, 165, 250, 0.3);
-      color: #93c5fd;
-    }
-
-    .category-header {
+    nav {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .back-btn {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 0.5rem 1rem;
-      color: #94a3b8;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .back-btn:hover {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: #3b82f6;
-      color: #f1f5f9;
-    }
-
-    .simulations-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .sim-card {
-      background: rgba(30, 41, 59, 0.8);
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(20px);
-      position: relative;
-      top: 0;
-      animation: fadeInUp 0.6s ease-out both;
-      animation-delay: calc(var(--card-index) * 0.1s);
-      display: flex;
-      flex-direction: column;
-      height: 420px;
-    }
-
-    .sim-card:nth-child(1) { --card-index: 1; }
-    .sim-card:nth-child(2) { --card-index: 2; }
-    .sim-card:nth-child(3) { --card-index: 3; }
-
-    .sim-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.6s ease;
-      z-index: 1;
-    }
-
-    .sim-card:hover::before {
-      left: 100%;
-    }
-
-    .sim-card:hover {
-      top: -15px;
-      transform: scale(1.1);
-      border-color: #3b82f6;
-      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
-    }
-
-    .sim-preview {
-      height: 200px;
-      background: linear-gradient(135deg, #1e293b, #334155);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sim-preview::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .sim-card:hover .sim-preview::after {
-      opacity: 1;
-    }
-
-    .preview-placeholder {
-      font-size: 4rem;
-      opacity: 0.7;
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 2;
-    }
-
-    .sim-card:hover .preview-placeholder {
-      transform: scale(1.1) rotate(5deg);
-      opacity: 1;
-    }
-
-    .sim-info {
-      padding: 2rem;
-      text-align: left;
-      position: relative;
-      z-index: 2;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sim-info h3 {
+    .logo a {
       font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
+      font-weight: 700;
       color: #f1f5f9;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: #94a3b8;
+      text-decoration: none;
       transition: color 0.3s ease;
     }
 
-    .sim-card:hover .sim-info h3 {
+    .nav-links a:hover,
+    .nav-links a.active {
       color: #60a5fa;
     }
 
-    .sim-info p {
-      color: #94a3b8;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-      transition: color 0.3s ease;
-      flex-grow: 1;
-    }
-
-    .sim-card:hover .sim-info p {
-      color: #cbd5e1;
-    }
-
-    .sim-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      color: white;
-      padding: 0.75rem 2rem;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .sim-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa);
-      transition: left 0.3s ease;
-      z-index: -1;
-    }
-
-    .sim-btn:hover::before {
-      left: 0;
-    }
-
-    .sim-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-    }
-
-    /* Floating animation for emojis */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      33% { transform: translateY(-10px) rotate(2deg); }
-      66% { transform: translateY(5px) rotate(-1deg); }
-    }
-
-    .preview-placeholder span {
-      display: inline-block;
-      animation: float 3s ease-in-out infinite;
-      animation-delay: calc(var(--card-index) * 0.5s);
-    }
-
-    /* Fade in animation */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Subtle background pattern */
-    #simulations::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0.1, transparent 50%);
-      pointer-events: none;
-    }
-
-    /* Category Sidebar Styles */
+    /* Category Sidebar */
     .category-sidebar {
       position: fixed;
-      top: 0;
-      left: -350px;
+      top: 70px;
+      left: -320px;
       width: 300px;
-      height: 100%;
+      height: calc(100vh - 70px);
       background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(20px);
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       padding: 2rem 1.5rem;
-      z-index: 1000;
+      z-index: 50;
       transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       overflow-y: auto;
+    }
+
+    .category-sidebar.active {
+      left: 0;
     }
 
     .sidebar-header {
@@ -661,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
     .sidebar-header h3 {
       color: #f1f5f9;
       font-size: 1.5rem;
-      margin: 0;
     }
 
     .close-sidebar {
@@ -671,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
       font-size: 2rem;
       cursor: pointer;
       transition: color 0.3s ease;
+      line-height: 1;
     }
 
     .close-sidebar:hover {
@@ -714,10 +152,19 @@ document.addEventListener('DOMContentLoaded', function() {
       font-size: 1.25rem;
     }
 
+    .category-count {
+      margin-left: auto;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      padding: 0.25rem 0.5rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+    }
+
     /* Sidebar Toggle Button */
     .sidebar-toggle {
       position: fixed;
-      top: 2rem;
+      top: 90px;
       left: 2rem;
       width: 40px;
       height: 40px;
@@ -725,8 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       cursor: pointer;
-      z-index: 999;
-      display: flex;
+      z-index: 45;
+      display: none;
       flex-direction: column;
       justify-content: center;
       align-items: center;
@@ -748,108 +195,154 @@ document.addEventListener('DOMContentLoaded', function() {
       transition: all 0.3s ease;
     }
 
-    /* Show sidebar when active */
-    .category-sidebar.active {
-      left: 0;
+    /* Main Content */
+    .main-content {
+      margin-top: 70px;
+      padding: 4rem 2rem 4rem 2rem;
+      transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .category-sidebar {
-        width: 100%;
-        left: -100%;
-      }
-
-      .sidebar-toggle {
-        left: 1rem;
-        top: 1rem;
-      }
-
-      #simulations h1 {
-        font-size: 2.5rem;
-      }
-      
-      .simulation-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      .simulations-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      .container {
-        padding: 0 1rem;
-      }
-
-      .sim-card:hover {
-        transform: translateY(-10px) scale(1.01);
-      }
+    .main-content.sidebar-active {
+      margin-left: 300px;
     }
 
-    /* Add these styles to the existing <style> section */
-
-    /* Layout changes for sidebar mode */
-    .container.sidebar-mode {
-      margin-left: 320px;
-      transition: margin-left 0.4s ease;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    /* Sidebar always visible in sidebar mode */
-    .category-sidebar.persistent {
-      left: 0;
-      position: fixed;
+    /* View Toggle */
+    .view-header {
+      text-align: center;
+      margin-bottom: 3rem;
     }
 
-    /* Hide sidebar toggle when not needed */
-    .sidebar-toggle.hidden {
-      display: none !important;
+    .view-header h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 0.8s ease-out;
     }
 
-    /* Responsive layout for sidebar mode */
-    @media (max-width: 768px) {
-      .container.sidebar-mode {
-        margin-left: 0;
-      }
-      
-      .category-sidebar.persistent {
-        left: -100%;
-      }
-      
-      .category-sidebar.persistent.active {
-        left: 0;
-      }
+    .view-header h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
     }
 
-    /* Tag Filters Styles */
-    .tag-filters {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.75rem;
-      margin-bottom: 2rem;
-    }
-
-    .tag-filter-btn {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50px;
-      padding: 0.5rem 1.25rem;
+    .view-header .subtitle {
+      font-size: 1.5rem;
       color: #94a3b8;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
+      margin-bottom: 1rem;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
     }
 
-    .tag-filter-btn:hover,
-    .tag-filter-btn.active {
-      background: rgba(59, 130, 246, 0.2);
+    .view-header .description {
+      font-size: 1.1rem;
+      color: #64748b;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: #94a3b8;
+      font-size: 1.2rem;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Gallery View - Category Cards */
+    .gallery-view {
+      display: block;
+    }
+
+    .gallery-view.hidden {
+      display: none;
+    }
+
+    .simulation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .gallery-card {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      cursor: pointer;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      animation: fadeInUp 0.6s ease-out both;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-10px) scale(1.02);
       border-color: #3b82f6;
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
+    }
+
+    .gallery-preview {
+      height: 180px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      transition: all 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-preview {
+      transform: scale(1.05);
+    }
+
+    .gallery-info {
+      padding: 2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-info h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+    }
+
+    .gallery-card:hover .gallery-info h3 {
       color: #60a5fa;
     }
-    
-    /* Fix for simulation counts showing 0 */
+
+    .gallery-info p {
+      color: #94a3b8;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
     .sim-count {
       background: rgba(59, 130, 246, 0.2);
       color: #60a5fa;
@@ -857,81 +350,596 @@ document.addEventListener('DOMContentLoaded', function() {
       border-radius: 50px;
       font-size: 0.875rem;
       font-weight: 500;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+
+    /* Video Gallery View */
+    .video-gallery-view {
+      display: none;
+    }
+
+    .video-gallery-view.active {
+      display: block;
+    }
+
+    .back-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      color: #94a3b8;
+      cursor: pointer;
       transition: all 0.3s ease;
-      position: absolute;
-      bottom: 1.5rem;
-      right: 2rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+
+    .back-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #f1f5f9;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .video-card {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      animation: fadeInUp 0.6s ease-out both;
+    }
+
+    .video-card:hover {
+      transform: translateY(-10px);
+      border-color: #3b82f6;
+      box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
+    }
+
+    .video-preview {
+      height: 200px;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-preview video,
+    .video-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-placeholder {
+      font-size: 4rem;
+      opacity: 0.7;
+    }
+
+    .video-info {
+      padding: 2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-info h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #f1f5f9;
+    }
+
+    .video-card:hover .video-info h3 {
+      color: #60a5fa;
+    }
+
+    .video-info p {
+      color: #94a3b8;
+      line-height: 1.6;
+      flex-grow: 1;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .sim-meta {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .meta-badge {
+      background: rgba(59, 130, 246, 0.1);
+      color: #60a5fa;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .sim-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .sim-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      text-align: center;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-content p {
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .social-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: #60a5fa;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .category-sidebar {
+        width: 100%;
+        left: -100%;
+      }
+
+      .main-content.sidebar-active {
+        margin-left: 0;
+      }
+
+      .view-header h1 {
+        font-size: 2.5rem;
+      }
+
+      .view-header h2 {
+        font-size: 2rem;
+      }
+
+      .simulation-grid,
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
     }
   </style>
-  <script src="js/config.js"></script>
-  <script src="js/gallery-loader.js"></script>
-  <script src="js/simulations.js" type="module"></script>
-  // ... existing code
-      .sim-count {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: absolute;
-        bottom: 1.5rem;
-        right: 2rem;
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../index.html">Viren Patel</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../portfolio.html">Portfolio</a></li>
+        <li><a href="index.html" class="active">Simulations</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Category Sidebar -->
+  <div class="category-sidebar" id="categorySidebar">
+    <div class="sidebar-header">
+      <h3>Categories</h3>
+      <button class="close-sidebar" id="closeSidebar">×</button>
+    </div>
+    <div class="category-list" id="categoryList">
+      <div class="loading">Loading categories</div>
+    </div>
+  </div>
+
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" id="sidebarToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <div class="container">
+      <!-- Gallery View (Category Cards) -->
+      <div class="gallery-view" id="galleryView">
+        <div class="view-header">
+          <h1>Simulations Gallery</h1>
+          <p class="subtitle">Interactive Simulations by Viren Patel</p>
+          <p class="description">Explore complex systems through interactive demonstrations. Select a category to view simulations.</p>
+        </div>
+        <div class="simulation-grid" id="simulationGrid">
+          <div class="loading">Loading simulations</div>
+        </div>
+      </div>
+
+      <!-- Video Gallery View -->
+      <div class="video-gallery-view" id="videoGalleryView">
+        <button class="back-btn" id="backBtn">← Back to Categories</button>
+        <div class="view-header">
+          <h2 id="categoryTitle">Category Title</h2>
+          <p id="categoryDescription">Category description</p>
+        </div>
+        <div class="video-grid" id="videoGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Category metadata with icons
+    const categoryMetadata = {
+      swarm: {
+        name: 'Swarm Intelligence',
+        icon: '🐝',
+        description: 'Explore collective behavior and emergent intelligence'
+      },
+      physics: {
+        name: 'Physics Simulations',
+        icon: '⚛️',
+        description: 'Interactive physics engines and natural phenomena'
+      },
+      chemistry: {
+        name: 'Chemistry & Reactions',
+        icon: '🧪',
+        description: 'Molecular dynamics and chemical processes'
+      },
+      mathematics: {
+        name: 'Mathematical Visualizations',
+        icon: '📊',
+        description: 'See mathematical concepts come to life'
       }
-    </style>
-    <script src="js/config.js"></script>
-    <script src="js/gallery-loader.js"></script>
-    <script>
-      // This script will handle navigating from a category card to the gallery page.
-      document.addEventListener('DOMContentLoaded', () => {
-        // The gallery-loader.js script creates the cards. We need to wait for them.
-        // We'll use a MutationObserver to detect when the cards are added to the DOM.
+    };
+
+    // State management
+    let allSimulations = [];
+    let categorizedData = {};
+    let currentView = 'gallery';
+    let selectedCategory = null;
+
+    // DOM elements
+    const galleryView = document.getElementById('galleryView');
+    const videoGalleryView = document.getElementById('videoGalleryView');
+    const simulationGrid = document.getElementById('simulationGrid');
+    const videoGrid = document.getElementById('videoGrid');
+    const categoryList = document.getElementById('categoryList');
+    const categorySidebar = document.getElementById('categorySidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const backBtn = document.getElementById('backBtn');
+    const mainContent = document.getElementById('mainContent');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const categoryDescription = document.getElementById('categoryDescription');
+
+    // Load and parse CSV data
+    async function loadSimulationsData() {
+      try {
+        const response = await fetch('assets/data/simulations-config.csv');
+        const csvText = await response.text();
         
-        const gridContainer = document.getElementById('simulations'); // Assuming this is the main container
-        if (!gridContainer) {
-          console.error('Main container with ID "simulations" not found.');
-          return;
-        }
-  
-        const handleCardClick = (event) => {
-          const card = event.target.closest('.gallery-card');
-          if (card && card.dataset.categoryId) {
-            const categoryId = card.dataset.categoryId;
-            // Navigate to the gallery page with the category ID as a URL parameter
-            window.location.href = `gallery.html?category=${categoryId}`;
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            allSimulations = results.data.filter(sim => sim.status === 'active');
+            processData();
+            init();
+          },
+          error: function(error) {
+            console.error('Error parsing CSV:', error);
+            showError();
           }
-        };
-  
-        // Use event delegation on the container. This is more efficient and works for dynamic content.
-        gridContainer.addEventListener('click', handleCardClick);
-  
-        // Fallback: If cards are already present when this script runs
-        const existingCards = gridContainer.querySelectorAll('.gallery-card');
-        if (existingCards.length > 0) {
-          // The listener is already attached, so we're good.
-          console.log('Category card listener attached.');
-        } else {
-          // If not, we can use an observer as a robust way to wait for them.
-          const observer = new MutationObserver((mutationsList, obs) => {
-            for (const mutation of mutationsList) {
-              if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                if (gridContainer.querySelector('.gallery-card')) {
-                  console.log('Category cards detected and listener is active.');
-                  obs.disconnect(); // Stop observing once we find the cards
-                  return;
-                }
-              }
-            }
-          });
-  
-          observer.observe(gridContainer, { childList: true, subtree: true });
+        });
+      } catch (error) {
+        console.error('Error loading CSV:', error);
+        showError();
+      }
+    }
+
+    // Process data into categories
+    function processData() {
+      categorizedData = {};
+      
+      allSimulations.forEach(sim => {
+        const category = sim.category;
+        if (!categorizedData[category]) {
+          categorizedData[category] = [];
+        }
+        categorizedData[category].push(sim);
+      });
+    }
+
+    // Show error message
+    function showError() {
+      simulationGrid.innerHTML = '<div class="loading" style="color: #ef4444;">Error loading simulations. Please refresh the page.</div>';
+      categoryList.innerHTML = '<div class="loading" style="color: #ef4444;">Error loading categories.</div>';
+    }
+
+    // Initialize
+    function init() {
+      renderCategoryCards();
+      renderSidebar();
+      setupEventListeners();
+    }
+
+    // Get category icon
+    function getCategoryIcon(categoryId) {
+      return categoryMetadata[categoryId]?.icon || '📁';
+    }
+
+    // Get category name
+    function getCategoryName(categoryId) {
+      return categoryMetadata[categoryId]?.name || categoryId.charAt(0).toUpperCase() + categoryId.slice(1);
+    }
+
+    // Get category description
+    function getCategoryDesc(categoryId) {
+      return categoryMetadata[categoryId]?.description || 'Explore simulations in this category';
+    }
+
+    // Render category cards (gallery view)
+    function renderCategoryCards() {
+      const categories = Object.keys(categorizedData);
+      
+      if (categories.length === 0) {
+        simulationGrid.innerHTML = '<div class="loading">No simulations available.</div>';
+        return;
+      }
+
+      simulationGrid.innerHTML = categories.map(categoryId => {
+        const simCount = categorizedData[categoryId].length;
+        return `
+          <div class="gallery-card" data-category="${categoryId}">
+            <div class="gallery-preview">${getCategoryIcon(categoryId)}</div>
+            <div class="gallery-info">
+              <h3>${getCategoryName(categoryId)}</h3>
+              <p>${getCategoryDesc(categoryId)}</p>
+              <span class="sim-count">${simCount} simulation${simCount !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render sidebar categories
+    function renderSidebar() {
+      const categories = Object.keys(categorizedData);
+      
+      categoryList.innerHTML = `
+        <button class="category-btn active" data-category="all">
+          <span class="category-icon">🏠</span>
+          <span>All Categories</span>
+        </button>
+        ${categories.map(categoryId => {
+          const count = categorizedData[categoryId].length;
+          return `
+            <button class="category-btn" data-category="${categoryId}">
+              <span class="category-icon">${getCategoryIcon(categoryId)}</span>
+              <span>${getCategoryName(categoryId)}</span>
+              <span class="category-count">${count}</span>
+            </button>
+          `;
+        }).join('')}
+      `;
+    }
+
+    // Render video gallery for a specific category
+    function renderVideoGallery(categoryId) {
+      const simulations = categorizedData[categoryId];
+      if (!simulations) return;
+
+      categoryTitle.textContent = getCategoryName(categoryId);
+      categoryDescription.textContent = getCategoryDesc(categoryId);
+
+      videoGrid.innerHTML = simulations.map(sim => {
+        const previewContent = sim.previewType === 'video' 
+          ? `<video autoplay loop muted playsinline>
+               <source src="${sim.previewPath}" type="video/mp4">
+               <img src="${sim.fallbackImage}" alt="${sim.title}">
+             </video>`
+          : `<img src="${sim.previewPath}" alt="${sim.title}">`;
+
+        return `
+          <div class="video-card">
+            <div class="video-preview">
+              ${previewContent}
+            </div>
+            <div class="video-info">
+              <h3>${sim.title}</h3>
+              <div class="sim-meta">
+                <span class="meta-badge">${sim.difficulty}</span>
+                <span class="meta-badge">${sim.estimatedTime}</span>
+              </div>
+              <p>${sim.shortDescription}</p>
+              <a href="${sim.simulationPage}" class="sim-btn">Launch Simulation</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Switch views
+    function switchToGalleryView() {
+      currentView = 'gallery';
+      galleryView.classList.remove('hidden');
+      videoGalleryView.classList.remove('active');
+      categorySidebar.classList.remove('active');
+      sidebarToggle.style.display = 'none';
+      mainContent.classList.remove('sidebar-active');
+      
+      // Reset sidebar buttons
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.category === 'all') {
+          btn.classList.add('active');
         }
       });
-    </script>
-  
-  </body>
-  </html>
 
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchToVideoGalleryView(categoryId) {
+      currentView = 'video';
+      selectedCategory = categoryId;
+      galleryView.classList.add('hidden');
+      videoGalleryView.classList.add('active');
+      categorySidebar.classList.add('active');
+      sidebarToggle.style.display = 'flex';
+      mainContent.classList.add('sidebar-active');
+      
+      renderVideoGallery(categoryId);
+      
+      // Update sidebar buttons
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.category === categoryId) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Event listeners
+    function setupEventListeners() {
+      // Category card clicks
+      simulationGrid.addEventListener('click', (e) => {
+        const card = e.target.closest('.gallery-card');
+        if (card) {
+          const categoryId = card.dataset.category;
+          switchToVideoGalleryView(categoryId);
+        }
+      });
+
+      // Sidebar category clicks
+      categoryList.addEventListener('click', (e) => {
+        const btn = e.target.closest('.category-btn');
+        if (btn) {
+          const categoryId = btn.dataset.category;
+          if (categoryId === 'all') {
+            switchToGalleryView();
+          } else {
+            switchToVideoGalleryView(categoryId);
+          }
+        }
+      });
+
+      // Back button
+      backBtn.addEventListener('click', switchToGalleryView);
+
+      // Sidebar toggle
+      sidebarToggle.addEventListener('click', () => {
+        categorySidebar.classList.toggle('active');
+      });
+
+      closeSidebar.addEventListener('click', () => {
+        categorySidebar.classList.remove('active');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 && 
+            categorySidebar.classList.contains('active') &&
+            !categorySidebar.contains(e.target) &&
+            !sidebarToggle.contains(e.target)) {
+          categorySidebar.classList.remove('active');
+        }
+      });
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', loadSimulationsData);
+    document.querySelectorAll('a[href*="simulations/index.html"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        // Save current state
+        const state = {
+          view: currentView,
+          category: selectedCategory,
+          scrollPosition: window.scrollY
+        };
+        sessionStorage.setItem('simulationIndexState', JSON.stringify(state));
+      });
+    });
+  </script>
 </body>
 </html>
