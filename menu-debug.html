@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Debug</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .debug-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      color: #4ade80;
+      padding: 15px;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 20000;
+      border-top: 2px solid #4ade80;
+    }
+    .debug-panel div {
+      margin: 5px 0;
+    }
+    .test-button {
+      position: fixed;
+      bottom: 120px;
+      right: 20px;
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      z-index: 20001;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Menu Debug Test</a>
+      </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section style="padding: 100px 20px; text-align: center; color: white;">
+    <h1>Mobile Menu Debug Page</h1>
+    <p>Resize browser to less than 768px to see hamburger menu</p>
+    <p style="font-size: 2rem; margin: 30px 0;">
+      Screen Width: <span id="width" style="color: #4ade80;"></span>px
+    </p>
+  </section>
+
+  <button class="test-button" onclick="testMenu()">
+    🧪 Test Menu
+  </button>
+
+  <div class="debug-panel">
+    <div><strong>Debug Info:</strong></div>
+    <div id="menu-toggle-status">Menu Toggle: <span id="toggle-display"></span></div>
+    <div id="nav-links-status">Nav Links Position: <span id="links-position"></span></div>
+    <div id="nav-links-active">Nav Links Active: <span id="links-active"></span></div>
+    <div id="overlay-status">Overlay Active: <span id="overlay-active"></span></div>
+    <div id="links-count">Total Links: <span id="total-links"></span></div>
+    <div id="z-index-info">Z-Index (Menu): <span id="menu-zindex"></span></div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    function updateDebug() {
+      const width = window.innerWidth;
+      document.getElementById('width').textContent = width;
+
+      const menuToggle = document.querySelector('.mobile-menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      const overlay = document.querySelector('.mobile-menu-overlay');
+
+      // Menu toggle display
+      const toggleStyle = window.getComputedStyle(menuToggle);
+      document.getElementById('toggle-display').textContent = toggleStyle.display;
+
+      // Nav links position
+      const linksStyle = window.getComputedStyle(navLinks);
+      document.getElementById('links-position').textContent = linksStyle.right;
+      document.getElementById('links-active').textContent = navLinks.classList.contains('active') ? 'YES ✓' : 'NO';
+      document.getElementById('menu-zindex').textContent = linksStyle.zIndex;
+
+      // Overlay
+      if (overlay) {
+        document.getElementById('overlay-active').textContent = overlay.classList.contains('active') ? 'YES ✓' : 'NO';
+      } else {
+        document.getElementById('overlay-active').textContent = 'Not created yet';
+      }
+
+      // Links count
+      const links = document.querySelectorAll('.nav-links a');
+      document.getElementById('total-links').textContent = links.length;
+    }
+
+    function testMenu() {
+      const menuToggle = document.querySelector('.mobile-menu-toggle');
+      menuToggle.click();
+      setTimeout(updateDebug, 100);
+    }
+
+    setInterval(updateDebug, 500);
+    window.addEventListener('resize', updateDebug);
+    updateDebug();
+  </script>
+</body>
+</html>

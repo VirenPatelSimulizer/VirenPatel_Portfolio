@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Menu Test</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    body {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .test-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      margin: 80px 20px 20px;
+      color: white;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .success { background: rgba(0, 255, 0, 0.2); border: 1px solid green; }
+    .error { background: rgba(255, 0, 0, 0.2); border: 1px solid red; }
+    .info { background: rgba(0, 100, 255, 0.2); border: 1px solid blue; }
+    .warning { background: rgba(255, 165, 0, 0.2); border: 1px solid orange; }
+    #console-log {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    #console-log div {
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel - MOBILE TEST</a>
+      </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="test-info">
+    <h1>Mobile Menu Test Page</h1>
+
+    <div id="screen-width" class="status info">
+      Screen Width: <span id="width-value"></span>px
+    </div>
+
+    <div id="menu-status" class="status">
+      Menu Button Status: <span id="button-status"></span>
+    </div>
+
+    <div id="js-status" class="status">
+      JavaScript Status: <span id="script-status"></span>
+    </div>
+
+    <div id="links-visible" class="status warning">
+      Navigation Links: <span id="links-count">Checking...</span>
+    </div>
+
+    <h3>Console Log:</h3>
+    <div id="console-log"></div>
+
+    <h2>Instructions:</h2>
+    <ol>
+      <li>Resize your browser window to less than 768px wide (or use mobile device)</li>
+      <li>You should see a hamburger menu button (≡) in the top right</li>
+      <li>Click the hamburger button to open the mobile menu</li>
+      <li>The menu should slide in from the right</li>
+      <li>Click outside or on a link to close it</li>
+    </ol>
+
+    <h3>Current Breakpoints:</h3>
+    <ul>
+      <li><strong>Desktop:</strong> 1200px and above - Full navigation visible</li>
+      <li><strong>Tablet:</strong> 768px - 1199px - Full navigation visible</li>
+      <li><strong>Mobile:</strong> Below 768px - Hamburger menu appears</li>
+    </ul>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Console log capture
+    const consoleLog = document.getElementById('console-log');
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const logEntry = document.createElement('div');
+      logEntry.textContent = args.join(' ');
+      logEntry.style.color = '#4ade80';
+      consoleLog.appendChild(logEntry);
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+    };
+
+    // Test script to show status
+    function updateStatus() {
+      const width = window.innerWidth;
+      const menuButton = document.querySelector('.mobile-menu-toggle');
+      const menuButtonStyle = window.getComputedStyle(menuButton);
+
+      document.getElementById('width-value').textContent = width;
+
+      // Check if menu button is visible
+      const isVisible = menuButtonStyle.display !== 'none';
+      const buttonStatus = document.getElementById('menu-status');
+      const buttonText = document.getElementById('button-status');
+
+      if (width < 768) {
+        if (isVisible) {
+          buttonStatus.className = 'status success';
+          buttonText.textContent = '✓ Hamburger menu VISIBLE (correct for mobile)';
+        } else {
+          buttonStatus.className = 'status error';
+          buttonText.textContent = '✗ Hamburger menu HIDDEN (ERROR - should be visible)';
+        }
+      } else {
+        if (!isVisible) {
+          buttonStatus.className = 'status success';
+          buttonText.textContent = '✓ Hamburger menu HIDDEN (correct for desktop)';
+        } else {
+          buttonStatus.className = 'status error';
+          buttonText.textContent = '✗ Hamburger menu VISIBLE (ERROR - should be hidden)';
+        }
+      }
+
+      // Check if JavaScript loaded
+      const jsStatus = document.getElementById('js-status');
+      const scriptText = document.getElementById('script-status');
+      if (typeof initMobileMenu !== 'undefined') {
+        jsStatus.className = 'status success';
+        scriptText.textContent = '✓ JavaScript loaded successfully';
+      } else {
+        jsStatus.className = 'status error';
+        scriptText.textContent = '✗ JavaScript not loaded';
+      }
+
+      // Check navigation links
+      const navLinks = document.querySelectorAll('.nav-links a');
+      const linksStatus = document.getElementById('links-visible');
+      const linksCount = document.getElementById('links-count');
+
+      if (navLinks.length > 0) {
+        linksStatus.className = 'status success';
+        linksCount.textContent = `✓ Found ${navLinks.length} navigation links (${Array.from(navLinks).map(a => a.textContent.trim()).join(', ')})`;
+      } else {
+        linksStatus.className = 'status error';
+        linksCount.textContent = '✗ No navigation links found!';
+      }
+    }
+
+    // Update on load and resize
+    window.addEventListener('load', updateStatus);
+    window.addEventListener('resize', updateStatus);
+
+    // Add manual test button
+    setTimeout(() => {
+      const testInfo = document.querySelector('.test-info');
+      const testButton = document.createElement('button');
+      testButton.textContent = '🧪 Click to Test Menu Toggle';
+      testButton.style.cssText = 'padding: 15px 30px; font-size: 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 50px; cursor: pointer; margin: 20px 0; font-weight: 600;';
+      testButton.onclick = () => {
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        console.log('Test button clicked - triggering menu toggle');
+        menuToggle.click();
+      };
+      testInfo.insertBefore(testButton, testInfo.querySelector('h2'));
+    }, 500);
+  </script>
+</body>
+</html>
