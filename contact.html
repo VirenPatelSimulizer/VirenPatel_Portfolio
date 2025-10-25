@@ -20,6 +20,11 @@
       <div class="logo">
         <a href="index.html">Viren Patel</a>
       </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
@@ -49,13 +54,13 @@
         </a>
         
         <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" class="contact-icon calendly" target="_blank" rel="noopener noreferrer">
-          <img src="assets/images/Calendly.png" alt="Calendly">
+          <img src="assets/images/calendly.png" alt="Calendly">
           <span>Schedule a Call</span>
         </a>
       </div>
 
       <!-- Contact Form -->
-      <div class="contact-form fade-in">
+      <!--div class="contact-form fade-in">
         <h2>Or Send a Message</h2>
         <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
           <div class="form-group">
@@ -71,7 +76,45 @@
             <span>Send Message</span>
           </button>
         </form>
+      </div-->
+      <div class="contact-form fade-in">
+        <h2>Or Send a Message</h2>
+        <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+
+          <!-- Web3Forms Access Key -->
+          <input type="hidden" name="access_key" value="c1a155b0-a3bd-4584-a2e6-fc7dcbd85b6a">
+
+          <!-- Optional: Email subject -->
+          <input type="hidden" name="subject" value="New Message from Viren Patel Portfolio">
+
+          <!-- Optional: From name -->
+          <input type="hidden" name="from_name" value="Viren Patel Portfolio">
+
+          <!-- Botcheck for spam protection -->
+          <input type="checkbox" name="botcheck" style="display:none;">
+
+          <!-- Form fields -->
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" placeholder="Your Message" required></textarea>
+          </div>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn-primary"><span>Send Message</span></button>
+
+          <!-- Inline notification -->
+          <p id="form-notification" style="display:none; color: green; margin-top: 10px;">
+            ✅ Your message was sent successfully!
+          </p>
+
+        </form>
       </div>
+
     </div>
   </section>
 
@@ -88,5 +131,33 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script>
+    document.getElementById("contact-form").addEventListener("submit", async function(e) {
+      e.preventDefault(); // prevent page reload
+
+      const form = e.target;
+      const data = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: data,
+          headers: { "Accept": "application/json" }
+        });
+
+        if (response.ok) {
+          // Show success message
+          document.getElementById("form-notification").style.display = "block";
+          // Reset form fields
+          form.reset();
+        } else {
+          alert("Oops! There was a problem submitting your form.");
+        }
+      } catch (error) {
+        alert("Oops! There was a problem submitting your form.");
+        console.error(error);
+      }
+    });
+  </script>
 </body>
 </html>
