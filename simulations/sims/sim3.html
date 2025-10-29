@@ -361,34 +361,66 @@
 
     /* Mobile Expand Button */
     .mobile-expand-btn {
-      display: none;
       position: fixed;
       right: 20px;
       top: 80px;
       width: 50px;
       height: 50px;
-      background: rgba(74, 158, 255, 0.9);
-      border: 2px solid rgba(74, 158, 255, 1);
+      background: rgba(137, 74, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(137, 74, 255, 0.3);
       border-radius: 50%;
-      color: white;
+      color: rgba(137, 74, 255, 0.9);
       font-size: 24px;
       cursor: pointer;
       z-index: 150;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
-      display: flex;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
       align-items: center;
       justify-content: center;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .mobile-expand-btn:active {
       transform: scale(0.9);
-      background: rgba(74, 158, 255, 1);
+      background: rgba(20, 20, 40, 0.9);
+      border-color: rgba(137, 74, 255, 0.9);
+    }
+
+    /* Mobile Collapse Button */
+    .mobile-collapse-btn {
+      position: fixed;
+      right: 20px;
+      top: calc(50vh + 10px);
+      width: 50px;
+      height: 50px;
+      background: rgba(248, 71, 225, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(248, 71, 225, 0.4);
+      border-radius: 50%;
+      color: rgba(248, 71, 225, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-collapse-btn:active {
+      transform: scale(0.9);
+      background: rgba(20, 20, 40, 0.9);
+      border-color: rgba(248, 71, 225, 0.9);
     }
 
     /* Hide by default on desktop */
     @media (min-width: 769px) {
-      .mobile-expand-btn {
+      .mobile-expand-btn,
+      .mobile-collapse-btn {
         display: none !important;
       }
     }
@@ -413,38 +445,29 @@
         transform: translateY(-100%);
       }
 
+      /* Hide sidebar toggle on mobile - use mobile buttons instead */
       .sidebar-toggle {
-        left: 50%;
-        top: auto;
-        bottom: 0;
-        transform: translateX(-50%);
-        border-radius: 0 0 8px 8px;
-        border-top: none;
-        border-left: 1px solid rgba(255, 255, 255, 0.1);
-        width: 60px;
-        z-index: 102;
-      }
-
-      .simulation-sidebar:not(.collapsed) .sidebar-toggle {
-        bottom: 0;
-        top: auto;
-      }
-
-      .simulation-sidebar.collapsed .sidebar-toggle {
-        bottom: auto;
-        top: 70px;
-        border-radius: 8px 8px 0 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: none;
+        display: none;
       }
 
       /* Show mobile expand button only when sidebar is collapsed */
       .mobile-expand-btn {
-        display: none;
+        display: flex;
       }
 
       .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Show mobile collapse button only when sidebar is expanded */
+      .mobile-collapse-btn {
         display: flex;
+      }
+
+      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       .simulation-canvas-wrapper {
@@ -488,6 +511,7 @@
         right: auto;
         padding: 8px 15px;
         font-size: 12px;
+        z-index: 50;
       }
 
       .back-text {
@@ -568,6 +592,7 @@
         right: auto;
         padding: 6px 12px;
         font-size: 11px;
+        z-index: 50;
       }
     }
 
@@ -734,6 +759,9 @@
 
       <!-- Mobile Expand Button (visible only when sidebar collapsed on mobile) -->
       <button class="mobile-expand-btn" id="mobileExpandBtn">▼</button>
+
+      <!-- Mobile Collapse Button (visible only when sidebar expanded on mobile) -->
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">▲</button>
 
       <!-- Sidebar Control Button -->
       <div class="sidebar-control-btn" id="sidebarControlBtn">←</div>
@@ -1319,13 +1347,12 @@
         const toggle = document.getElementById('sidebarToggle');
         const controlBtn = document.getElementById('sidebarControlBtn');
         const mobileExpandBtn = document.getElementById('mobileExpandBtn');
+        const mobileCollapseBtn = document.getElementById('mobileCollapseBtn');
 
         const updateButtons = () => {
           const isCollapsed = this.sidebar.classList.contains('collapsed');
-          // Use arrows for mobile (▼ = expand down, ▲ = collapse up)
-          if (isMobile()) {
-            toggle.textContent = isCollapsed ? '▼' : '▲';
-          } else {
+          // Desktop toggle button
+          if (toggle && !isMobile()) {
             toggle.textContent = isCollapsed ? '☰' : '✕';
           }
           if (controlBtn) {
@@ -1333,10 +1360,12 @@
           }
         };
 
-        toggle.addEventListener('click', () => {
-          this.sidebar.classList.toggle('collapsed');
-          updateButtons();
-        });
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            this.sidebar.classList.toggle('collapsed');
+            updateButtons();
+          });
+        }
 
         if (controlBtn) {
           controlBtn.addEventListener('click', () => {
@@ -1349,6 +1378,14 @@
         if (mobileExpandBtn) {
           mobileExpandBtn.addEventListener('click', () => {
             this.sidebar.classList.remove('collapsed');
+            updateButtons();
+          });
+        }
+
+        // Mobile collapse button - collapses sidebar when clicked
+        if (mobileCollapseBtn) {
+          mobileCollapseBtn.addEventListener('click', () => {
+            this.sidebar.classList.add('collapsed');
             updateButtons();
           });
         }
