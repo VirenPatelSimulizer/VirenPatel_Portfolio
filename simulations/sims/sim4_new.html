@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Viren Patel - Redox Reaction Simulation">
+  <title>Redox Reaction Simulation - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E');
+  </script>
+
+  <style>
+    /* Simulation Container */
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .simulation-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 320px;
+      max-width: 320px;
+      height: 100%;
+      max-height: 100vh;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+
+    .simulation-sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      left: 0;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 101;
+    }
+
+    .simulation-sidebar:not(.collapsed) .sidebar-toggle {
+      left: 320px;
+    }
+
+    .simulation-sidebar.collapsed .sidebar-toggle {
+      left: 0;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(30, 30, 50, 0.95);
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #b0b0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-value {
+      float: right;
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .control-input {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .control-input::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-input::-moz-range-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Canvas Styles */
+    .simulation-canvas-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    #simulationCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* Back Button */
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateX(-3px);
+      color: #4a9eff;
+    }
+
+    .back-arrow {
+      font-size: 18px;
+      transition: transform 0.3s;
+    }
+
+    .back-button:hover .back-arrow {
+      transform: translateX(-3px);
+    }
+
+    /* Overlay Controls */
+    .simulation-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .simulation-overlay.active {
+      display: flex;
+    }
+
+    .overlay-button {
+      padding: 15px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .overlay-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+    }
+
+    .overlay-button.play {
+      background: rgba(74, 158, 255, 0.2);
+      border-color: #4a9eff;
+    }
+
+    .overlay-button.reset {
+      background: rgba(255, 74, 74, 0.2);
+      border-color: #ff4a4a;
+    }
+
+    /* Stats Display */
+    .simulation-stats {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      font-size: 12px;
+      line-height: 1.6;
+      z-index: 50;
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      gap: 8px;
+    }
+
+    .stat-value {
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .stat-neutral {
+      color: #aaaaaa;
+    }
+
+    .stat-positive {
+      color: #ff6b6b;
+    }
+
+    .stat-negative {
+      color: #4ecdc4;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .simulation-sidebar {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 50vh;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .simulation-sidebar.collapsed {
+        transform: translateY(-100%);
+      }
+
+      .sidebar-toggle {
+        display: none;
+      }
+
+      .back-button {
+        top: 10px;
+        left: 10px;
+        right: auto;
+        padding: 8px 15px;
+        font-size: 12px;
+      }
+
+      .back-text {
+        display: none;
+      }
+
+      .simulation-stats {
+        font-size: 10px;
+        padding: 10px;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel</a>
+      </div>
+      <div class="logo">
+        <a>Redox Reaction Simulation</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <!-- Sidebar -->
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+      <div class="sidebar-title">Simulation Controls</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Particle Count
+          <span class="control-value" id="particleCountValue">20</span>
+        </label>
+        <input type="range" class="control-input" id="particleCount" min="4" max="100" step="2" value="20">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Particle Speed
+          <span class="control-value" id="particleSpeedValue">2.0</span>
+        </label>
+        <input type="range" class="control-input" id="particleSpeed" min="0.5" max="5" step="0.1" value="2.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          EN Threshold
+          <span class="control-value" id="enThresholdValue">1.5</span>
+        </label>
+        <input type="range" class="control-input" id="enThreshold" min="0.5" max="3.0" step="0.1" value="1.5">
+        <small style="color: #888; font-size: 11px; display: block; margin-top: 5px;">
+          Electronegativity difference required for redox reaction
+        </small>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Coulomb Force
+          <span class="control-value" id="coulombForceValue">1.0</span>
+        </label>
+        <input type="range" class="control-input" id="coulombForce" min="0" max="3" step="0.1" value="1.0">
+        <small style="color: #888; font-size: 11px; display: block; margin-top: 5px;">
+          Strength of electrostatic forces between ions
+        </small>
+      </div>
+
+      <div class="control-group">
+        <div class="sidebar-title" style="font-size: 14px; margin-bottom: 10px;">Particle Type A (Metals)</div>
+        <label class="control-label">Element</label>
+        <select class="control-input" id="elementA" style="height: auto; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #e0e0e0;">
+          <option value="Na">Sodium (Na) → Na⁺</option>
+          <option value="K">Potassium (K) → K⁺</option>
+          <option value="Li">Lithium (Li) → Li⁺</option>
+          <option value="Mg">Magnesium (Mg) → Mg²⁺</option>
+          <option value="Ca">Calcium (Ca) → Ca²⁺</option>
+          <option value="Ba">Barium (Ba) → Ba²⁺</option>
+          <option value="Al">Aluminum (Al) → Al³⁺</option>
+        </select>
+        <small style="color: #888; font-size: 11px; display: block; margin-top: 5px;">
+          Electron donors (form cations)
+        </small>
+      </div>
+
+      <div class="control-group">
+        <div class="sidebar-title" style="font-size: 14px; margin-bottom: 10px;">Particle Type B (Non-metals)</div>
+        <label class="control-label">Element</label>
+        <select class="control-input" id="elementB" style="height: auto; padding: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #e0e0e0;">
+          <option value="Cl">Chlorine (Cl) → Cl⁻</option>
+          <option value="Br">Bromine (Br) → Br⁻</option>
+          <option value="I">Iodine (I) → I⁻</option>
+          <option value="O">Oxygen (O) → O²⁻</option>
+          <option value="S">Sulfur (S) → S²⁻</option>
+        </select>
+        <small style="color: #888; font-size: 11px; display: block; margin-top: 5px;">
+          Electron acceptors (form anions)
+        </small>
+      </div>
+    </div>
+
+    <!-- Canvas Wrapper -->
+    <div class="simulation-canvas-wrapper">
+      <canvas id="simulationCanvas"></canvas>
+
+      <!-- Back Button -->
+      <a href="../index.html" class="back-button">
+        <span class="back-arrow">←</span>
+        <span class="back-text">Back to Simulations</span>
+      </a>
+
+      <!-- Stats Display -->
+      <div class="simulation-stats" id="statsDisplay">
+        <div class="stat-item">
+          <span>FPS:</span>
+          <span class="stat-value" id="fpsValue">60</span>
+        </div>
+        <div class="stat-item">
+          <span>Neutral:</span>
+          <span class="stat-neutral" id="neutralCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Cations:</span>
+          <span class="stat-positive" id="cationCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Anions:</span>
+          <span class="stat-negative" id="anionCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Reactions:</span>
+          <span class="stat-value" id="reactionCount">0</span>
+        </div>
+      </div>
+
+      <!-- Overlay Controls -->
+      <div class="simulation-overlay active" id="simulationOverlay">
+        <button class="overlay-button play" id="playButton">Play</button>
+        <button class="overlay-button reset" id="resetButton">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * REDOX REACTION SIMULATION
+     * Demonstrates electron transfer in chemical reactions
+     */
+
+    // Element properties database (Ionic bond forming elements only)
+    // Radii in picometers (pm), scaled with Li⁺ (76 pm) as base unit = 1.0
+    const ELEMENTS = {
+      // Group 1 - Alkali metals (lose 1 electron)
+      'Na': { name: 'Sodium', en: 0.93, valence: 1, maxCharge: +1, minCharge: 0,
+              atomicRadius: 186, ionicRadius: 102, color: [255, 180, 0] },
+      'K': { name: 'Potassium', en: 0.82, valence: 1, maxCharge: +1, minCharge: 0,
+             atomicRadius: 227, ionicRadius: 138, color: [143, 64, 212] },
+      'Li': { name: 'Lithium', en: 0.98, valence: 1, maxCharge: +1, minCharge: 0,
+              atomicRadius: 152, ionicRadius: 76, color: [204, 128, 255] },
+
+      // Group 2 - Alkaline earth metals (lose 2 electrons)
+      'Mg': { name: 'Magnesium', en: 1.31, valence: 2, maxCharge: +2, minCharge: 0,
+              atomicRadius: 160, ionicRadius: 72, color: [200, 200, 200] },
+      'Ca': { name: 'Calcium', en: 1.00, valence: 2, maxCharge: +2, minCharge: 0,
+              atomicRadius: 197, ionicRadius: 100, color: [255, 255, 0] },
+      'Ba': { name: 'Barium', en: 0.89, valence: 2, maxCharge: +2, minCharge: 0,
+              atomicRadius: 215, ionicRadius: 135, color: [0, 201, 0] },
+
+      // Group 13 - (lose 3 electrons)
+      'Al': { name: 'Aluminum', en: 1.61, valence: 3, maxCharge: +3, minCharge: 0,
+              atomicRadius: 143, ionicRadius: 54, color: [192, 192, 192] },
+
+      // Group 16 - Chalcogens (gain 2 electrons)
+      'O': { name: 'Oxygen', en: 3.44, valence: 6, maxCharge: 0, minCharge: -2,
+             atomicRadius: 66, ionicRadius: 140, color: [255, 50, 50] },
+      'S': { name: 'Sulfur', en: 2.58, valence: 6, maxCharge: 0, minCharge: -2,
+             atomicRadius: 104, ionicRadius: 184, color: [255, 255, 100] },
+
+      // Group 17 - Halogens (gain 1 electron)
+      'Cl': { name: 'Chlorine', en: 3.16, valence: 7, maxCharge: 0, minCharge: -1,
+              atomicRadius: 99, ionicRadius: 181, color: [0, 255, 100] },
+      'Br': { name: 'Bromine', en: 2.96, valence: 7, maxCharge: 0, minCharge: -1,
+              atomicRadius: 114, ionicRadius: 196, color: [165, 42, 42] },
+      'I': { name: 'Iodine', en: 2.66, valence: 7, maxCharge: 0, minCharge: -1,
+             atomicRadius: 133, ionicRadius: 220, color: [148, 0, 211] }
+    };
+
+    // Simulation parameters
+    const params = {
+      particleCount: 20,
+      particleSpeed: 2.0,
+      enThreshold: 1.5,
+      coulombForce: 1.0,
+      elementA: 'Na',
+      elementB: 'Cl',
+      dt: 0.016
+    };
+
+    const BASE_RADIUS_SCALE = 0.15; // Scale factor for visual representation (pm to pixels)
+    const SMALLEST_IONIC_RADIUS = 54; // Al³⁺ has smallest ionic radius (54 pm)
+    const COLLISION_DISTANCE = 35;
+    const COULOMB_CONSTANT = 500;
+
+    let particles = [];
+    let totalReactions = 0;
+
+    // Particle class
+    class Particle {
+      constructor(x, y, element, speed, type) {
+        this.x = x;
+        this.y = y;
+        this.element = element;
+        this.type = type; // 'A' or 'B'
+        this.charge = 0; // Neutral initially
+
+        // Random velocity direction, same speed
+        const angle = Math.random() * Math.PI * 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+
+        // Element properties
+        this.en = ELEMENTS[element].en;
+        this.valence = ELEMENTS[element].valence;
+        this.maxCharge = ELEMENTS[element].maxCharge;
+        this.minCharge = ELEMENTS[element].minCharge;
+        this.atomicRadius = ELEMENTS[element].atomicRadius;
+        this.ionicRadius = ELEMENTS[element].ionicRadius;
+        this.baseColor = ELEMENTS[element].color;
+
+        // Set initial radius (neutral atom)
+        this.updateRadius();
+      }
+
+      updateRadius() {
+        // Use atomic radius when neutral, ionic radius when charged
+        const currentRadius = (this.charge === 0) ? this.atomicRadius : this.ionicRadius;
+
+        // Scale relative to smallest ion (Al³⁺ = 54 pm as base unit)
+        // Base visual size of smallest ion = 8 pixels
+        const baseSize = 8;
+        this.radius = (currentRadius / SMALLEST_IONIC_RADIUS) * baseSize;
+      }
+
+      getColor() {
+        if (this.charge === 0) {
+          // Neutral - base color
+          return `rgb(${this.baseColor[0]}, ${this.baseColor[1]}, ${this.baseColor[2]})`;
+        } else if (this.charge > 0) {
+          // Cation - reddish glow
+          return `rgb(${Math.min(255, this.baseColor[0] + 50)}, ${Math.max(0, this.baseColor[1] - 50)}, ${Math.max(0, this.baseColor[2] - 50)})`;
+        } else {
+          // Anion - bluish glow
+          return `rgb(${Math.max(0, this.baseColor[0] - 50)}, ${Math.max(0, this.baseColor[1] - 50)}, ${Math.min(255, this.baseColor[2] + 100)})`;
+        }
+      }
+
+      update(dt, width, height) {
+        // Update position
+        this.x += this.vx * dt * 60;
+        this.y += this.vy * dt * 60;
+
+        // Bounce off walls
+        if (this.x - this.radius < 0) {
+          this.x = this.radius;
+          this.vx = Math.abs(this.vx);
+        } else if (this.x + this.radius > width) {
+          this.x = width - this.radius;
+          this.vx = -Math.abs(this.vx);
+        }
+
+        if (this.y - this.radius < 0) {
+          this.y = this.radius;
+          this.vy = Math.abs(this.vy);
+        } else if (this.y + this.radius > height) {
+          this.y = height - this.radius;
+          this.vy = -Math.abs(this.vy);
+        }
+      }
+
+      draw(ctx) {
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.getColor();
+        ctx.fill();
+
+        // Glow effect
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = this.getColor();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw element symbol
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.element, this.x, this.y);
+
+        // Draw charge if not neutral
+        if (this.charge !== 0) {
+          ctx.font = 'bold 10px Inter';
+          const chargeText = this.charge > 0 ? `+${this.charge}` : `${this.charge}`;
+          ctx.fillText(chargeText, this.x + this.radius * 0.6, this.y - this.radius * 0.6);
+        }
+      }
+    }
+
+    // Check for collisions and redox reactions
+    function checkCollisions() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+
+          // Calculate distance
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Check if particles are close enough to collide
+          if (dist < COLLISION_DISTANCE) {
+            // Check if they're different types (can exchange electrons)
+            if (p1.type !== p2.type) {
+              // Check electronegativity difference
+              const enDiff = Math.abs(p1.en - p2.en);
+
+              if (enDiff >= params.enThreshold) {
+                // REDOX REACTION OCCURS!
+                const reactionOccurred = performRedoxReaction(p1, p2);
+                if (reactionOccurred) {
+                  totalReactions++;
+                }
+              }
+            }
+
+            // Elastic collision response
+            handleElasticCollision(p1, p2, dx, dy, dist);
+          }
+        }
+      }
+    }
+
+    // Perform electron transfer (redox reaction)
+    function performRedoxReaction(p1, p2) {
+      // Identify donor (lower EN) and acceptor (higher EN)
+      let donor, acceptor;
+
+      if (p1.en < p2.en) {
+        donor = p1;
+        acceptor = p2;
+      } else {
+        donor = p2;
+        acceptor = p1;
+      }
+
+      // Check if donor can still donate (hasn't reached max charge)
+      if (donor.charge >= donor.maxCharge) return false;
+
+      // Check if acceptor can still accept (hasn't reached min charge)
+      if (acceptor.charge <= acceptor.minCharge) return false;
+
+      // Calculate electrons to transfer based on remaining capacity
+      // Donor: can give away electrons up to maxCharge (from current charge)
+      const electronsToGive = donor.maxCharge - donor.charge;
+
+      // Acceptor: can accept electrons down to minCharge (from current charge)
+      const electronsToAccept = Math.abs(acceptor.charge - acceptor.minCharge);
+
+      // Transfer the minimum of what donor can give and acceptor can take
+      const electronsTransferred = Math.min(electronsToGive, electronsToAccept, 1); // Transfer 1 electron per collision
+
+      if (electronsTransferred > 0) {
+        // Update charges
+        donor.charge += electronsTransferred;  // Loses electrons (becomes more positive)
+        acceptor.charge -= electronsTransferred;  // Gains electrons (becomes more negative)
+
+        // Ensure charges don't exceed oxidation state limits
+        donor.charge = Math.min(donor.charge, donor.maxCharge);
+        acceptor.charge = Math.max(acceptor.charge, acceptor.minCharge);
+
+        // Update radii based on new charge state (atoms shrink when losing e⁻, expand when gaining e⁻)
+        donor.updateRadius();
+        acceptor.updateRadius();
+
+        console.log(`Redox: ${donor.element} → ${donor.element}${donor.charge > 0 ? '+' : ''}${donor.charge} | ${acceptor.element} → ${acceptor.element}${acceptor.charge < 0 ? '' : '+'}${acceptor.charge}`);
+        return true;
+      }
+      return false;
+    }
+
+    // Handle elastic collision physics
+    function handleElasticCollision(p1, p2, dx, dy, dist) {
+      if (dist === 0) return;
+
+      // Overlap correction
+      const overlap = p1.radius + p2.radius - dist;
+      if (overlap > 0) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+
+        // Separate particles
+        p1.x -= nx * overlap * 0.5;
+        p1.y -= ny * overlap * 0.5;
+        p2.x += nx * overlap * 0.5;
+        p2.y += ny * overlap * 0.5;
+
+        // Calculate relative velocity
+        const dvx = p2.vx - p1.vx;
+        const dvy = p2.vy - p1.vy;
+        const dvn = dvx * nx + dvy * ny;
+
+        // Only bounce if moving towards each other
+        if (dvn < 0) {
+          // Equal mass elastic collision
+          const impulse = dvn;
+          p1.vx += impulse * nx;
+          p1.vy += impulse * ny;
+          p2.vx -= impulse * nx;
+          p2.vy -= impulse * ny;
+        }
+      }
+    }
+
+    // Apply Coulombic forces between charged particles
+    function applyCoulombicForces() {
+      if (params.coulombForce === 0) return;
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+
+          // Only apply force if at least one is charged
+          if (p1.charge === 0 && p2.charge === 0) continue;
+
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const distSq = dx * dx + dy * dy;
+          const dist = Math.sqrt(distSq);
+
+          if (dist < 1) continue;
+
+          // Coulomb's law: F = k * q1 * q2 / r²
+          const force = (COULOMB_CONSTANT * params.coulombForce * p1.charge * p2.charge) / distSq;
+
+          // Normalize direction
+          const nx = dx / dist;
+          const ny = dy / dist;
+
+          // Apply force (negative for attraction, positive for repulsion)
+          const fx = -nx * force * params.dt;
+          const fy = -ny * force * params.dt;
+
+          p1.vx += fx;
+          p1.vy += fy;
+          p2.vx -= fx;
+          p2.vy -= fy;
+        }
+      }
+    }
+
+    // Initialize particles
+    function initParticles(canvas) {
+      particles = [];
+      totalReactions = 0;
+
+      const halfCount = Math.floor(params.particleCount / 2);
+      const margin = 30; // Margin from edges
+
+      // Create type A particles (lower EN - donors)
+      for (let i = 0; i < halfCount; i++) {
+        const x = margin + Math.random() * (canvas.width - margin * 2);
+        const y = margin + Math.random() * (canvas.height - margin * 2);
+        particles.push(new Particle(x, y, params.elementA, params.particleSpeed, 'A'));
+      }
+
+      // Create type B particles (higher EN - acceptors)
+      for (let i = 0; i < halfCount; i++) {
+        const x = margin + Math.random() * (canvas.width - margin * 2);
+        const y = margin + Math.random() * (canvas.height - margin * 2);
+        particles.push(new Particle(x, y, params.elementB, params.particleSpeed, 'B'));
+      }
+    }
+
+    // Main simulation object
+    const Simulation = {
+      canvas: null,
+      ctx: null,
+      isPaused: true,
+      lastTime: 0,
+      fps: 60,
+      frameCount: 0,
+      fpsTime: 0,
+
+      init(canvasElement) {
+        this.canvas = canvasElement;
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.createParticles();
+        this.lastTime = performance.now();
+        this.animate();
+      },
+
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+      },
+
+      createParticles() {
+        initParticles(this.canvas);
+      },
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+
+        this.frameCount++;
+        this.fpsTime += deltaTime;
+        if (this.fpsTime >= 1) {
+          this.fps = Math.round(this.frameCount / this.fpsTime);
+          this.frameCount = 0;
+          this.fpsTime = 0;
+        }
+
+        if (!this.isPaused) {
+          this.update(deltaTime);
+        }
+        this.draw();
+        this.updateStats();
+      },
+
+      update(dt) {
+        dt = Math.min(dt, 0.033);
+
+        // Apply Coulombic forces
+        applyCoulombicForces();
+
+        // Update particle positions
+        for (const p of particles) {
+          p.update(params.dt, this.canvas.width, this.canvas.height);
+        }
+
+        // Check for collisions and reactions
+        checkCollisions();
+      },
+
+      draw() {
+        this.ctx.fillStyle = 'rgba(10, 10, 10, 1)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw all particles
+        for (const p of particles) {
+          p.draw(this.ctx);
+        }
+      },
+
+      updateStats() {
+        document.getElementById('fpsValue').textContent = this.fps;
+
+        let neutral = 0, cations = 0, anions = 0;
+        for (const p of particles) {
+          if (p.charge === 0) neutral++;
+          else if (p.charge > 0) cations++;
+          else anions++;
+        }
+
+        document.getElementById('neutralCount').textContent = neutral;
+        document.getElementById('cationCount').textContent = cations;
+        document.getElementById('anionCount').textContent = anions;
+        document.getElementById('reactionCount').textContent = totalReactions;
+      },
+
+      reset() {
+        this.pause();
+        this.createParticles();
+        this.draw();
+      },
+
+      pause() {
+        this.isPaused = true;
+      },
+
+      play() {
+        this.isPaused = false;
+        this.lastTime = performance.now();
+      }
+    };
+
+    // UI Controller
+    const UIController = {
+      sidebar: null,
+      overlay: null,
+
+      init() {
+        this.sidebar = document.getElementById('simulationSidebar');
+        this.overlay = document.getElementById('simulationOverlay');
+
+        this.setupSidebarToggle();
+        this.setupControls();
+        this.setupOverlay();
+        this.setupCanvas();
+      },
+
+      setupSidebarToggle() {
+        const toggle = document.getElementById('sidebarToggle');
+
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            this.sidebar.classList.toggle('collapsed');
+            toggle.textContent = this.sidebar.classList.contains('collapsed') ? '☰' : '✕';
+          });
+        }
+      },
+
+      setupControls() {
+        // Particle count
+        document.getElementById('particleCount').addEventListener('input', (e) => {
+          params.particleCount = parseInt(e.target.value);
+          document.getElementById('particleCountValue').textContent = params.particleCount;
+        });
+
+        // Particle speed
+        document.getElementById('particleSpeed').addEventListener('input', (e) => {
+          params.particleSpeed = parseFloat(e.target.value);
+          document.getElementById('particleSpeedValue').textContent = params.particleSpeed.toFixed(1);
+        });
+
+        // EN threshold
+        document.getElementById('enThreshold').addEventListener('input', (e) => {
+          params.enThreshold = parseFloat(e.target.value);
+          document.getElementById('enThresholdValue').textContent = params.enThreshold.toFixed(1);
+        });
+
+        // Coulomb force
+        document.getElementById('coulombForce').addEventListener('input', (e) => {
+          params.coulombForce = parseFloat(e.target.value);
+          document.getElementById('coulombForceValue').textContent = params.coulombForce.toFixed(1);
+        });
+
+        // Element selection
+        document.getElementById('elementA').addEventListener('change', (e) => {
+          params.elementA = e.target.value;
+        });
+
+        document.getElementById('elementB').addEventListener('change', (e) => {
+          params.elementB = e.target.value;
+        });
+      },
+
+      setupOverlay() {
+        document.getElementById('playButton').addEventListener('click', () => {
+          Simulation.play();
+          this.hideOverlay();
+        });
+
+        document.getElementById('resetButton').addEventListener('click', () => {
+          Simulation.reset();
+          this.showOverlay();
+        });
+      },
+
+      setupCanvas() {
+        const canvas = document.getElementById('simulationCanvas');
+        canvas.addEventListener('click', () => {
+          Simulation.pause();
+          this.showOverlay();
+        });
+      },
+
+      showOverlay() {
+        this.overlay.classList.add('active');
+      },
+
+      hideOverlay() {
+        this.overlay.classList.remove('active');
+      }
+    };
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('simulationCanvas');
+      Simulation.init(canvas);
+      UIController.init();
+    });
+  </script>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -78,19 +78,39 @@
       <!-- Contact Form -->
       <!--div class="contact-form fade-in">
         <h2>Or Send a Message</h2>
-        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+
+          <!-- Web3Forms Access Key -->
+          <input type="hidden" name="access_key" value="c1a155b0-a3bd-4584-a2e6-fc7dcbd85b6a">
+
+          <!-- Optional: Email subject -->
+          <input type="hidden" name="subject" value="New Message from Viren Patel Portfolio">
+
+          <!-- Optional: From name -->
+          <input type="hidden" name="from_name" value="Viren Patel Portfolio">
+
+          <!-- Botcheck for spam protection -->
+          <input type="checkbox" name="botcheck" style="display:none;">
+
+          <!-- Form fields -->
           <div class="form-group">
             <input type="text" name="name" placeholder="Your Name" required>
           </div>
           <div class="form-group">
-            <input type="email" name="_replyto" placeholder="Your Email" required>
+            <input type="email" name="email" placeholder="Your Email" required>
           </div>
           <div class="form-group">
             <textarea name="message" placeholder="Your Message" required></textarea>
           </div>
-          <button type="submit" class="btn-primary">
-            <span>Send Message</span>
-          </button>
+
+          <!-- Submit button -->
+          <button type="submit" class="btn-primary"><span>Send Message</span></button>
+
+          <!-- Inline notification -->
+          <p id="form-notification" style="display:none; color: green; margin-top: 10px;">
+            ✅ Your message was sent successfully!
+          </p>
+
         </form>
       </div-->
       <div class="contact-form fade-in">

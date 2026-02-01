@@ -14,8 +14,8 @@
     .simulation-container {
       position: relative;
       width: 100%;
-      min-height: calc(100vh - 80px - 100px);
-      margin-top: 70px; /* space below navbar */
+      height: calc(100vh - 60px);
+      margin-top: 60px; /* space below navbar */
       display: flex;
       background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
       overflow: hidden;
@@ -27,13 +27,16 @@
       left: 0;
       top: 0;
       width: 300px;
+      max-width: 300px;
       height: 100%;
+      max-height: 100vh;
       background: rgba(20, 20, 40, 0.95);
       backdrop-filter: blur(10px);
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       padding: 20px;
       box-sizing: border-box;
-      /*overflow-y: auto;*/
+      overflow-y: auto;
+      overflow-x: hidden;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
       color: #e0e0e0;
@@ -240,6 +243,7 @@
       right: 20px;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       padding: 10px 20px;
       background: rgba(20, 20, 40, 0.9);
@@ -252,6 +256,8 @@
       font-weight: 500;
       transition: all 0.3s;
       z-index: 150;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     .back-button:hover {
@@ -270,42 +276,319 @@
       transform: translateX(-3px);
     }
 
-    
+    /* Info Button */
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 20px;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      transition: all 0.3s;
+      z-index: 150;
+    }
 
-    @media (max-width: 768px) {
-      .back-button {
-        top: 10px;
-        right: 10px;
-        padding: 8px 15px;
-        font-size: 12px;
-      }
-      
-      .back-text {
-        display: none;
-      }
-      
-      .back-arrow {
-        font-size: 20px;
+    .info-button:hover {
+      background: rgba(107, 92, 231, 0.3);
+      border-color: #6b5ce7;
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    /* Mobile Expand Button */
+    .mobile-expand-btn {
+      position: fixed;
+      right: 20px;
+      top: 80px;
+      width: 50px;
+      height: 50px;
+      background: rgba(137, 74, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(137, 74, 255, 0.3);
+      border-radius: 50%;
+      color: rgba(137, 74, 255, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-expand-btn:active {
+      transform: scale(0.9);
+      background: rgba(20, 20, 40, 0.9);
+      border-color: rgba(137, 74, 255, 0.9);
+    }
+
+    /* Mobile Collapse Button */
+    .mobile-collapse-btn {
+      position: fixed;
+      right: 20px;
+      top: calc(50vh + 10px);
+      width: 50px;
+      height: 50px;
+      background: rgba(248, 71, 225, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(248, 71, 225, 0.4);
+      border-radius: 50%;
+      color: rgba(248, 71, 225, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-collapse-btn:active {
+      transform: scale(0.9);
+      background: rgba(20, 20, 40, 0.9);
+      border-color: rgba(248, 71, 225, 0.9);
+    }
+
+    /* Hide by default on desktop */
+    @media (min-width: 769px) {
+      .mobile-expand-btn,
+      .mobile-collapse-btn {
+        display: none !important;
       }
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
       .simulation-sidebar {
-        width: 250px;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 50vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        top: 60px;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        position: fixed;
+        transform: translateY(0);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .simulation-sidebar.collapsed {
-        transform: translateX(-250px);
+        transform: translateY(calc(-100% - 60px));
       }
 
-      .simulation-canvas-wrapper.sidebar-visible {
-        margin-left: 250px;
+      /* Hide sidebar toggle on mobile - use mobile buttons instead */
+      .sidebar-toggle {
+        display: none;
+      }
+
+      /* Show mobile expand button only when sidebar is collapsed */
+      .mobile-expand-btn {
+        display: flex;
+      }
+
+      .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Show mobile collapse button only when sidebar is expanded */
+      .mobile-collapse-btn {
+        display: flex;
+      }
+
+      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .simulation-canvas-wrapper {
+        padding-top: 0;
+      }
+
+      .sidebar-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+      }
+
+      .control-label {
+        font-size: 11px;
+      }
+
+      .control-value {
+        font-size: 11px;
+      }
+
+      .control-group {
+        margin-bottom: 15px;
       }
 
       .overlay-button {
-        padding: 12px 30px;
+        padding: 10px 25px;
+        font-size: 13px;
+      }
+
+      .back-button {
+        top: 10px;
+        left: 10px;
+        right: auto;
+        padding: 10px;
+        font-size: 12px;
+        z-index: 50;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .back-text {
+        display: none;
+      }
+
+      .back-arrow {
+        font-size: 24px;
+      }
+
+      .info-button {
+        top: 10px;
+        left: 60px;
+        right: auto;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        z-index: 50;
+      }
+
+      .simulation-stats {
+        font-size: 9px;
+        padding: 8px 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+        top: 10px;
+      }
+
+      .stat-item {
+        gap: 5px;
+      }
+
+      .distribution-plot {
+        bottom: 10px;
+        right: 10px;
+        padding: 10px;
+      }
+
+      #plotCanvas {
+        width: 200px;
+        height: 100px;
+      }
+
+      .simulation-container {
+        height: calc(100vh - 60px);
+        margin-top: 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .simulation-sidebar {
+        padding: 15px;
+      }
+
+      .sidebar-title {
         font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .control-label {
+        font-size: 10px;
+      }
+
+      .control-value {
+        font-size: 10px;
+      }
+
+      .control-group {
+        margin-bottom: 12px;
+      }
+
+      .control-input {
+        height: 5px;
+      }
+
+      .control-input::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+      }
+
+      .control-input::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+      }
+
+      .overlay-button {
+        padding: 8px 20px;
+        font-size: 12px;
+      }
+
+      .simulation-stats {
+        font-size: 8px;
+        padding: 6px 8px;
+        gap: 6px;
+      }
+
+      .back-button {
+        left: 10px;
+        right: auto;
+        padding: 8px;
+        font-size: 11px;
+        z-index: 50;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+      }
+
+      .back-arrow {
+        font-size: 20px;
+      }
+    }
+
+    /* Landscape mobile optimization */
+    @media (max-width: 896px) and (orientation: landscape) {
+      .simulation-sidebar {
+        max-height: 40vh;
+      }
+
+      .control-group {
+        margin-bottom: 10px;
+      }
+
+      .sidebar-title {
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .simulation-stats {
+        font-size: 8px;
+        padding: 5px 8px;
       }
     }
 
@@ -591,43 +874,6 @@
       cursor: pointer;
     }
 
-    /* Back Button */
-    .back-button {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: rgba(20, 20, 40, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      color: #e0e0e0;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s;
-      z-index: 150;
-    }
-
-    .back-button:hover {
-      background: rgba(30, 30, 50, 0.95);
-      border-color: #4a9eff;
-      transform: translateX(-3px);
-      color: #4a9eff;
-    }
-
-    .back-arrow {
-      font-size: 18px;
-      transition: transform 0.3s;
-    }
-
-    .back-button:hover .back-arrow {
-      transform: translateX(-3px);
-    }
-
     /* Overlay Controls */
     .simulation-overlay {
       position: absolute;
@@ -704,9 +950,67 @@
       font-weight: 600;
     }
 
-    
+    /* Distribution Plot */
+    .distribution-plot {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 50;
+    }
 
-    
+    #plotCanvas {
+      display: block;
+    }
+
+    /* Nav Info Button */
+    .nav-info-btn {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%) !important;
+      padding: 8px 16px !important;
+      border-radius: 20px !important;
+      color: #fff !important;
+      font-weight: 500 !important;
+      transition: all 0.3s !important;
+    }
+
+    .nav-info-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(107, 92, 231, 0.4);
+    }
+
+    /* Mobile Menu - Force display on small screens */
+    @media (max-width: 768px) {
+      header nav {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+
+      .mobile-menu-toggle {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer !important;
+        padding: 5px !important;
+        z-index: 1001 !important;
+      }
+
+      .mobile-menu-toggle span {
+        display: block !important;
+        width: 28px !important;
+        height: 3px !important;
+        background: #e0e0e0 !important;
+        border-radius: 2px !important;
+        transition: all 0.3s !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -719,11 +1023,17 @@
       <div class="logo">
         <a href="index.html">Brownian Motion Simulation</a>
       </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <ul class="nav-links">
-        <li><a href="#hero">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="simulations/index.html">Simulations</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+        <li><a href="sim1_info.html" class="nav-info-btn">ⓘ Info</a></li>
       </ul>
     </nav>
   </header>
@@ -795,7 +1105,16 @@
     <!-- Canvas Wrapper -->
     <div class="simulation-canvas-wrapper">
       <canvas id="simulationCanvas"></canvas>
-      
+
+      <!-- Mobile Expand Button (visible only when sidebar collapsed on mobile) -->
+      <button class="mobile-expand-btn" id="mobileExpandBtn">►</button>
+
+      <!-- Mobile Collapse Button (visible only when sidebar expanded on mobile) -->
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">◄</button>
+
+      <!-- Info Button 
+      <a href="sim1_info.html" class="info-button" title="Simulation Info">i</a>
+      -->
       <!-- Back Button -->
       <a href="../index.html" class="back-button" id="backButton">
         <span class="back-arrow">←</span>
@@ -816,6 +1135,11 @@
           <span>Variety:</span>
           <span class="stat-value" id="currentVariety">1</span>
         </div>
+      </div>
+
+      <!-- Distribution Plot -->
+      <div class="distribution-plot" id="distributionPlot">
+        <canvas id="plotCanvas" width="180" height="180"></canvas>
       </div>
 
       <!-- Overlay Controls -->
@@ -956,22 +1280,20 @@
         }
       }
 
-      // Bounce off canvas boundaries
+      // Wrap around canvas boundaries (periodic/toroidal)
       bounceOffWalls(width, height, elasticity) {
-        if (this.x - this.radius < 0) {
-          this.x = this.radius;
-          this.vx = Math.abs(this.vx) * elasticity;
-        } else if (this.x + this.radius > width) {
-          this.x = width - this.radius;
-          this.vx = -Math.abs(this.vx) * elasticity;
+        // Wrap horizontally - exit right, enter left and vice versa
+        if (this.x < 0) {
+          this.x += width;
+        } else if (this.x > width) {
+          this.x -= width;
         }
 
-        if (this.y - this.radius < 0) {
-          this.y = this.radius;
-          this.vy = Math.abs(this.vy) * elasticity;
-        } else if (this.y + this.radius > height) {
-          this.y = height - this.radius;
-          this.vy = -Math.abs(this.vy) * elasticity;
+        // Wrap vertically - exit bottom, enter top and vice versa
+        if (this.y < 0) {
+          this.y += height;
+        } else if (this.y > height) {
+          this.y -= height;
         }
       }
 
@@ -1151,6 +1473,342 @@
         document.getElementById('fpsValue').textContent = this.fps;
         document.getElementById('totalParticles').textContent = this.particles.length;
         document.getElementById('currentVariety').textContent = params.variety;
+        this.drawDistribution();
+      },
+
+      // Draw distribution plot - linear for 1-2 types, polar contour for 3+
+      drawDistribution() {
+        const plotCanvas = document.getElementById('plotCanvas');
+        if (!plotCanvas) return;
+
+        // Use linear plot for 1-2 particle types, polar for 3+
+        if (params.variety <= 2) {
+          this.drawLinearDistribution(plotCanvas);
+        } else {
+          this.drawPolarContour(plotCanvas);
+        }
+      },
+
+      // Linear smooth distribution plot for 1-2 particle types
+      drawLinearDistribution(plotCanvas) {
+        const ctx = plotCanvas.getContext('2d');
+        const width = plotCanvas.width;
+        const height = plotCanvas.height;
+
+        // Clear canvas
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.8)';
+        ctx.fillRect(0, 0, width, height);
+
+        // Create bins for histogram - one set per particle type
+        const numBins = 50;
+        const binsByType = [];
+        for (let type = 0; type < params.variety; type++) {
+          binsByType[type] = new Array(numBins).fill(0);
+        }
+        const canvasWidth = this.canvas.width;
+
+        // Count particles in each bin by type
+        for (const particle of this.particles) {
+          const binIndex = Math.floor((particle.x / canvasWidth) * numBins);
+          if (binIndex >= 0 && binIndex < numBins && particle.type < params.variety) {
+            binsByType[particle.type][binIndex]++;
+          }
+        }
+
+        // Find max for scaling across all types
+        let maxCount = 1;
+        for (const bins of binsByType) {
+          maxCount = Math.max(maxCount, ...bins);
+        }
+
+        const binWidth = width / numBins;
+
+        // Draw each particle type as a filled line plot with smooth curves
+        for (let type = 0; type < params.variety; type++) {
+          const bins = binsByType[type];
+          const color = PARTICLE_COLORS[type];
+
+          // Apply smoothing
+          const smoothedBins = [];
+          const smoothWindow = 2;
+
+          for (let i = 0; i < numBins; i++) {
+            let sum = 0;
+            let count = 0;
+            for (let j = Math.max(0, i - smoothWindow); j <= Math.min(numBins - 1, i + smoothWindow); j++) {
+              sum += bins[j];
+              count++;
+            }
+            smoothedBins[i] = sum / count;
+          }
+
+          // Create smooth curve using quadratic curves
+          ctx.beginPath();
+          ctx.moveTo(0, height - 15);
+
+          let x0 = binWidth / 2;
+          let y0 = height - 15 - (smoothedBins[0] / maxCount) * (height - 30);
+          ctx.lineTo(x0, y0);
+
+          for (let i = 0; i < numBins - 1; i++) {
+            const x1 = (i + 1) * binWidth + binWidth / 2;
+            const y1 = height - 15 - (smoothedBins[i + 1] / maxCount) * (height - 30);
+            const cpX = (x0 + x1) / 2;
+            const cpY = (y0 + y1) / 2;
+            ctx.quadraticCurveTo(x0, y0, cpX, cpY);
+            x0 = x1;
+            y0 = y1;
+          }
+
+          ctx.lineTo(x0, y0);
+          ctx.lineTo(width, height - 15);
+          ctx.closePath();
+
+          ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`;
+          ctx.fill();
+
+          // Draw stroke
+          ctx.beginPath();
+          x0 = binWidth / 2;
+          y0 = height - 15 - (smoothedBins[0] / maxCount) * (height - 30);
+          ctx.moveTo(x0, y0);
+
+          for (let i = 0; i < numBins - 1; i++) {
+            const x1 = (i + 1) * binWidth + binWidth / 2;
+            const y1 = height - 15 - (smoothedBins[i + 1] / maxCount) * (height - 30);
+            const cpX = (x0 + x1) / 2;
+            const cpY = (y0 + y1) / 2;
+            ctx.quadraticCurveTo(x0, y0, cpX, cpY);
+            x0 = x1;
+            y0 = y1;
+          }
+
+          ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`;
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+        }
+
+        // Draw axis
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, height - 15);
+        ctx.lineTo(width, height - 15);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('X Position Distribution', width / 2, 12);
+      },
+
+      // Polar contour plot with lines for 3+ particle types
+      drawPolarContour(plotCanvas) {
+        const ctx = plotCanvas.getContext('2d');
+        const width = plotCanvas.width;
+        const height = plotCanvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const maxRadius = Math.min(width, height) / 2 - 5;
+
+        // Clear canvas
+        ctx.fillStyle = 'rgba(15, 12, 8, 1)';
+        ctx.fillRect(0, 0, width, height);
+
+        const canvasWidth = this.canvas.width;
+        const canvasHeight = this.canvas.height;
+
+        // Create 2D density grid
+        const gridSize = 50;
+        const densityByType = [];
+
+        for (let type = 0; type < params.variety; type++) {
+          densityByType[type] = [];
+          for (let y = 0; y < gridSize; y++) {
+            densityByType[type][y] = new Array(gridSize).fill(0);
+          }
+        }
+
+        // Map particles to grid with Gaussian kernel
+        const kernelRadius = 3;
+        const sigma = 1.5;
+        for (const particle of this.particles) {
+          const px = (particle.x / canvasWidth) * gridSize;
+          const py = (particle.y / canvasHeight) * gridSize;
+          const gx = Math.floor(px);
+          const gy = Math.floor(py);
+
+          if (particle.type < params.variety) {
+            for (let dy = -kernelRadius; dy <= kernelRadius; dy++) {
+              for (let dx = -kernelRadius; dx <= kernelRadius; dx++) {
+                const nx = gx + dx;
+                const ny = gy + dy;
+                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize) {
+                  const dist = Math.sqrt(dx * dx + dy * dy);
+                  const weight = Math.exp(-(dist * dist) / (2 * sigma * sigma));
+                  densityByType[particle.type][ny][nx] += weight;
+                }
+              }
+            }
+          }
+        }
+
+        // Multiple smoothing passes
+        const smoothed = [];
+        for (let type = 0; type < params.variety; type++) {
+          let current = densityByType[type];
+          for (let pass = 0; pass < 2; pass++) {
+            const next = [];
+            for (let y = 0; y < gridSize; y++) {
+              next[y] = new Array(gridSize).fill(0);
+              for (let x = 0; x < gridSize; x++) {
+                let sum = 0, count = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                  for (let dx = -1; dx <= 1; dx++) {
+                    const ny = y + dy, nx = x + dx;
+                    if (ny >= 0 && ny < gridSize && nx >= 0 && nx < gridSize) {
+                      sum += current[ny][nx];
+                      count++;
+                    }
+                  }
+                }
+                next[y][x] = sum / count;
+              }
+            }
+            current = next;
+          }
+          smoothed[type] = current;
+        }
+
+        // Find max density per type
+        const maxDensityByType = [];
+        for (let type = 0; type < params.variety; type++) {
+          let max = 0.001;
+          for (const row of smoothed[type]) {
+            max = Math.max(max, ...row);
+          }
+          maxDensityByType[type] = max;
+        }
+
+        // Marching squares helper - interpolate edge crossing point
+        const interpolate = (v1, v2, threshold) => {
+          if (Math.abs(v2 - v1) < 0.0001) return 0.5;
+          return (threshold - v1) / (v2 - v1);
+        };
+
+        // Grid to plot coordinates
+        const toPlotX = (x) => centerX + (x - gridSize / 2) * (maxRadius * 2 / gridSize);
+        const toPlotY = (y) => centerY + (y - gridSize / 2) * (maxRadius * 2 / gridSize);
+
+        // Contour levels (percentage of max)
+        const contourLevels = [0.08, 0.16, 0.24, 0.32, 0.42, 0.52, 0.64, 0.76, 0.88];
+
+        // Draw each particle type
+        for (let type = params.variety - 1; type >= 0; type--) {
+          const grid = smoothed[type];
+          const color = PARTICLE_COLORS[type];
+          const maxD = maxDensityByType[type];
+
+          // Draw filled regions with transparency for overlap blending
+          for (let levelIdx = 0; levelIdx < contourLevels.length; levelIdx++) {
+            const threshold = contourLevels[levelIdx] * maxD;
+            // Alpha increases with density level for gradient effect
+            const alpha = 0.08 + (levelIdx / contourLevels.length) * 0.15;
+
+            ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+
+            // Fill cells above threshold
+            const cellW = (maxRadius * 2) / gridSize;
+            for (let y = 0; y < gridSize - 1; y++) {
+              for (let x = 0; x < gridSize - 1; x++) {
+                if (grid[y][x] >= threshold) {
+                  const px = toPlotX(x);
+                  const py = toPlotY(y);
+                  ctx.fillRect(px, py, cellW + 0.5, cellW + 0.5);
+                }
+              }
+            }
+          }
+
+          // Draw contour lines using marching squares
+          ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.7)`;
+          ctx.lineWidth = 1;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+
+          for (const levelPct of contourLevels) {
+            const threshold = levelPct * maxD;
+
+            for (let y = 0; y < gridSize - 1; y++) {
+              for (let x = 0; x < gridSize - 1; x++) {
+                // Get corner values
+                const tl = grid[y][x];
+                const tr = grid[y][x + 1];
+                const br = grid[y + 1][x + 1];
+                const bl = grid[y + 1][x];
+
+                // Marching squares case
+                let caseIndex = 0;
+                if (tl >= threshold) caseIndex |= 1;
+                if (tr >= threshold) caseIndex |= 2;
+                if (br >= threshold) caseIndex |= 4;
+                if (bl >= threshold) caseIndex |= 8;
+
+                if (caseIndex === 0 || caseIndex === 15) continue;
+
+                // Calculate interpolated edge points
+                const top = interpolate(tl, tr, threshold);
+                const right = interpolate(tr, br, threshold);
+                const bottom = interpolate(bl, br, threshold);
+                const left = interpolate(tl, bl, threshold);
+
+                const px = toPlotX(x);
+                const py = toPlotY(y);
+                const cellW = (maxRadius * 2) / gridSize;
+
+                const points = {
+                  top: { x: px + top * cellW, y: py },
+                  right: { x: px + cellW, y: py + right * cellW },
+                  bottom: { x: px + bottom * cellW, y: py + cellW },
+                  left: { x: px, y: py + left * cellW }
+                };
+
+                // Draw line segments based on case
+                const drawLine = (p1, p2) => {
+                  ctx.beginPath();
+                  ctx.moveTo(p1.x, p1.y);
+                  ctx.lineTo(p2.x, p2.y);
+                  ctx.stroke();
+                };
+
+                switch (caseIndex) {
+                  case 1: case 14: drawLine(points.top, points.left); break;
+                  case 2: case 13: drawLine(points.top, points.right); break;
+                  case 3: case 12: drawLine(points.left, points.right); break;
+                  case 4: case 11: drawLine(points.right, points.bottom); break;
+                  case 5:
+                    drawLine(points.top, points.right);
+                    drawLine(points.bottom, points.left);
+                    break;
+                  case 6: case 9: drawLine(points.top, points.bottom); break;
+                  case 7: case 8: drawLine(points.left, points.bottom); break;
+                  case 10:
+                    drawLine(points.top, points.left);
+                    drawLine(points.right, points.bottom);
+                    break;
+                }
+              }
+            }
+          }
+        }
+
+        // Label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Density Contours', centerX, 10);
       },
 
       // Reset simulation
@@ -1193,12 +1851,41 @@
       },
 
       setupSidebarToggle() {
-          const toggle = document.getElementById('sidebarToggle');
+        const toggle = document.getElementById('sidebarToggle');
+        const mobileExpandBtn = document.getElementById('mobileExpandBtn');
+        const mobileCollapseBtn = document.getElementById('mobileCollapseBtn');
+
+        const updateButtons = () => {
+          const isCollapsed = this.sidebar.classList.contains('collapsed');
+          if (toggle) {
+            toggle.textContent = isCollapsed ? '☰' : '✕';
+          }
+        };
+
+        if (toggle) {
           toggle.addEventListener('click', () => {
-          this.sidebar.classList.toggle('collapsed');
-          toggle.textContent = this.sidebar.classList.contains('collapsed') ? '☰' : '✕';
+            this.sidebar.classList.toggle('collapsed');
+            updateButtons();
           });
-          },
+        }
+
+        if (mobileExpandBtn) {
+          mobileExpandBtn.addEventListener('click', () => {
+            this.sidebar.classList.remove('collapsed');
+            updateButtons();
+          });
+        }
+
+        if (mobileCollapseBtn) {
+          mobileCollapseBtn.addEventListener('click', () => {
+            this.sidebar.classList.add('collapsed');
+            updateButtons();
+          });
+        }
+
+        updateButtons();
+        window.addEventListener('resize', updateButtons);
+      },
 
       setupControls() {
         // Variety
@@ -1292,9 +1979,16 @@
 
       setupCanvas() {
         const canvas = document.getElementById('simulationCanvas');
-        canvas.addEventListener('click', () => {
+
+        const pauseSimulation = () => {
           Simulation.pause();
           this.showOverlay();
+        };
+
+        canvas.addEventListener('click', pauseSimulation);
+        canvas.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          pauseSimulation();
         });
       },
 
@@ -1307,11 +2001,25 @@
       }
     };
 
+    // Mobile detection
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    }
+
     // Initialize everything on page load
     window.addEventListener('DOMContentLoaded', () => {
       const canvas = document.getElementById('simulationCanvas');
       Simulation.init(canvas, params);
       UIController.init();
+
+      // Start with sidebar collapsed on mobile
+      if (isMobile()) {
+        const sidebar = document.getElementById('simulationSidebar');
+        if (sidebar) {
+          sidebar.classList.add('collapsed');
+        }
+      }
+
     });
   </script>
 
