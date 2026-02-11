@@ -1,0 +1,315 @@
+# Semiconductor Backend Assembly & Test Simulation Tool
+## Comprehensive Feature Summary
+
+---
+
+## OVERVIEW
+
+This interactive web-based simulation tool models the complete semiconductor backend assembly and test manufacturing flow. It enables engineers and quality professionals to visualize, simulate, and analyze how variability propagates through the manufacturing process, from raw material sources to final tested output. The tool specifically focuses on comparing Static PAT (SPAT) vs Dynamic PAT (DPAT) limit methodologies for defect screening.
+
+---
+
+## CORE CAPABILITIES
+
+### Visual Node-Based Graph Editor
+- Drag-and-drop interface for building manufacturing flow diagrams
+- Real-time connection drawing between nodes
+- Pan and zoom controls for navigating complex layouts
+- Multi-select nodes with shift+click or selection box
+- Copy/paste functionality for duplicating node configurations
+- Right-click to delete nodes or connections
+- Double-click connections to edit operation type and weights
+
+### Manufacturing Flow Simulation
+- Simulates component lots flowing through assembly equipment
+- Models module building from multiple component sources
+- Tracks lot genealogy through the entire process
+- Applies cumulative variability effects at each stage
+- Generates realistic test measurement distributions
+
+---
+
+## NODE TYPES
+
+### 1. Material Source (Blue)
+- Represents raw material or wafer input
+- OUTPUT ONLY - no incoming connections allowed
+- Cannot connect to other source nodes
+- Parameters:
+  - Lot Size: Units per component lot
+  - Component Count To Module (CCTM): How many components from this source are needed per module
+  - Lot-to-lot mean and sigma variation
+  - Drift rate and step-shift probability
+- Required: At least one source must exist for simulation to run
+
+### 2. Component Source (Green)
+- Similar to Material Source for secondary components
+- OUTPUT ONLY node
+- Configurable CCTM for BOM (Bill of Materials) recipes
+- Supports multiple component types feeding into assembly
+
+### 3. Assembly Equipment (Purple)
+- Combines components into modules
+- MULTIPLE INPUTS allowed from different sources
+- MULTIPLE OUTPUTS with weighted distribution (must sum to 100%)
+- Can connect to: Assembly, Tester, Output, Transport
+- Parameters:
+  - Assembly yield loss probability
+  - Alignment error variation
+  - Wire bonding / die attach variation
+  - Drift and step-shift characteristics
+- Supports assembly-to-assembly chaining (A1 -> A2)
+
+### 4. Transport Node (Light Blue) - NEW
+- Models material movement between locations
+- MUST have both input AND output connected
+- Simulates handling-induced damage:
+  - ESD (Electrostatic Discharge) damage probability
+  - Physical handling damage probability
+  - Temperature excursion events
+  - General handling stress
+- Damage causes units to become outliers (shifted by configurable sigma magnitude)
+
+### 5. Tester (Orange)
+- Performs electrical/parametric testing on modules
+- Parameters:
+  - Test lot capacity (batch size)
+  - Contact resistance variation
+  - Temperature coefficient
+  - Calibration drift
+  - Repeatability and reproducibility (R&R)
+- Can connect to Output or another Tester (multi-stage testing)
+- Supports binning with configurable limits
+
+### 6. Firmware Mode (Pink)
+- Each node represents ONE specific firmware variant
+- Connect multiple FW nodes to a Tester for multi-firmware testing
+- Connection weights determine lot distribution percentage
+- Split modes: Random (probabilistic) or Sequential (first X%, then rest)
+- Parameters per variant:
+  - Mean offset (in sigma units)
+  - Sigma multiplier
+- Predefined variants: FW-A, FW-B, FW-C, FW-D with distinct profiles
+
+### 7. Thermal Condition (Yellow)
+- Models temperature-dependent behavior
+- Predefined instances: Hot (85C), Room (25C), Cold (-40C)
+- Each temperature has mean effect and sigma effect multipliers
+- Uses multiplicative operation by default
+
+### 8. Measurement Chain (Cyan)
+- Models test equipment degradation over time
+- Parameters:
+  - Degradation rate
+  - Maintenance threshold (triggers reset)
+  - Contact wear effects
+
+### 9. Routing / Rework (Orange)
+- Models different process flows
+- Instances: Standard Flow, Burn-in Path, Retest Insert, Rework Path
+- Each path has distinct mean and sigma effects
+
+### 10. Output Node (White)
+- Multiple outputs can exist in a single simulation
+- Checkbox to select which output shows the plot (radio behavior - only one at a time)
+- Parameters:
+  - Measurement name (e.g., "Iread", "Vth", "Ron")
+  - Measurement unit (e.g., "mA", "V", "Ohm")
+  - Target mean value
+  - Lower Spec Limit (LSL)
+  - Upper Spec Limit (USL)
+  - Total modules to simulate
+
+---
+
+## CONNECTION SYSTEM
+
+### Connection Types (Operations)
+- (+) Additive: Contributions sum together (default)
+- (-) Subtractive: Contribution is subtracted
+- (*) Multiplicative: Contribution multiplies the value
+- (/) Divisive: Contribution divides the value
+
+### Connection Weights
+- When a node has multiple outputs, weights determine distribution
+- Weights automatically balance to sum to 100%
+- Lock individual weights to prevent auto-adjustment
+- Visual weight labels displayed on connections
+
+### Connection Validation Rules
+- Source nodes cannot connect to each other
+- Output nodes have no outgoing connections
+- Source nodes have no incoming connections
+- Respects each node type's "canConnectTo" restrictions
+- Prevents circular connections (cycle detection)
+- Shows error notification when invalid connection attempted
+
+---
+
+## SIMULATION ENGINE
+
+### Manufacturing Flow Model
+1. Component lots are generated from source nodes with lot-to-lot variation
+2. Components are consumed according to BOM (CCTM values)
+3. Modules are assembled with assembly equipment effects
+4. Modules are routed through testers based on graph topology
+5. Tester adds measurement variation to each module
+6. Results are grouped into test lots based on tester capacity
+
+### Variability Parameters (Per Node)
+- Base Mean Contribution: Constant offset to measurement
+- Base Sigma Contribution: Added variance
+- Mean Delta (sigma units): Lot-to-lot mean variation range
+- Noise Factor: Random sigma variation per lot
+- Drift Rate: Gradual mean shift over time
+- Step Shift Probability: Chance of sudden mean jump
+- Step Shift Magnitude: Size of sudden jumps (in sigma)
+
+### Defect Modeling
+- True defects: Units exceeding defect threshold
+- Process defects: Rare extreme outliers (8+ sigma)
+- Intermittent defects: Units that sometimes appear defective
+- Configurable intermittent rate and spike probability
+
+---
+
+## PAT (Part Average Testing) ANALYSIS
+
+### Static PAT (SPAT)
+- Fixed limits calculated from training lots
+- Uses Median + k*MAD (Median Absolute Deviation)
+- More robust to outliers than mean/sigma
+- Optional periodic refresh of limits
+- Training period configurable (default: 30 lots)
+
+### Dynamic PAT (DPAT)
+- Rolling window limits that adapt over time
+- Window size configurable (default: 10 lots)
+- Modes: Unstratified or Stratified by conditions
+- Better at tracking process drift
+
+### PAT Metrics Displayed
+- Fallout rate (% units failing PAT)
+- Escape rate (% defects passing PAT)
+- False reject count
+- Escape count
+- Total defects detected
+- Comparison between SPAT and DPAT performance
+
+---
+
+## VISUALIZATION
+
+### Lot Distribution Plot
+- Box plots showing measurement distribution per lot
+- Color coding by selected node (routing visualization)
+- True defects marked with red dots
+- Process defects marked with orange dots
+- Training period indicator
+- SPAT limits (dashed lines)
+- DPAT limits (solid lines tracking over time)
+- Defect threshold line
+
+### Node Highlighting
+- Click any node to highlight lots that passed through it
+- Visual tracing of routing paths
+- Firmware variant coloring when FW node selected
+
+### PAT Limits Plot
+- Shows SPAT upper/lower limits
+- Shows DPAT limits evolution over time
+- Training region clearly marked
+
+### Escapes & Fallout Plot
+- Cumulative escape and fallout tracking
+- Visual comparison of SPAT vs DPAT screening effectiveness
+
+---
+
+## USER INTERFACE
+
+### Status Bar
+- Run/Pause/Reset simulation controls
+- Current simulation status
+- Lot progress counter
+- Export/Import layout buttons
+- Export simulation data button
+
+### Sidebar Controls
+- Preset scenarios (Stable, Mix Change, Tester Drift, Chaos, Firmware)
+- Basic parameters (lots, baseline mean/sigma)
+- SPAT settings (training lots, k-factor)
+- DPAT settings (window size, mode)
+- Advanced PAT options (periodic refresh, stratification)
+- Defect settings (limit, intermittent rate)
+- Firmware variants list
+- Random seed for reproducibility
+
+### Node Properties Panel
+- Appears when node is selected
+- Full parameter editing for each node type
+- Real-time updates to graph
+
+---
+
+## DATA MANAGEMENT
+
+### Export Layout
+- Saves complete graph configuration to JSON file
+- Includes: All nodes with positions and parameters
+- Includes: All connections with weights and operations
+- Includes: Simulation settings
+- Includes: Zoom and pan state
+
+### Import Layout
+- Restores previously saved configurations
+- Validates file format
+- Preserves all node IDs and connections
+
+### Export Simulation Results
+- Exports detailed lot-by-lot data
+- Includes all measurements and statistics
+- JSON format for further analysis
+
+---
+
+## VALIDATION & ERROR HANDLING
+
+### Pre-Simulation Checks
+- Verifies at least one source node exists
+- Verifies at least one output node exists
+- Checks for complete path from source to output
+- Validates transport nodes have both I/O connected
+- Displays detailed error messages if validation fails
+
+### Connection Validation
+- Real-time validation when creating connections
+- Visual error notifications for invalid connections
+- Prevents illogical configurations
+
+---
+
+## USE CASES
+
+1. **Process Capability Analysis**: Understand how upstream variations affect final test results
+2. **PAT Limit Optimization**: Compare SPAT vs DPAT effectiveness for specific processes
+3. **What-If Scenarios**: Test impact of equipment drift, material changes, or process modifications
+4. **Training & Education**: Visualize variability propagation concepts
+5. **Root Cause Analysis**: Trace defect sources through the manufacturing flow
+6. **Process Design**: Optimize routing and test strategies before implementation
+
+---
+
+## TECHNICAL SPECIFICATIONS
+
+- Pure client-side JavaScript (no server required)
+- HTML5 Canvas for graph rendering
+- Responsive design with mobile support
+- Seeded random number generator for reproducibility
+- Real-time simulation with progress feedback
+- Supports complex multi-path manufacturing flows
+
+---
+
+Document Version: 1.0
+Last Updated: February 2026

@@ -4,30 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Viren Patel - Technology enthusiast, podcast host, and simulation developer. Explore my portfolio of projects and listen to Decoded with Viren.">
-  <title>Chemical Kinetics Simulation - Viren Patel</title>
+  <title>Turing Reaction-Diffusion - Viren Patel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 
-  <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
-    // Your measurement ID
-    gtag('config', 'G-DMXF1FG10E', {
-      // optional advanced settings
-      // 'page_title': document.title,
-      // 'page_path': location.pathname
-    });
+    gtag('config', 'G-DMXF1FG10E', {});
   </script>
-  <!-- End Google Analytics -->
 
   <style>
-    /* Simulation Container */
     .simulation-container {
       position: relative;
       width: 100%;
@@ -38,7 +29,6 @@
       overflow: hidden;
     }
 
-    /* Sidebar Styles */
     .simulation-sidebar {
       position: absolute;
       left: 0;
@@ -52,16 +42,14 @@
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       padding: 20px;
       box-sizing: border-box;
-      overflow-y: hidden;
+      overflow-y: auto;
       overflow-x: hidden;
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
       color: #e0e0e0;
     }
 
-    .simulation-sidebar.collapsed {
-      transform: translateX(-100%);
-    }
+    .simulation-sidebar.collapsed { transform: translateX(-100%); }
 
     .sidebar-toggle {
       position: fixed;
@@ -70,7 +58,6 @@
       width: 40px;
       height: 40px;
       background: rgba(20, 20, 40, 0.95);
-      backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-left: none;
       border-radius: 0 8px 8px 0;
@@ -80,21 +67,12 @@
       justify-content: center;
       color: #fff;
       font-size: 20px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s;
       z-index: 101;
     }
 
-    .simulation-sidebar:not(.collapsed) .sidebar-toggle {
-      left: 320px;
-    }
-
-    .simulation-sidebar.collapsed .sidebar-toggle {
-      left: 0;
-    }
-
-    .sidebar-toggle:hover {
-      background: rgba(30, 30, 50, 0.95);
-    }
+    .simulation-sidebar:not(.collapsed) .sidebar-toggle { left: 320px; }
+    .simulation-sidebar.collapsed .sidebar-toggle { left: 0; }
 
     .sidebar-title {
       font-size: 18px;
@@ -103,49 +81,15 @@
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 1px;
-      position: relative;
     }
 
-    .sidebar-control-btn {
-      position: fixed;
-      left: 320px;
-      top: 80px;
-      width: 40px;
-      height: 40px;
-      background: rgba(74, 158, 255, 0.3);
-      border: 1px solid rgba(74, 158, 255, 0.6);
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #4a9eff;
-      font-size: 20px;
-      font-weight: bold;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 150;
-    }
-
-    .sidebar-control-btn:hover {
-      background: rgba(74, 158, 255, 0.5);
-      border-color: #4a9eff;
-      transform: scale(1.1);
-    }
-
-    .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .sidebar-control-btn {
-      left: 20px;
-      top: 80px;
-    }
-
-    .control-group {
-      margin-bottom: 20px;
-    }
+    .control-group { margin-bottom: 18px; }
 
     .control-label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: #b0b0b0;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -174,11 +118,6 @@
       background: #4a9eff;
       border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .control-input::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
     }
 
     .control-input::-moz-range-thumb {
@@ -188,11 +127,6 @@
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .control-input::-moz-range-thumb:hover {
-      transform: scale(1.2);
     }
 
     .control-select {
@@ -202,43 +136,64 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 6px;
       color: #e0e0e0;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
       outline: none;
     }
 
-    .control-select option {
-      background: #1a1a2e;
-      color: #e0e0e0;
+    .control-select option { background: #1a1a2e; color: #e0e0e0; }
+
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
     }
 
-    .delay-group {
-      margin-top: 10px;
-      padding: 10px;
-      background: rgba(74, 158, 255, 0.1);
-      border-left: 3px solid #4a9eff;
-      border-radius: 4px;
-      display: none;
-    }
-
-    .delay-group.visible {
-      display: block;
-    }
-
-    /* Canvas Styles */
-    .simulation-canvas-wrapper {
-      flex: 1;
-      position: relative;
-    }
-
-    #simulationCanvas {
-      display: block;
-      width: 100%;
-      height: 100%;
+    .preset-btn {
+      padding: 8px 10px;
+      background: rgba(74, 158, 255, 0.15);
+      border: 1px solid rgba(74, 158, 255, 0.4);
+      border-radius: 6px;
+      color: #4a9eff;
+      font-size: 10px;
+      font-weight: 500;
       cursor: pointer;
+      transition: all 0.2s;
     }
 
-    /* Back Button */
+    .preset-btn:hover {
+      background: rgba(74, 158, 255, 0.3);
+      border-color: #4a9eff;
+    }
+
+    .playback-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .playback-btn {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+
+    .play-btn { background: rgba(0, 200, 100, 0.2); border-color: rgba(0, 200, 100, 0.5); color: #00c864; }
+    .play-btn:hover { background: rgba(0, 200, 100, 0.35); }
+    .pause-btn { background: rgba(255, 180, 0, 0.2); border-color: rgba(255, 180, 0, 0.5); color: #ffb400; }
+    .pause-btn:hover { background: rgba(255, 180, 0, 0.35); }
+    .reset-btn { background: rgba(255, 74, 74, 0.2); border-color: rgba(255, 74, 74, 0.5); color: #ff4a4a; }
+    .reset-btn:hover { background: rgba(255, 74, 74, 0.35); }
+
+    .simulation-canvas-wrapper { flex: 1; position: relative; }
+    #simulationCanvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+
     .back-button {
       position: absolute;
       top: 20px;
@@ -248,7 +203,6 @@
       gap: 8px;
       padding: 10px 20px;
       background: rgba(20, 20, 40, 0.9);
-      backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: #e0e0e0;
@@ -259,36 +213,50 @@
       z-index: 150;
     }
 
-    .back-button:hover {
-      background: rgba(30, 30, 50, 0.95);
-      border-color: #4a9eff;
-      transform: translateX(-3px);
-      color: #4a9eff;
+    .back-button:hover { background: rgba(30, 30, 50, 0.95); border-color: #4a9eff; color: #4a9eff; }
+
+    .simulation-stats {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 40, 0.9);
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      font-size: 12px;
+      z-index: 50;
+      display: flex;
+      gap: 20px;
     }
 
-    .back-arrow {
-      font-size: 18px;
-      transition: transform 0.3s;
-    }
+    .stat-item { display: flex; gap: 6px; }
+    .stat-value { color: #4a9eff; font-weight: 600; }
+    .stat-particle-a { color: #00d4ff; font-weight: 600; }
+    .stat-particle-b { color: #ff6b35; font-weight: 600; }
 
-    .back-button:hover .back-arrow {
-      transform: translateX(-3px);
-    }
-
-    /* Overlay Controls */
     .simulation-overlay {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: none;
+      flex-direction: column;
+      align-items: center;
       gap: 20px;
       z-index: 50;
     }
 
-    .simulation-overlay.active {
-      display: flex;
+    .simulation-overlay.active { display: flex; }
+
+    .overlay-text {
+      color: #888;
+      font-size: 14px;
+      text-align: center;
     }
+
+    .overlay-buttons { display: flex; gap: 15px; }
 
     .overlay-button {
       padding: 15px 40px;
@@ -298,339 +266,60 @@
       letter-spacing: 1px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       background: rgba(20, 20, 40, 0.9);
-      backdrop-filter: blur(10px);
       color: #fff;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s;
     }
 
-    .overlay-button:hover {
-      background: rgba(30, 30, 50, 0.95);
-      border-color: #4a9eff;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
-    }
+    .overlay-button:hover { border-color: #4a9eff; transform: translateY(-2px); }
+    .overlay-button.play { background: rgba(74, 158, 255, 0.2); border-color: #4a9eff; }
 
-    .overlay-button.play {
-      background: rgba(74, 158, 255, 0.2);
-      border-color: #4a9eff;
-    }
-
-    .overlay-button.reset {
-      background: rgba(255, 74, 74, 0.2);
-      border-color: #ff4a4a;
-    }
-
-    /* Stats Display */
-    .simulation-stats {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20, 20, 40, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 15px 20px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e0e0e0;
-      font-size: 12px;
-      line-height: 1.6;
-      z-index: 50;
-      display: flex;
-      gap: 20px;
-    }
-
-    .stat-item {
-      display: flex;
-      gap: 8px;
-    }
-
-    .stat-value {
-      color: #4a9eff;
-      font-weight: 600;
-    }
-
-    .stat-particle-a {
-      color: #00d4ff;
-    }
-
-    .stat-particle-b {
-      color: #ff6b35;
-    }
-
-    /* Mobile Expand Button */
-    .mobile-expand-btn {
+    .mobile-expand-btn, .mobile-collapse-btn {
       position: fixed;
       right: 20px;
-      top: 80px;
       width: 50px;
       height: 50px;
-      background: rgba(137, 74, 255, 0.05);
-      backdrop-filter: blur(10px);
+      background: rgba(137, 74, 255, 0.1);
       border: 1px solid rgba(137, 74, 255, 0.3);
       border-radius: 50%;
       color: rgba(137, 74, 255, 0.9);
       font-size: 24px;
       cursor: pointer;
       z-index: 150;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      transition: all 0.3s ease;
+      display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
       pointer-events: none;
     }
 
-    .mobile-expand-btn:active {
-      transform: scale(0.9);
-      background: rgba(20, 20, 40, 0.9);
-      border-color: rgba(137, 74, 255, 0.9);
-    }
+    .mobile-expand-btn { top: 80px; }
+    .mobile-collapse-btn { top: calc(50vh + 10px); }
 
-    /* Mobile Collapse Button */
-    .mobile-collapse-btn {
-      position: fixed;
-      right: 20px;
-      top: calc(50vh + 10px);
-      width: 50px;
-      height: 50px;
-      background: rgba(248, 71, 225, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(248, 71, 225, 0.4);
-      border-radius: 50%;
-      color: rgba(248, 71, 225, 0.9);
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 150;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      transition: opacity 0.4s ease, transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-    }
+    @media (min-width: 769px) { .mobile-expand-btn, .mobile-collapse-btn { display: none !important; } }
 
-    .mobile-collapse-btn:active {
-      transform: scale(0.9);
-      background: rgba(20, 20, 40, 0.9);
-      border-color: rgba(248, 71, 225, 0.9);
-    }
-
-    /* Hide by default on desktop */
-    @media (min-width: 769px) {
-      .mobile-expand-btn,
-      .mobile-collapse-btn {
-        display: none !important;
-      }
-    }
-
-    /* Responsive Design */
     @media (max-width: 768px) {
-      .simulation-sidebar {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        max-height: 50vh;
-        overflow-y: auto;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        top: 0;
-        left: 0;
-        z-index: 100;
-        position: fixed;
-      }
-
-      .simulation-sidebar.collapsed {
-        transform: translateY(-100%);
-      }
-
-      /* Hide sidebar toggle on mobile - use mobile buttons instead */
-      .sidebar-toggle {
-        display: none;
-      }
-
-      /* Show mobile expand button only when sidebar is collapsed */
-      .mobile-expand-btn {
-        display: flex;
-      }
-
-      .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      /* Show mobile collapse button only when sidebar is expanded */
-      .mobile-collapse-btn {
-        display: flex;
-      }
-
-      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .simulation-canvas-wrapper {
-        padding-top: 0;
-      }
-
-      .sidebar-control-btn {
-        display: none;
-      }
-
-      .sidebar-title {
-        font-size: 16px;
-        margin-bottom: 15px;
-      }
-
-      .control-label {
-        font-size: 11px;
-      }
-
-      .control-value {
-        font-size: 11px;
-      }
-
-      .control-select {
-        font-size: 11px;
-        padding: 6px;
-      }
-
-      .control-group {
-        margin-bottom: 15px;
-      }
-
-      .overlay-button {
-        padding: 10px 25px;
-        font-size: 13px;
-      }
-
-      .back-button {
-        top: 10px;
-        left: 10px;
-        right: auto;
-        padding: 8px 15px;
-        font-size: 12px;
-        z-index: 50;
-      }
-
-      .back-text {
-        display: none;
-      }
-
-      .simulation-stats {
-        font-size: 9px;
-        padding: 8px 10px;
-        gap: 8px;
-        flex-wrap: wrap;
-        top: 10px;
-      }
-
-      .stat-item {
-        gap: 5px;
-      }
-
-      .simulation-container {
-        height: calc(100vh - 70px);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .simulation-sidebar {
-        padding: 15px;
-      }
-
-      .sidebar-title {
-        font-size: 14px;
-        margin-bottom: 12px;
-      }
-
-      .control-label {
-        font-size: 10px;
-      }
-
-      .control-value {
-        font-size: 10px;
-      }
-
-      .control-select {
-        font-size: 10px;
-        padding: 5px;
-      }
-
-      .control-group {
-        margin-bottom: 12px;
-      }
-
-      .control-input {
-        height: 5px;
-      }
-
-      .control-input::-webkit-slider-thumb {
-        width: 14px;
-        height: 14px;
-      }
-
-      .control-input::-moz-range-thumb {
-        width: 14px;
-        height: 14px;
-      }
-
-      .overlay-button {
-        padding: 8px 20px;
-        font-size: 12px;
-      }
-
-      .simulation-stats {
-        font-size: 8px;
-        padding: 6px 8px;
-        gap: 6px;
-      }
-
-      .back-button {
-        left: 10px;
-        right: auto;
-        padding: 6px 12px;
-        font-size: 11px;
-        z-index: 50;
-      }
-    }
-
-    /* Landscape mobile optimization */
-    @media (max-width: 896px) and (orientation: landscape) {
-      .simulation-sidebar {
-        max-height: 40vh;
-      }
-
-      .control-group {
-        margin-bottom: 10px;
-      }
-
-      .sidebar-title {
-        font-size: 13px;
-        margin-bottom: 10px;
-      }
-
-      .simulation-stats {
-        font-size: 8px;
-        padding: 5px 8px;
-      }
+      .simulation-sidebar { width: 100%; max-width: 100%; height: auto; max-height: 50vh; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; }
+      .simulation-sidebar.collapsed { transform: translateY(-100%); }
+      .sidebar-toggle { display: none; }
+      .mobile-expand-btn, .mobile-collapse-btn { display: flex; }
+      .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn { opacity: 1; pointer-events: auto; }
+      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn { opacity: 1; pointer-events: auto; }
+      .back-button { top: 10px; left: 10px; right: auto; padding: 8px 15px; font-size: 12px; }
+      .back-text { display: none; }
+      .simulation-stats { font-size: 10px; padding: 8px 12px; gap: 12px; }
     }
   </style>
 </head>
 <body>
-  <!-- Floating Particles -->
   <div class="particles" id="particles"></div>
- 
-  <!-- Navbar -->
+
   <header>
     <nav>
-      <div class="logo">
-        <a href="index.html">Viren Patel</a>
-      </div>
-      <div class="logo">
-        <a>Chemical Kinetics Simulation</a>
-      </div>
+      <div class="logo"><a href="index.html">Viren Patel</a></div>
+      <div class="logo"><a>Turing Patterns</a></div>
       <ul class="nav-links">
         <li><a href="#hero">Home</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
@@ -639,1857 +328,828 @@
       </ul>
     </nav>
   </header>
- 
-  <!--  Add Simulation below here  -->
+
   <div class="simulation-container">
-    <!-- Sidebar -->
     <div class="simulation-sidebar" id="simulationSidebar">
       <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
-      <div class="sidebar-title">Simulation Controls</div>
-      
+      <div class="sidebar-title">Particle Turing Patterns</div>
+
       <div class="control-group">
-        <label class="control-label">
-          Wall Mode
-        </label>
-        <select class="control-select" id="wallMode">
-          <option value="solid">Solid Walls (Bounce)</option>
-          <option value="wrap">Wrap-Around (Continuous)</option>
+        <div class="playback-buttons">
+          <button class="playback-btn play-btn" id="playBtn">&#9658; Play</button>
+          <button class="playback-btn pause-btn" id="pauseBtn">&#10074;&#10074; Pause</button>
+          <button class="playback-btn reset-btn" id="resetBtn">&#8635; Reset</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Pattern Presets</label>
+        <div class="preset-buttons">
+          <button class="preset-btn" data-preset="spots">Spots</button>
+          <button class="preset-btn" data-preset="stripes">Stripes/Worms</button>
+          <button class="preset-btn" data-preset="labyrinth">Labyrinth</button>
+          <button class="preset-btn" data-preset="chaos">Chaotic Blobs</button>
+          <button class="preset-btn" data-preset="mitosis">Mitosis</button>
+          <button class="preset-btn" data-preset="coral">Coral Growth</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Activator Diffusion (D<sub>A</sub>) <span class="control-value" id="daValue">0.15</span></label>
+        <input type="range" class="control-input" id="diffusionA" min="0.05" max="0.5" step="0.01" value="0.15">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Inhibitor Diffusion (D<sub>B</sub>) <span class="control-value" id="dbValue">0.60</span></label>
+        <input type="range" class="control-input" id="diffusionB" min="0.2" max="1.5" step="0.05" value="0.6">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Reaction Radius (r) <span class="control-value" id="radiusValue">60</span></label>
+        <input type="range" class="control-input" id="reactionRadius" min="30" max="100" step="5" value="60">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Autocatalysis (k<sub>1</sub>) <span class="control-value" id="k1Value">0.15</span></label>
+        <input type="range" class="control-input" id="k1" min="0.05" max="0.30" step="0.01" value="0.15">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Inhibitor Gen (k<sub>2</sub>) <span class="control-value" id="k2Value">0.20</span></label>
+        <input type="range" class="control-input" id="k2" min="0.05" max="0.40" step="0.01" value="0.20">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Suppression (k<sub>3</sub>) <span class="control-value" id="k3Value">0.08</span></label>
+        <input type="range" class="control-input" id="k3" min="0.02" max="0.15" step="0.01" value="0.08">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Activator Decay <span class="control-value" id="decayAValue">0.002</span></label>
+        <input type="range" class="control-input" id="decayA" min="0.001" max="0.01" step="0.001" value="0.002">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Inhibitor Decay <span class="control-value" id="decayBValue">0.015</span></label>
+        <input type="range" class="control-input" id="decayB" min="0.005" max="0.03" step="0.001" value="0.015">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Initial Particles <span class="control-value" id="particleCountValue">300</span></label>
+        <input type="range" class="control-input" id="particleCount" min="100" max="600" step="25" value="300">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Simulation Speed <span class="control-value" id="speedValue">1.0</span></label>
+        <input type="range" class="control-input" id="simSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Render Mode</label>
+        <select class="control-select" id="renderMode">
+          <option value="particles">Individual Particles</option>
+          <option value="density">Density Field</option>
         </select>
       </div>
 
       <div class="control-group">
-        <label class="control-label">
-          Element 1
-        </label>
-        <select class="control-select" id="element1Select">
-          <option value="">Loading...</option>
+        <label class="control-label">Color Scheme</label>
+        <select class="control-select" id="colorScheme">
+          <option value="dualParticle">Dual Particle (A/B)</option>
+          <option value="neonCyan">Neon Cyan</option>
+          <option value="fire">Fire</option>
+          <option value="ocean">Ocean</option>
+          <option value="purple">Purple Haze</option>
+          <option value="classic">Classic B/W</option>
         </select>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Element 1 Count
-          <span class="control-value" id="element1CountValue">30</span>
-        </label>
-        <input type="range" class="control-input" id="element1Count" min="10" max="500" step="10" value="30">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Element 2
-        </label>
-        <select class="control-select" id="element2Select">
-          <option value="">Loading...</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Element 2 Count
-          <span class="control-value" id="element2CountValue">30</span>
-        </label>
-        <input type="range" class="control-input" id="element2Count" min="10" max="500" step="10" value="30">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Element 3
-        </label>
-        <select class="control-select" id="element3Select">
-          <option value="">Loading...</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Element 3 Count
-          <span class="control-value" id="element3CountValue">0</span>
-        </label>
-        <input type="range" class="control-input" id="element3Count" min="0" max="500" step="10" value="0">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Particle Speed
-          <span class="control-value" id="particleSpeedValue">1.0</span>
-        </label>
-        <input type="range" class="control-input" id="particleSpeed" min="0" max="5" step="0.1" value="1.0">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Radius Scale
-          <span class="control-value" id="radiusScaleValue">1.0</span>
-        </label>
-        <input type="range" class="control-input" id="radiusScale" min="0.5" max="3" step="0.1" value="1.0">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Bond Strength
-          <span class="control-value" id="bondStrengthValue">1.0</span>
-          <label style="float: right; display: flex; align-items: center; gap: 5px; font-size: 12px; text-transform: none; cursor: pointer;">
-            <input type="checkbox" id="showBonds" checked style="cursor: pointer; width: 16px; height: 16px;">
-            <span>Show Bonds</span>
-          </label>
-        </label>
-        <input type="range" class="control-input" id="bondStrength" min="0.1" max="3" step="0.1" value="1.0">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">
-          Temperature (K)
-          <span class="control-value" id="temperatureValue">300</span>
-        </label>
-        <input type="range" class="control-input" id="temperature" min="100" max="1000" step="10" value="300">
       </div>
     </div>
 
-    <!-- Canvas Wrapper -->
     <div class="simulation-canvas-wrapper">
       <canvas id="simulationCanvas"></canvas>
 
-      <!-- Mobile Expand Button (visible only when sidebar collapsed on mobile) -->
-      <button class="mobile-expand-btn" id="mobileExpandBtn">▼</button>
+      <button class="mobile-expand-btn" id="mobileExpandBtn">&#9660;</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">&#9650;</button>
 
-      <!-- Mobile Collapse Button (visible only when sidebar expanded on mobile) -->
-      <button class="mobile-collapse-btn" id="mobileCollapseBtn">▲</button>
-
-      <!-- Sidebar Control Button -->
-      <div class="sidebar-control-btn" id="sidebarControlBtn">←</div>
-
-      <!-- Back Button -->
-      <a href="../index.html" class="back-button" id="backButton">
-        <span class="back-arrow">←</span>
-        <span class="back-text">Back to Simulations</span>
+      <a href="../index.html" class="back-button">
+        <span class="back-arrow">&larr;</span>
+        <span class="back-text">Back</span>
       </a>
 
-      <!-- Stats Display -->
-      <div class="simulation-stats" id="statsDisplay">
-        <div class="stat-item">
-          <span>FPS:</span>
-          <span class="stat-value" id="fpsValue">60</span>
-        </div>
-        <div class="stat-item">
-          <span>Particles:</span>
-          <span class="stat-value" id="totalParticles">0</span>
-        </div>
-        <div class="stat-item">
-          <span>Bonds:</span>
-          <span class="stat-value" id="totalBonds">0</span>
-        </div>
-        <div class="stat-item">
-          <span>Avg Speed:</span>
-          <span class="stat-value" id="avgSpeed">0</span>
-        </div>
+      <div class="simulation-stats">
+        <div class="stat-item"><span>FPS:</span><span class="stat-value" id="fpsValue">60</span></div>
+        <div class="stat-item"><span class="stat-particle-a">A Particles:</span><span class="stat-particle-a" id="countA">0</span></div>
+        <div class="stat-item"><span class="stat-particle-b">B Particles:</span><span class="stat-particle-b" id="countB">0</span></div>
       </div>
 
-      <!-- Overlay Controls -->
-      <div class="simulation-overlay active" id="simulationOverlay">
-        <button class="overlay-button play" id="playButton">Play</button>
-        <button class="overlay-button reset" id="resetButton">Reset</button>
+      <div class="simulation-overlay active" id="overlay">
+        <div class="overlay-text">Particle-based Turing pattern simulation with Brownian motion and stochastic reactions</div>
+        <div class="overlay-buttons">
+          <button class="overlay-button play" id="overlayPlay">Play</button>
+        </div>
       </div>
     </div>
   </div>
-  <!--  Add Simulation End here  -->
- 
-  <!-- Footer -->
+
   <footer>
     <div class="footer-content">
       <p>&copy; 2025 Viren Patel. All rights reserved.</p>
       <div class="social-links">
         <a href="mailto:virenp.jobs@gmail.com">Email</a>
         <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
-        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
       </div>
     </div>
   </footer>
 
   <script>
     /**
-     * Chemical Kinetics Particle Simulator
-     * Simulates chemical elements with bonding based on electronegativity and valence
+     * Particle-Based Turing Reaction-Diffusion
+     *
+     * Uses Brownian motion in continuous 2D space with stochastic local reactions.
+     * Implements activator-inhibitor dynamics:
+     * - Activator (A): autocatalytic, promotes itself
+     * - Inhibitor (B): generated by A, suppresses A, diffuses faster (DB >> DA)
+     *
+     * Reaction rules (stochastic, within radius r):
+     * 1. Autocatalysis: A + A → 2A + A' (rate k1) - activator promotes birth of new activator
+     * 2. Inhibitor generation: A → A + B (rate k2) - activator creates inhibitor
+     * 3. Suppression: A + B → B (rate k3) - inhibitor kills activator
+     * 4. Decay: A → ∅ (rate decayA), B → ∅ (rate decayB)
+     *
+     * Turing instability requires: DB >> DA (inhibitor diffuses faster than activator)
      */
 
-    // Global element data loaded from CSV
-    let elementsData = [];
-    let selectedElements = [null, null, null];
+    const CONFIG = {
+      // Canvas and simulation size
+      WIDTH: 600,
+      HEIGHT: 600,
 
-    const params = {
-      element1Count: 30,
-      element2Count: 30,
-      element3Count: 0,
-      particleSpeed: 100.0,
-      radiusScale: 1.0,
-      bondStrength: 1.0,
-      temperature: 300,
-      dt: 0.016,
-      wallMode: 'solid',
-      showBonds: true
+      // Diffusion coefficients - controls random force intensity on velocity
+      DA: 0.15,   // Activator diffusion (slow - stays local)
+      DB: 0.6,    // Inhibitor diffusion (faster - spreads out to suppress distant A)
+
+      // Velocity damping (0-1, higher = more friction, smoother movement)
+      damping: 0.92,
+
+      // Reaction radius
+      r: 60,
+
+      // Reaction rates - tuned for pattern formation
+      k1: 0.15,   // Autocatalysis rate (A+A -> more A)
+      k2: 0.20,   // Inhibitor generation rate (A -> A+B)
+      k3: 0.08,   // Suppression rate (A+B -> B, A dies)
+
+      // Decay rates
+      decayA: 0.002,  // Very slow decay so patterns persist
+      decayB: 0.015,  // Faster B decay so suppression is local in time
+
+      // Cell division velocity - how fast offspring move away from parent
+      divisionSpeed: 0.8,
+
+      // Initial particle count (lower for visual style with glowing particles)
+      initialParticles: 300,
+
+      // Simulation speed multiplier
+      speed: 1.0,
+
+      // Rendering
+      renderMode: 'particles',
+      colorScheme: 'dualParticle',
+
+      // Spatial hash cell size (should be >= reaction radius)
+      cellSize: 65
     };
 
-    const BASE_RADIUS = 5;
-    const RESTITUTION = 1.0; // Elastic collisions
-    const BOLTZMANN_CONSTANT = 8.617e-5; // eV/K
+    // Pattern presets with velocity-based smooth movement
+    // Key: DB >> DA (inhibitor diffuses faster), strong autocatalysis, moderate suppression
+    const PRESETS = {
+      spots: { DA: 0.12, DB: 0.5, r: 50, k1: 0.18, k2: 0.25, k3: 0.06, decayA: 0.001, decayB: 0.02 },
+      stripes: { DA: 0.18, DB: 0.7, r: 70, k1: 0.12, k2: 0.18, k3: 0.10, decayA: 0.003, decayB: 0.012 },
+      labyrinth: { DA: 0.15, DB: 0.6, r: 60, k1: 0.15, k2: 0.20, k3: 0.08, decayA: 0.002, decayB: 0.015 },
+      chaos: { DA: 0.25, DB: 0.5, r: 45, k1: 0.20, k2: 0.15, k3: 0.05, decayA: 0.005, decayB: 0.01 },
+      mitosis: { DA: 0.10, DB: 0.6, r: 40, k1: 0.22, k2: 0.30, k3: 0.04, decayA: 0.001, decayB: 0.025 },
+      coral: { DA: 0.14, DB: 0.55, r: 55, k1: 0.16, k2: 0.22, k3: 0.07, decayA: 0.002, decayB: 0.018 }
+    };
 
-    // Mobile detection and scaling
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    }
-
-    function getDeviceScale() {
-      if (window.innerWidth <= 480) {
-        return 0.6;
-      } else if (window.innerWidth <= 768) {
-        return 0.75;
+    // Color schemes for density rendering
+    const COLORS = {
+      dualParticle: (a, b) => {
+        // Cyan for activators (A), orange for inhibitors (B) - matching sim3 theme
+        const intensityA = Math.min(1, a * 3);
+        const intensityB = Math.min(1, b * 2);
+        // Blend: cyan activators with orange inhibitor influence
+        const r = Math.floor(intensityA * 0 + intensityB * 255 * 0.3);
+        const g = Math.floor(intensityA * 212);
+        const bl = Math.floor(intensityA * 255 * 0.8);
+        return [r, g, bl];
+      },
+      neonCyan: (a, b) => {
+        const intensity = Math.min(1, a * 3);
+        return [Math.floor(intensity * 20), Math.floor(intensity * 212), Math.floor(intensity * 255)];
+      },
+      fire: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.min(255, Math.floor(v * 400)), Math.floor(v * 150), Math.floor(v * 40)];
+      },
+      ocean: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.floor(v * 40), Math.floor(80 + v * 120), Math.floor(120 + v * 135)];
+      },
+      purple: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.floor(80 + v * 175), Math.floor(v * 60), Math.floor(120 + v * 135)];
+      },
+      classic: (a, b) => {
+        const v = Math.min(255, Math.floor(a * 3 * 255));
+        return [v, v, v];
       }
-      return 1.0;
+    };
+
+    /**
+     * Spatial Hash Grid for O(1) neighbor lookup
+     */
+    class SpatialHash {
+      constructor(width, height, cellSize) {
+        this.cellSize = cellSize;
+        this.cols = Math.ceil(width / cellSize);
+        this.rows = Math.ceil(height / cellSize);
+        this.grid = new Array(this.cols * this.rows);
+        this.clear();
+      }
+
+      clear() {
+        for (let i = 0; i < this.grid.length; i++) {
+          this.grid[i] = [];
+        }
+      }
+
+      getKey(x, y) {
+        const col = Math.floor(x / this.cellSize);
+        const row = Math.floor(y / this.cellSize);
+        // Wrap for periodic boundaries
+        const wCol = ((col % this.cols) + this.cols) % this.cols;
+        const wRow = ((row % this.rows) + this.rows) % this.rows;
+        return wRow * this.cols + wCol;
+      }
+
+      insert(particle) {
+        const key = this.getKey(particle.x, particle.y);
+        this.grid[key].push(particle);
+      }
+
+      getNeighbors(x, y, radius) {
+        const neighbors = [];
+        const cellRadius = Math.ceil(radius / this.cellSize);
+        const cx = Math.floor(x / this.cellSize);
+        const cy = Math.floor(y / this.cellSize);
+
+        for (let dy = -cellRadius; dy <= cellRadius; dy++) {
+          for (let dx = -cellRadius; dx <= cellRadius; dx++) {
+            const col = ((cx + dx) % this.cols + this.cols) % this.cols;
+            const row = ((cy + dy) % this.rows + this.rows) % this.rows;
+            const cell = this.grid[row * this.cols + col];
+            for (const p of cell) {
+              neighbors.push(p);
+            }
+          }
+        }
+        return neighbors;
+      }
     }
 
-    // Load elements from CSV
-    async function loadElements() {
-      try {
-        const response = await fetch('elements.csv');
-        const text = await response.text();
-        const lines = text.trim().split('\n');
-        const headers = lines[0].split(',');
+    /**
+     * Main Simulation
+     */
+    class TuringParticles {
+      constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.particlesA = [];
+        this.particlesB = [];
+        this.spatialA = new SpatialHash(width, height, CONFIG.cellSize);
+        this.spatialB = new SpatialHash(width, height, CONFIG.cellSize);
 
-        elementsData = [];
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',');
-          if (values.length < headers.length) continue;
+        // Density grid for rendering
+        this.gridSize = 150;
+        this.densityA = new Float32Array(this.gridSize * this.gridSize);
+        this.densityB = new Float32Array(this.gridSize * this.gridSize);
 
-          const element = {};
-          headers.forEach((header, index) => {
-            const value = values[index];
-            if (header === 'symbol' || header === 'name' || header === 'bondType' || header === 'tendency') {
-              element[header] = value;
-            } else {
-              element[header] = parseFloat(value);
-            }
+        this.init();
+      }
+
+      init() {
+        this.particlesA = [];
+        this.particlesB = [];
+
+        const total = CONFIG.initialParticles;
+        const ratioA = 0.5; // Start with 50% activators
+
+        // Seed activators in tight clusters to kickstart pattern formation
+        const numClusters = 5;
+        const clusterRadius = 40;
+        const clusterCenters = [];
+
+        // Place clusters with some spacing
+        for (let i = 0; i < numClusters; i++) {
+          clusterCenters.push({
+            x: 100 + Math.random() * (this.width - 200),
+            y: 100 + Math.random() * (this.height - 200)
           });
-          elementsData.push(element);
         }
 
-        // Set default selected elements
-        selectedElements[0] = elementsData.find(e => e.symbol === 'Na') || elementsData[0];
-        selectedElements[1] = elementsData.find(e => e.symbol === 'Cl') || elementsData[1];
-        selectedElements[2] = elementsData.find(e => e.symbol === 'H') || elementsData[2];
-
-        return elementsData;
-      } catch (error) {
-        console.error('Error loading elements:', error);
-        return [];
-      }
-    }
-
-    // Calculate bond type between two elements
-    function calculateBondProperties(elem1, elem2) {
-      if (!elem1 || !elem2) return null;
-
-      const enDiff = Math.abs(elem1.electronegativity - elem2.electronegativity);
-
-      // Determine bond type based on electronegativity difference
-      let bondType, strength;
-      if (enDiff > 1.7) {
-        // Ionic bond
-        bondType = 'ionic';
-        strength = 3.0;
-      } else if (enDiff > 0.4) {
-        // Polar covalent
-        bondType = 'polar';
-        strength = 2.0;
-      } else {
-        // Nonpolar covalent
-        bondType = 'covalent';
-        strength = 1.5;
-      }
-
-      // Check valence compatibility (simplified)
-      const valenceCompatible = (elem1.valenceElectrons + elem2.valenceElectrons <= 8);
-
-      return {
-        bondType,
-        strength: strength * (valenceCompatible ? 1.0 : 0.3),
-        canBond: strength > 0.5,
-        bondLength: (elem1.atomicNumber + elem2.atomicNumber) * 0.15
-      };
-    }
-
-    class Particle {
-      constructor(x, y, element, speed, id) {
-        this.id = id || Date.now() + Math.random();
-        this.pos = {x, y};
-        this.vel = {x: 0, y: 0};
-        this.force = {x: 0, y: 0};
-
-        this.element = element;
-        this.mass = element.mass;
-
-        // Chemical properties
-        this.maxBonds = element.maxBonds || 1;
-        this.currentBonds = [];
-        this.charge = 0;
-        this.preferredCharge = element.preferredCharge || 0;
-
-        // Molecule membership
-        this.moleculeId = null;
-
-        // Scale radius based on device and atomic number
-        const deviceScale = getDeviceScale();
-        const atomicScale = Math.pow(element.atomicNumber, 0.33) * 0.5;
-        this.radius = params.radiusScale * BASE_RADIUS * atomicScale * deviceScale;
-
-        // Random initial velocity based on temperature
-        const angle = Math.random() * Math.PI * 2;
-        const thermalSpeed = speed * Math.sqrt(params.temperature / 300);
-        this.vel.x = Math.cos(angle) * thermalSpeed;
-        this.vel.y = Math.sin(angle) * thermalSpeed;
-
-        // Color from element data (using CSV color columns)
-        this.color = {
-          r: Math.round(element.color_r) || 255,
-          g: Math.round(element.color_g) || 255,
-          b: Math.round(element.color_b) || 255
-        };
-      }
-
-      getAvailableBonds() {
-        return this.maxBonds - this.currentBonds.length;
-      }
-
-      canBond() {
-        return this.getAvailableBonds() > 0 && this.moleculeId === null;
-      }
-
-      getSpeed() {
-        return Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
-      }
-
-      update(dt) {
-        // Don't update position if part of a molecule (molecule handles it)
-        if (this.moleculeId !== null) return;
-
-        this.pos.x += this.vel.x * dt;
-        this.pos.y += this.vel.y * dt;
-      }
-
-      handleBoundaries(width, height) {
-        if (this.moleculeId !== null) return; // Molecule handles boundaries
-
-        if (params.wallMode === 'solid') {
-          if (this.pos.x - this.radius < 0) {
-            this.pos.x = this.radius;
-            this.vel.x = Math.abs(this.vel.x);
-          } else if (this.pos.x + this.radius > width) {
-            this.pos.x = width - this.radius;
-            this.vel.x = -Math.abs(this.vel.x);
+        // Create activator particles - mostly clustered, with zero initial velocity
+        const numA = Math.floor(total * ratioA);
+        for (let i = 0; i < numA; i++) {
+          let x, y;
+          // 85% in tight clusters, 15% scattered
+          if (Math.random() < 0.85) {
+            const cluster = clusterCenters[Math.floor(Math.random() * numClusters)];
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * clusterRadius;
+            x = cluster.x + Math.cos(angle) * dist;
+            y = cluster.y + Math.sin(angle) * dist;
+          } else {
+            x = Math.random() * this.width;
+            y = Math.random() * this.height;
           }
-          if (this.pos.y - this.radius < 0) {
-            this.pos.y = this.radius;
-            this.vel.y = Math.abs(this.vel.y);
-          } else if (this.pos.y + this.radius > height) {
-            this.pos.y = height - this.radius;
-            this.vel.y = -Math.abs(this.vel.y);
-          }
-        } else if (params.wallMode === 'wrap') {
-          if (this.pos.x < -this.radius) this.pos.x = width + this.radius;
-          else if (this.pos.x > width + this.radius) this.pos.x = -this.radius;
-          if (this.pos.y < -this.radius) this.pos.y = height + this.radius;
-          else if (this.pos.y > height + this.radius) this.pos.y = -this.radius;
+          // Periodic boundary wrap
+          x = ((x % this.width) + this.width) % this.width;
+          y = ((y % this.height) + this.height) % this.height;
+          this.particlesA.push({ x, y, vx: 0, vy: 0 });
         }
+
+        // Create inhibitor particles - spread more evenly, with zero initial velocity
+        const numB = total - numA;
+        for (let i = 0; i < numB; i++) {
+          this.particlesB.push({
+            x: Math.random() * this.width,
+            y: Math.random() * this.height,
+            vx: 0,
+            vy: 0
+          });
+        }
+
+        this.rebuildSpatialHash();
       }
 
-      draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.pos.x, this.pos.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgb(${this.color.r}, ${this.color.g}, ${this.color.b})`;
-        ctx.fill();
-
-        const shadowBlur = isMobile() ? 5 : 10;
-        ctx.shadowBlur = shadowBlur;
-        ctx.shadowColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0.6)`;
-
-        // Draw element symbol
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#fff';
-        ctx.font = `bold ${this.radius * 0.8}px Inter`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.element.symbol, this.pos.x, this.pos.y);
-
-        // Draw charge indicator if charged
-        if (this.charge !== 0) {
-          ctx.font = `${this.radius * 0.5}px Inter`;
-          const chargeStr = this.charge > 0 ? `+${this.charge}` : `${this.charge}`;
-          ctx.fillText(chargeStr, this.pos.x + this.radius * 0.6, this.pos.y - this.radius * 0.6);
-        }
-      }
-    }
-
-    // Molecule class - represents bonded particles moving as a unit
-    class Molecule {
-      constructor(id, particles) {
-        this.id = id;
-        this.particleIds = particles.map(p => p.id);
-        this.centerOfMass = {x: 0, y: 0};
-        this.velocity = {x: 0, y: 0};
-        this.mass = 0;
-        this.formula = '';
-        this.labelOpacity = 1.0;
-        this.age = 0; // Track age for label fade
-
-        this.updateProperties(particles);
+      rebuildSpatialHash() {
+        this.spatialA.clear();
+        this.spatialB.clear();
+        for (const p of this.particlesA) this.spatialA.insert(p);
+        for (const p of this.particlesB) this.spatialB.insert(p);
       }
 
-      updateProperties(particles) {
-        const moleculeParticles = particles.filter(p => this.particleIds.includes(p.id));
-
-        // Calculate center of mass
-        let totalMass = 0;
-        let comX = 0, comY = 0;
-
-        for (const p of moleculeParticles) {
-          comX += p.pos.x * p.mass;
-          comY += p.pos.y * p.mass;
-          totalMass += p.mass;
-        }
-
-        this.centerOfMass.x = comX / totalMass;
-        this.centerOfMass.y = comY / totalMass;
-        this.mass = totalMass;
-
-        // Calculate average velocity (momentum conservation)
-        let momX = 0, momY = 0;
-        for (const p of moleculeParticles) {
-          momX += p.vel.x * p.mass;
-          momY += p.vel.y * p.mass;
-        }
-
-        this.velocity.x = momX / totalMass;
-        this.velocity.y = momY / totalMass;
-
-        // Generate chemical formula
-        this.formula = this.generateFormula(moleculeParticles);
+      // Box-Muller for Gaussian random
+      gaussianRandom() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
       }
 
-      generateFormula(moleculeParticles) {
-        const elementCounts = {};
-        for (const p of moleculeParticles) {
-          const symbol = p.element.symbol;
-          elementCounts[symbol] = (elementCounts[symbol] || 0) + 1;
+      step(dt = 1) {
+        const { DA, DB, r, k1, k2, k3, decayA, decayB, damping, divisionSpeed } = CONFIG;
+        const r2 = r * r;
+
+        // Arrays to hold new particles and indices to remove
+        const newA = [];
+        const newB = [];
+        const removeA = new Set();
+        const removeB = new Set();
+
+        // 1. Velocity-based Brownian motion for smooth movement
+        // Brownian force is added to velocity, then damped, then position is updated
+        for (const p of this.particlesA) {
+          // Add random Brownian force to velocity
+          p.vx += Math.sqrt(2 * DA * dt) * this.gaussianRandom();
+          p.vy += Math.sqrt(2 * DA * dt) * this.gaussianRandom();
+          // Apply damping for smooth deceleration
+          p.vx *= damping;
+          p.vy *= damping;
+          // Update position based on velocity
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          // Periodic boundaries
+          p.x = ((p.x % this.width) + this.width) % this.width;
+          p.y = ((p.y % this.height) + this.height) % this.height;
         }
 
-        let formula = '';
-        for (const [symbol, count] of Object.entries(elementCounts)) {
-          formula += symbol + (count > 1 ? count : '');
-        }
-        return formula;
-      }
-
-      update(particles, dt) {
-        const moleculeParticles = particles.filter(p => this.particleIds.includes(p.id));
-
-        // Increment age for label fade
-        this.age += dt;
-        if (this.age > 2.0 && this.labelOpacity > 0) {
-          // Start fading after 2 seconds
-          this.labelOpacity -= dt * 0.5; // Fade over 2 seconds
-          if (this.labelOpacity < 0) this.labelOpacity = 0;
+        for (const p of this.particlesB) {
+          // Add random Brownian force to velocity
+          p.vx += Math.sqrt(2 * DB * dt) * this.gaussianRandom();
+          p.vy += Math.sqrt(2 * DB * dt) * this.gaussianRandom();
+          // Apply damping for smooth deceleration
+          p.vx *= damping;
+          p.vy *= damping;
+          // Update position based on velocity
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          // Periodic boundaries
+          p.x = ((p.x % this.width) + this.width) % this.width;
+          p.y = ((p.y % this.height) + this.height) % this.height;
         }
 
-        // Store relative positions BEFORE updating COM
-        const relativePositions = moleculeParticles.map(p => ({
-          id: p.id,
-          dx: p.pos.x - this.centerOfMass.x,
-          dy: p.pos.y - this.centerOfMass.y
-        }));
+        // Rebuild spatial hash after movement
+        this.rebuildSpatialHash();
 
-        // Update center of mass position based on velocity
-        this.centerOfMass.x += this.velocity.x * dt;
-        this.centerOfMass.y += this.velocity.y * dt;
+        // 2. Stochastic reactions
+        // Process each activator particle
+        for (let i = 0; i < this.particlesA.length; i++) {
+          if (removeA.has(i)) continue;
+          const pA = this.particlesA[i];
 
-        // Update particle positions to maintain structure relative to new COM
-        for (const p of moleculeParticles) {
-          const rel = relativePositions.find(r => r.id === p.id);
-          p.pos.x = this.centerOfMass.x + rel.dx;
-          p.pos.y = this.centerOfMass.y + rel.dy;
-          // Important: set particle velocity to molecule velocity
-          p.vel.x = this.velocity.x;
-          p.vel.y = this.velocity.y;
-        }
-      }
+          // Count neighbors
+          const neighborsA = this.spatialA.getNeighbors(pA.x, pA.y, r);
+          const neighborsB = this.spatialB.getNeighbors(pA.x, pA.y, r);
 
-      handleBoundaries(particles, width, height) {
-        const moleculeParticles = particles.filter(p => this.particleIds.includes(p.id));
+          let countA = 0, countB = 0;
 
-        if (params.wallMode === 'solid') {
-          // Find the extent of the molecule
-          let minX = Infinity, maxX = -Infinity;
-          let minY = Infinity, maxY = -Infinity;
-
-          for (const p of moleculeParticles) {
-            minX = Math.min(minX, p.pos.x - p.radius);
-            maxX = Math.max(maxX, p.pos.x + p.radius);
-            minY = Math.min(minY, p.pos.y - p.radius);
-            maxY = Math.max(maxY, p.pos.y + p.radius);
+          for (const n of neighborsA) {
+            const dx = this.wrapDist(n.x - pA.x, this.width);
+            const dy = this.wrapDist(n.y - pA.y, this.height);
+            if (dx * dx + dy * dy < r2 && n !== pA) countA++;
           }
 
-          // Bounce off walls
-          if (minX < 0 || maxX > width) {
-            this.velocity.x = -this.velocity.x;
-            this.centerOfMass.x += this.velocity.x * 0.01;
-          }
-          if (minY < 0 || maxY > height) {
-            this.velocity.y = -this.velocity.y;
-            this.centerOfMass.y += this.velocity.y * 0.01;
-          }
-        }
-      }
-
-      draw(ctx, particles) {
-        // Only draw label if opacity > 0
-        if (this.labelOpacity <= 0) return;
-
-        const moleculeParticles = particles.filter(p => this.particleIds.includes(p.id));
-        if (moleculeParticles.length === 0) return;
-
-        // Calculate current center from particle positions
-        let centerX = 0, centerY = 0;
-        for (const p of moleculeParticles) {
-          centerX += p.pos.x;
-          centerY += p.pos.y;
-        }
-        centerX /= moleculeParticles.length;
-        centerY /= moleculeParticles.length;
-
-        // Draw molecule label with fade effect
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = `rgba(255, 255, 100, ${this.labelOpacity * 0.8})`;
-        ctx.font = `bold ${isMobile() ? 10 : 12}px Inter`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-
-        // Find highest particle position to place label above molecule
-        let minY = Math.min(...moleculeParticles.map(p => p.pos.y - p.radius));
-        ctx.fillText(this.formula, centerX, minY - 5);
-      }
-    }
-
-    let particles = [];
-    let bonds = [];
-    let molecules = [];
-    let nextMoleculeId = 1;
-    let nextParticleId = 1;
-
-    // Reaction rules database
-    const reactionRules = [
-      {
-        // H2O formation: 2H + O → H2O
-        name: 'Water Formation',
-        reactants: [
-          {symbol: 'H', count: 2},
-          {symbol: 'O', count: 1}
-        ],
-        products: [{formula: 'H2O', structure: ['H', 'O', 'H']}],
-        activationEnergy: 50, // kJ/mol
-        energyChange: -285.8, // kJ/mol (exothermic)
-        bondType: 'covalent',
-        requiresValence: true
-      },
-      {
-        // NaCl formation: Na + Cl → NaCl
-        name: 'Sodium Chloride Formation',
-        reactants: [
-          {symbol: 'Na', count: 1},
-          {symbol: 'Cl', count: 1}
-        ],
-        products: [{formula: 'NaCl', structure: ['Na', 'Cl']}],
-        activationEnergy: 5, // kJ/mol (very low - ionic bonds form easily)
-        energyChange: -411, // kJ/mol (exothermic)
-        bondType: 'ionic',
-        requiresValence: true
-      },
-      {
-        // H2 formation: 2H → H2
-        name: 'Hydrogen Gas Formation',
-        reactants: [
-          {symbol: 'H', count: 2}
-        ],
-        products: [{formula: 'H2', structure: ['H', 'H']}],
-        activationEnergy: 40, // kJ/mol
-        energyChange: -436, // kJ/mol
-        bondType: 'covalent',
-        requiresValence: true
-      },
-      {
-        // O2 formation: 2O → O2
-        name: 'Oxygen Gas Formation',
-        reactants: [
-          {symbol: 'O', count: 2}
-        ],
-        products: [{formula: 'O2', structure: ['O', 'O']}],
-        activationEnergy: 45, // kJ/mol
-        energyChange: -498, // kJ/mol
-        bondType: 'covalent',
-        requiresValence: true
-      },
-      {
-        // CO2 formation: C + 2O → CO2
-        name: 'Carbon Dioxide Formation',
-        reactants: [
-          {symbol: 'C', count: 1},
-          {symbol: 'O', count: 2}
-        ],
-        products: [{formula: 'CO2', structure: ['O', 'C', 'O']}],
-        activationEnergy: 60, // kJ/mol
-        energyChange: -393.5, // kJ/mol
-        bondType: 'covalent',
-        requiresValence: true
-      }
-    ];
-
-    // ========================================
-    // CHEMICAL KINETICS COLLISION ENGINE
-    // ========================================
-
-    /**
-     * Calculate kinetic energy of collision
-     * Returns energy in kJ/mol equivalent scale
-     */
-    function getCollisionEnergy(p1, p2) {
-      // Relative velocity
-      const dvx = p1.vel.x - p2.vel.x;
-      const dvy = p1.vel.y - p2.vel.y;
-      const relativeSpeed = Math.sqrt(dvx * dvx + dvy * dvy);
-
-      // Reduced mass
-      const reducedMass = (p1.mass * p2.mass) / (p1.mass + p2.mass);
-
-      // Kinetic energy in collision (converted to kJ/mol scale)
-      const kineticEnergy = 0.5 * reducedMass * relativeSpeed * relativeSpeed * 0.01;
-
-      return kineticEnergy;
-    }
-
-    /**
-     * Main collision resolution function
-     * Determines reaction type and applies chemistry
-     * NOW SUPPORTS: Molecules reacting with atoms or other molecules!
-     */
-    function resolveCollision(a, b, collisionEnergy, temperature) {
-      // Check if particles have available bonding capacity
-      const vacanciesA = a.getAvailableBonds();
-      const vacanciesB = b.getAvailableBonds();
-
-      // ✅ ALLOW MOLECULES TO REACT if they have available bonds
-      // Example: H2O can add another H to become H3O+
-      if (vacanciesA <= 0 && vacanciesB <= 0) {
-        return elasticScatter(a, b, collisionEnergy);
-      }
-
-      // If one or both are in molecules, check if they can still react
-      const aInMolecule = a.moleculeId !== null;
-      const bInMolecule = b.moleculeId !== null;
-
-      // Don't allow particles in the SAME molecule to react again
-      if (aInMolecule && bInMolecule && a.moleculeId === b.moleculeId) {
-        return elasticScatter(a, b, collisionEnergy);
-      }
-
-      // Step 1: Calculate electronegativity difference
-      const deltaEN = Math.abs(a.element.electronegativity - b.element.electronegativity);
-
-      // Step 2: Determine bond type
-      const bothMetals = (a.element.tendency === 'Metal' && b.element.tendency === 'Metal');
-      const isIonic = deltaEN >= 1.8 ||
-                      (a.element.bondType.includes('Ionic') || b.element.bondType.includes('Ionic'));
-      const isPolarCovalent = deltaEN >= 0.4 && deltaEN < 1.8;
-      const isNonPolarCovalent = deltaEN < 0.4;
-
-      // Step 3: Calculate reaction probability
-      let reactionProbability = 0;
-      let reactionType = 'none';
-
-      if (bothMetals) {
-        reactionType = 'metallic';
-        reactionProbability = clamp(0.1 + 0.03 * collisionEnergy, 0, 0.6);
-      } else if (isIonic && deltaEN >= 1.8) {
-        reactionType = 'ionic';
-        reactionProbability = clamp(0.2 + 0.05 * collisionEnergy + 0.3 * (deltaEN / 4), 0, 1);
-      } else if (isPolarCovalent || isNonPolarCovalent) {
-        reactionType = isPolarCovalent ? 'polar_covalent' : 'covalent';
-        const vacancyFactor = (vacanciesA + vacanciesB) / 8;
-        reactionProbability = clamp(0.15 + 0.04 * collisionEnergy + 0.2 * vacancyFactor, 0, 1);
-      }
-
-      // Apply temperature effect (Arrhenius-like)
-      const tempFactor = temperature / 300; // Normalized to room temp
-      reactionProbability *= Math.sqrt(tempFactor);
-
-      // Step 4: Stochastic check
-      if (Math.random() > reactionProbability) {
-        return elasticScatter(a, b, collisionEnergy);
-      }
-
-      // Step 5: Apply reaction logic based on type
-      switch (reactionType) {
-        case 'metallic':
-          return formMetallicCluster(a, b);
-        case 'ionic':
-          return createIonicBond(a, b, deltaEN);
-        case 'polar_covalent':
-        case 'covalent':
-          return formCovalentBond(a, b, reactionType === 'polar_covalent' ? deltaEN : 0);
-        default:
-          return elasticScatter(a, b, collisionEnergy);
-      }
-    }
-
-    /**
-     * Clamp utility function
-     */
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    /**
-     * Form covalent bond by sharing electrons
-     */
-    function formCovalentBond(a, b, deltaEN) {
-      // Calculate available vacancies
-      const vacanciesA = a.getAvailableBonds();
-      const vacanciesB = b.getAvailableBonds();
-
-      // Determine number of shared electron pairs
-      const sharedPairs = Math.min(vacanciesA, vacanciesB, 3); // Max triple bond
-
-      if (sharedPairs <= 0) return false;
-
-      // Determine bond order (single, double, triple)
-      let bondFormula = '';
-      if (sharedPairs === 1) bondFormula = `${a.element.symbol}-${b.element.symbol}`;
-      else if (sharedPairs === 2) bondFormula = `${a.element.symbol}=${b.element.symbol}`;
-      else if (sharedPairs === 3) bondFormula = `${a.element.symbol}≡${b.element.symbol}`;
-
-      // Add partial charges for polar covalent
-      if (deltaEN > 0.4) {
-        const delta = deltaEN * 0.3; // Partial charge magnitude
-        if (a.element.electronegativity > b.element.electronegativity) {
-          a.charge -= delta;
-          b.charge += delta;
-        } else {
-          a.charge += delta;
-          b.charge -= delta;
-        }
-      }
-
-      // Create molecule
-      const reactants = [
-        { symbol: a.element.symbol, count: 1 },
-        { symbol: b.element.symbol, count: 1 }
-      ];
-      const structure = [a.element.symbol, b.element.symbol];
-
-      const rule = {
-        name: `${bondFormula} Formation`,
-        reactants: reactants,
-        products: [{ formula: bondFormula, structure: structure }],
-        activationEnergy: 20 + deltaEN * 10,
-        energyChange: -100 * sharedPairs,
-        bondType: deltaEN > 0.4 ? 'polar' : 'covalent',
-        requiresValence: true
-      };
-
-      createMolecule([a, b], rule);
-
-      console.log(`✓ Covalent: ${bondFormula} ${deltaEN > 0.4 ? '(polar)' : ''}`);
-      return true;
-    }
-
-    /**
-     * Create ionic bond via electron transfer
-     */
-    function createIonicBond(a, b, deltaEN) {
-      // Identify donor (lower EN) and acceptor (higher EN)
-      let donor = a.element.electronegativity < b.element.electronegativity ? a : b;
-      let acceptor = donor === a ? b : a;
-
-      // Calculate electron transfer
-      const donorAvailable = donor.element.valenceElectrons - donor.currentBonds.length;
-      const acceptorVacancies = acceptor.getAvailableBonds();
-
-      const electronsToTransfer = Math.min(donorAvailable, acceptorVacancies, 3);
-
-      if (electronsToTransfer <= 0) return false;
-
-      // Transfer electrons (update charges)
-      donor.charge += electronsToTransfer;
-      acceptor.charge -= electronsToTransfer;
-
-      // Create ionic molecule
-      const formula = `${donor.element.symbol}${acceptor.element.symbol}`;
-      const rule = {
-        name: `${formula} Formation (Ionic)`,
-        reactants: [
-          { symbol: donor.element.symbol, count: 1 },
-          { symbol: acceptor.element.symbol, count: 1 }
-        ],
-        products: [{ formula: formula, structure: [donor.element.symbol, acceptor.element.symbol] }],
-        activationEnergy: 5,
-        energyChange: -400,
-        bondType: 'ionic',
-        requiresValence: true
-      };
-
-      createMolecule([donor, acceptor], rule);
-
-      console.log(`✓ Ionic: ${donor.element.symbol}⁺${Math.abs(donor.charge)} + ${acceptor.element.symbol}⁻${Math.abs(acceptor.charge)} → ${formula}`);
-      return true;
-    }
-
-    /**
-     * Form metallic cluster (weak bonds, electron sea)
-     */
-    function formMetallicCluster(a, b) {
-      // Metallic bonding - minimal electron transfer, delocalized electrons
-      const formula = `${a.element.symbol}${b.element.symbol}`;
-
-      const rule = {
-        name: `${formula} Metallic Cluster`,
-        reactants: [
-          { symbol: a.element.symbol, count: 1 },
-          { symbol: b.element.symbol, count: 1 }
-        ],
-        products: [{ formula: formula, structure: [a.element.symbol, b.element.symbol] }],
-        activationEnergy: 10,
-        energyChange: -50,
-        bondType: 'metallic',
-        requiresValence: false
-      };
-
-      // Slight charge delocalization
-      const avgCharge = (a.charge + b.charge) / 2;
-      a.charge = avgCharge;
-      b.charge = avgCharge;
-
-      createMolecule([a, b], rule);
-
-      console.log(`✓ Metallic: ${a.element.symbol} + ${b.element.symbol} → ${formula} cluster`);
-      return true;
-    }
-
-    /**
-     * Elastic scatter - no reaction
-     */
-    function elasticScatter(a, b, collisionEnergy) {
-      // Particles bounce off without reacting
-      // Physics already handled in handleCollisions()
-      return false;
-    }
-
-    /**
-     * Optional: Break existing bond if collision energy is very high
-     */
-    function breakBond(a, b, collisionEnergy) {
-      const BOND_BREAK_THRESHOLD = 200; // kJ/mol
-
-      if (collisionEnergy < BOND_BREAK_THRESHOLD) return false;
-
-      // Check if a and b are in the same molecule
-      if (a.moleculeId !== null && a.moleculeId === b.moleculeId) {
-        const moleculeId = a.moleculeId;
-
-        // Remove molecule
-        molecules = molecules.filter(m => m.id !== moleculeId);
-
-        // Free particles
-        a.moleculeId = null;
-        b.moleculeId = null;
-        a.currentBonds = a.currentBonds.filter(id => id !== b.id);
-        b.currentBonds = b.currentBonds.filter(id => id !== a.id);
-        a.charge = 0;
-        b.charge = 0;
-
-        console.log(`✗ Bond broken: ${a.element.symbol}-${b.element.symbol} (${collisionEnergy.toFixed(1)} kJ/mol)`);
-        return true;
-      }
-
-      return false;
-    }
-
-    // Check if reaction is electronegatively favorable
-    function isElectronegativelyCompatible(reactants, rule) {
-      if (rule.bondType === 'ionic') {
-        // Ionic bonds need high electronegativity difference
-        const enDiffs = [];
-        for (let i = 0; i < reactants.length; i++) {
-          for (let j = i + 1; j < reactants.length; j++) {
-            const enDiff = Math.abs(reactants[i].element.electronegativity - reactants[j].element.electronegativity);
-            enDiffs.push(enDiff);
-          }
-        }
-        // Need at least one pair with EN diff > 1.7 for ionic
-        return enDiffs.some(diff => diff > 1.7);
-      } else if (rule.bondType === 'covalent') {
-        // Covalent bonds need compatible electronegativity (not too different)
-        const enDiffs = [];
-        for (let i = 0; i < reactants.length; i++) {
-          for (let j = i + 1; j < reactants.length; j++) {
-            const enDiff = Math.abs(reactants[i].element.electronegativity - reactants[j].element.electronegativity);
-            enDiffs.push(enDiff);
-          }
-        }
-        // All pairs should have EN diff < 2.0 for covalent
-        return enDiffs.every(diff => diff < 2.0);
-      }
-      return true;
-    }
-
-    // Check if particles have available valence
-    function hasAvailableValence(particles, rule) {
-      if (!rule.requiresValence) return true;
-
-      // Check if all particles have available bonds
-      for (const p of particles) {
-        if (p.getAvailableBonds() <= 0) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    // Calculate Arrhenius reaction probability
-    function getReactionProbability(collisionEnergy, activationEnergy, temperature) {
-      // Arrhenius equation: k = A * e^(-Ea/RT)
-      // R = 8.314 J/(mol·K) = 0.008314 kJ/(mol·K)
-      const R = 0.008314;
-      const A = 1.0; // Pre-exponential factor (normalized)
-
-      // Temperature effect on activation energy
-      const effectiveEa = activationEnergy * (300 / temperature); // Scale Ea by temperature
-
-      // If collision energy exceeds activation energy, increase probability
-      if (collisionEnergy >= effectiveEa) {
-        return Math.min(0.95, A * Math.exp(-(effectiveEa - collisionEnergy) / (R * temperature)));
-      } else {
-        // Arrhenius probability if below activation energy
-        return A * Math.exp(-effectiveEa / (R * temperature));
-      }
-    }
-
-    // Check for chemical reactions on collision
-    function checkReactions() {
-      const REACTION_DISTANCE = 30; // Distance threshold for reaction
-
-      for (let i = 0; i < particles.length; i++) {
-        const pi = particles[i];
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const pj = particles[j];
-
-          // ✅ NOW CHECKS ALL PAIRS (including molecules)
-          // Skip only if both are in the SAME molecule
-          if (pi.moleculeId !== null && pi.moleculeId === pj.moleculeId) {
-            continue;
+          for (const n of neighborsB) {
+            const dx = this.wrapDist(n.x - pA.x, this.width);
+            const dy = this.wrapDist(n.y - pA.y, this.height);
+            if (dx * dx + dy * dy < r2) countB++;
           }
 
-          // Calculate distance
-          const dx = pj.pos.x - pi.pos.x;
-          const dy = pj.pos.y - pi.pos.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          // Check if particles are close enough
-          if (dist < REACTION_DISTANCE) {
-            // Calculate collision energy
-            const collisionEnergy = getCollisionEnergy(pi, pj);
-
-            // ✅ USE NEW COLLISION ENGINE
-            // Can now handle: atom+atom, atom+molecule, molecule+molecule
-            resolveCollision(pi, pj, collisionEnergy, params.temperature);
-
-            // Optional: Check for bond breaking at very high energies
-            if (collisionEnergy > 150) {
-              breakBond(pi, pj, collisionEnergy);
-            }
+          // Autocatalysis: A + A → A + A + A' (CELL DIVISION - new particle spawns AT parent and moves away)
+          if (countA > 0 && Math.random() < k1 * countA * dt) {
+            // Birth new activator at EXACT parent position with outward velocity (cell division effect)
+            const angle = Math.random() * Math.PI * 2;
+            // New particle starts at parent's exact position
+            const nx = pA.x;
+            const ny = pA.y;
+            // Give it outward velocity (splits from parent)
+            const outVx = Math.cos(angle) * divisionSpeed;
+            const outVy = Math.sin(angle) * divisionSpeed;
+            newA.push({ x: nx, y: ny, vx: outVx, vy: outVy });
+            // Also give parent a small opposite push (conservation of momentum feel)
+            pA.vx -= outVx * 0.3;
+            pA.vy -= outVy * 0.3;
           }
-        }
-      }
-    }
 
-    // Attempt to create a reaction from nearby particles
-    function tryReaction(nearbyParticles, collisionEnergy) {
-      // Check each reaction rule
-      for (const rule of reactionRules) {
-        // Count available reactants
-        const available = {};
-        const particlesBySymbol = {};
-
-        for (const p of nearbyParticles) {
-          if (p.moleculeId !== null) continue;
-
-          const symbol = p.element.symbol;
-          available[symbol] = (available[symbol] || 0) + 1;
-
-          if (!particlesBySymbol[symbol]) {
-            particlesBySymbol[symbol] = [];
+          // Inhibitor generation: A → A + B (CELL DIVISION - B spawns AT parent and moves away)
+          if (Math.random() < k2 * dt) {
+            const angle = Math.random() * Math.PI * 2;
+            // New inhibitor starts at parent's exact position
+            const nx = pA.x;
+            const ny = pA.y;
+            // Give it outward velocity
+            const outVx = Math.cos(angle) * divisionSpeed * 0.8;
+            const outVy = Math.sin(angle) * divisionSpeed * 0.8;
+            newB.push({ x: nx, y: ny, vx: outVx, vy: outVy });
           }
-          particlesBySymbol[symbol].push(p);
-        }
 
-        // Check if we have enough reactants
-        let canReact = true;
-        for (const reactant of rule.reactants) {
-          if ((available[reactant.symbol] || 0) < reactant.count) {
-            canReact = false;
-            break;
+          // Suppression: A + B → B (A dies if B nearby)
+          if (countB > 0 && Math.random() < k3 * countB * dt) {
+            removeA.add(i);
+          }
+
+          // Natural decay
+          if (Math.random() < decayA * dt) {
+            removeA.add(i);
           }
         }
 
-        if (!canReact) continue;
-
-        // Collect particles for reaction
-        const reactingParticles = [];
-        for (const reactant of rule.reactants) {
-          const needed = reactant.count;
-          const particlesOfType = particlesBySymbol[reactant.symbol];
-          for (let i = 0; i < needed && i < particlesOfType.length; i++) {
-            reactingParticles.push(particlesOfType[i]);
+        // Process inhibitor decay
+        for (let i = 0; i < this.particlesB.length; i++) {
+          if (Math.random() < decayB * dt) {
+            removeB.add(i);
           }
         }
 
-        if (reactingParticles.length === 0) continue;
+        // Apply removals using filter (more efficient than splice)
+        this.particlesA = this.particlesA.filter((_, i) => !removeA.has(i));
+        this.particlesB = this.particlesB.filter((_, i) => !removeB.has(i));
 
-        // ✅ NEW: Check valence availability
-        if (!hasAvailableValence(reactingParticles, rule)) {
-          continue; // Skip if particles don't have available bonds
-        }
+        // Add new particles
+        for (const p of newA) this.particlesA.push(p);
+        for (const p of newB) this.particlesB.push(p);
 
-        // ✅ NEW: Check electronegativity compatibility
-        if (!isElectronegativelyCompatible(reactingParticles, rule)) {
-          continue; // Skip if bond type not compatible with electronegativity
-        }
-
-        // ✅ NEW: Calculate reaction probability based on Arrhenius equation
-        const reactionProb = getReactionProbability(
-          collisionEnergy,
-          rule.activationEnergy,
-          params.temperature
-        );
-
-        // ✅ NEW: Stochastic check with temperature-dependent probability
-        if (Math.random() > reactionProb) {
-          continue; // Reaction doesn't occur this time
-        }
-
-        // All checks passed - create molecule!
-        createMolecule(reactingParticles, rule);
-        return true;
+        // Population control to prevent runaway growth or extinction
+        this.populationControl();
       }
 
-      return false;
-    }
-
-    // Create a molecule from reacting particles
-    function createMolecule(reactingParticles, rule) {
-      // ✅ CHECK IF ANY PARTICLES ARE ALREADY IN MOLECULES
-      const existingMolecules = new Set();
-      const newParticles = [];
-
-      for (const p of reactingParticles) {
-        if (p.moleculeId !== null) {
-          existingMolecules.add(p.moleculeId);
-        } else {
-          newParticles.push(p);
-        }
+      wrapDist(d, size) {
+        if (d > size / 2) return d - size;
+        if (d < -size / 2) return d + size;
+        return d;
       }
 
-      let moleculeId;
+      populationControl() {
+        const targetTotal = CONFIG.initialParticles;
+        const maxParticles = targetTotal * 2;
+        const minParticles = targetTotal * 0.1;
 
-      // If particles from existing molecule(s), merge/expand
-      if (existingMolecules.size > 0) {
-        // Use first existing molecule ID
-        moleculeId = [...existingMolecules][0];
+        // If too many particles, cull randomly
+        if (this.particlesA.length + this.particlesB.length > maxParticles) {
+          const excess = (this.particlesA.length + this.particlesB.length) - maxParticles;
+          const cullA = Math.floor(excess * (this.particlesA.length / (this.particlesA.length + this.particlesB.length)));
+          const cullB = excess - cullA;
 
-        // Remove old molecules
-        for (const oldId of existingMolecules) {
-          const oldMol = molecules.find(m => m.id === oldId);
-          if (oldMol) {
-            // Add all particles from old molecule
-            for (const pid of oldMol.particleIds) {
-              const particle = particles.find(p => p.id === pid);
-              if (particle && !reactingParticles.includes(particle)) {
-                reactingParticles.push(particle);
-              }
-            }
+          for (let i = 0; i < cullA && this.particlesA.length > 100; i++) {
+            const idx = Math.floor(Math.random() * this.particlesA.length);
+            this.particlesA.splice(idx, 1);
+          }
+          for (let i = 0; i < cullB && this.particlesB.length > 100; i++) {
+            const idx = Math.floor(Math.random() * this.particlesB.length);
+            this.particlesB.splice(idx, 1);
           }
         }
 
-        // Remove old molecule objects
-        molecules = molecules.filter(m => !existingMolecules.has(m.id));
-      } else {
-        // All new particles - create new molecule
-        moleculeId = nextMoleculeId++;
-      }
-
-      // Calculate center of mass and average velocity
-      let totalMass = 0;
-      let comX = 0, comY = 0;
-      let momX = 0, momY = 0;
-
-      for (const p of reactingParticles) {
-        comX += p.pos.x * p.mass;
-        comY += p.pos.y * p.mass;
-        momX += p.vel.x * p.mass;
-        momY += p.vel.y * p.mass;
-        totalMass += p.mass;
-      }
-
-      comX /= totalMass;
-      comY /= totalMass;
-      const avgVelX = momX / totalMass;
-      const avgVelY = momY / totalMass;
-
-      // Mark particles as part of molecule and update their bonds
-      for (const p of reactingParticles) {
-        p.moleculeId = moleculeId;
-
-        // Mark bonds as used (add other particles in molecule to currentBonds)
-        for (const other of reactingParticles) {
-          if (other.id !== p.id && !p.currentBonds.includes(other.id)) {
-            p.currentBonds.push(other.id);
-          }
-        }
-      }
-
-      // Arrange particles in molecular structure around COM
-      if (rule.products[0].structure) {
-        arrangeMolecularStructure(reactingParticles, rule.products[0].structure, comX, comY);
-      }
-
-      // Handle ionic bonding (charge transfer)
-      if (rule.name.includes('Sodium Chloride')) {
-        const na = reactingParticles.find(p => p.element.symbol === 'Na');
-        const cl = reactingParticles.find(p => p.element.symbol === 'Cl');
-        if (na && cl) {
-          na.charge = +1;
-          cl.charge = -1;
-        }
-      }
-
-      // Create molecule object (it will recalculate COM from arranged positions)
-      const molecule = new Molecule(moleculeId, reactingParticles);
-
-      // Set velocity from conserved momentum
-      molecule.velocity.x = avgVelX;
-      molecule.velocity.y = avgVelY;
-
-      // Apply particle velocities
-      for (const p of reactingParticles) {
-        p.vel.x = molecule.velocity.x;
-        p.vel.y = molecule.velocity.y;
-      }
-
-      molecules.push(molecule);
-
-      // Apply energy change (affects velocity)
-      if (rule.energyChange < 0) {
-        // Exothermic - release energy as kinetic energy
-        const speedBoost = Math.sqrt(Math.abs(rule.energyChange) * 0.001);
-        molecule.velocity.x += (Math.random() - 0.5) * speedBoost;
-        molecule.velocity.y += (Math.random() - 0.5) * speedBoost;
-      }
-    }
-
-    // Arrange particles in molecular geometry
-    function arrangeMolecularStructure(particles, structure, centerX, centerY) {
-      if (particles.length !== structure.length) return;
-
-      // Sort particles to match structure order
-      const sortedParticles = [];
-      for (const symbol of structure) {
-        const p = particles.find(p => p.element.symbol === symbol && !sortedParticles.includes(p));
-        if (p) sortedParticles.push(p);
-      }
-
-      // Use provided center (calculated from pre-reaction positions)
-      // Arrange in a line or angle depending on structure
-      if (sortedParticles.length === 2) {
-        // Linear molecule (H2, O2, NaCl)
-        const spacing = 15;
-        sortedParticles[0].pos.x = centerX - spacing / 2;
-        sortedParticles[0].pos.y = centerY;
-        sortedParticles[1].pos.x = centerX + spacing / 2;
-        sortedParticles[1].pos.y = centerY;
-      } else if (sortedParticles.length === 3) {
-        // Bent or linear molecule (H2O, CO2)
-        const spacing = 18;
-        if (structure.includes('H') && structure.includes('O')) {
-          // H2O - bent structure (104.5° angle)
-          sortedParticles[0].pos.x = centerX - spacing * 0.8;
-          sortedParticles[0].pos.y = centerY + spacing * 0.5;
-          sortedParticles[1].pos.x = centerX; // O in center
-          sortedParticles[1].pos.y = centerY;
-          sortedParticles[2].pos.x = centerX + spacing * 0.8;
-          sortedParticles[2].pos.y = centerY + spacing * 0.5;
-        } else {
-          // CO2 - linear structure
-          sortedParticles[0].pos.x = centerX - spacing;
-          sortedParticles[0].pos.y = centerY;
-          sortedParticles[1].pos.x = centerX;
-          sortedParticles[1].pos.y = centerY;
-          sortedParticles[2].pos.x = centerX + spacing;
-          sortedParticles[2].pos.y = centerY;
-        }
-      }
-    }
-
-    function updateBonds() {
-      if (!params.showBonds) {
-        bonds = [];
-        return;
-      }
-
-      bonds = [];
-
-      // Check all particle pairs for bonding
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const pi = particles[i];
-          const pj = particles[j];
-
-          // Calculate bond properties
-          const bondProps = calculateBondProperties(pi.element, pj.element);
-          if (!bondProps || !bondProps.canBond) continue;
-
-          // Calculate distance
-          const dx = pj.pos.x - pi.pos.x;
-          const dy = pj.pos.y - pi.pos.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          // Bond forms if particles are close enough OR in same molecule
-          const bondDistance = bondProps.bondLength * params.bondStrength * 8;
-          const inSameMolecule = pi.moleculeId !== null && pi.moleculeId === pj.moleculeId;
-
-          if (dist <= bondDistance || inSameMolecule) {
-            bonds.push({
-              i,
-              j,
-              type: bondProps.bondType,
-              strength: bondProps.strength
+        // If too few activators, inject some with zero velocity
+        if (this.particlesA.length < minParticles * 0.5) {
+          const inject = Math.floor(minParticles * 0.3);
+          for (let i = 0; i < inject; i++) {
+            this.particlesA.push({
+              x: Math.random() * this.width,
+              y: Math.random() * this.height,
+              vx: 0,
+              vy: 0
             });
           }
         }
       }
-    }
 
-    function initParticles(canvas) {
-      particles = [];
-      molecules = [];
-      nextParticleId = 1;
-      nextMoleculeId = 1;
+      computeDensity() {
+        const cellW = this.width / this.gridSize;
+        const cellH = this.height / this.gridSize;
 
-      function isValidPosition(x, y, radius) {
-        for (let p of particles) {
-          const dx = x - p.pos.x;
-          const dy = y - p.pos.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < radius + p.radius + 5) {
-            return false;
+        this.densityA.fill(0);
+        this.densityB.fill(0);
+
+        for (const p of this.particlesA) {
+          const gx = Math.floor(p.x / cellW);
+          const gy = Math.floor(p.y / cellH);
+          if (gx >= 0 && gx < this.gridSize && gy >= 0 && gy < this.gridSize) {
+            this.densityA[gy * this.gridSize + gx]++;
           }
         }
-        return true;
-      }
 
-      // Create particles for each selected element
-      const elementCounts = [
-        {element: selectedElements[0], count: params.element1Count},
-        {element: selectedElements[1], count: params.element2Count},
-        {element: selectedElements[2], count: params.element3Count}
-      ];
-
-      for (const {element, count} of elementCounts) {
-        if (!element || count === 0) continue;
-
-        for (let i = 0; i < count; i++) {
-          let attempts = 0;
-          let x, y;
-          const atomicScale = Math.pow(element.atomicNumber, 0.33) * 0.5;
-          const radius = params.radiusScale * BASE_RADIUS * atomicScale;
-
-          do {
-            x = radius * 2 + Math.random() * (canvas.width - 4 * radius);
-            y = radius * 2 + Math.random() * (canvas.height - 4 * radius);
-            attempts++;
-          } while (!isValidPosition(x, y, radius) && attempts < 100);
-
-          if (attempts < 100) {
-            particles.push(new Particle(x, y, element, params.particleSpeed, nextParticleId++));
+        for (const p of this.particlesB) {
+          const gx = Math.floor(p.x / cellW);
+          const gy = Math.floor(p.y / cellH);
+          if (gx >= 0 && gx < this.gridSize && gy >= 0 && gy < this.gridSize) {
+            this.densityB[gy * this.gridSize + gx]++;
           }
         }
-      }
-    }
 
-    function computeForces() {
-      const MAX_FORCE = 10;
-      const FORCE_STRENGTH = 800;
-      const IONIC_FORCE_STRENGTH = 1200; // Stronger ionic attraction
-
-      // Reset all forces
-      for (let p of particles) {
-        p.force.x = 0;
-        p.force.y = 0;
-      }
-
-      // Calculate forces between all particle pairs
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const pi = particles[i];
-          const pj = particles[j];
-
-          // Calculate distance
-          const dx = pj.pos.x - pi.pos.x;
-          const dy = pj.pos.y - pi.pos.y;
-          const distSq = dx * dx + dy * dy;
-          const dist = Math.sqrt(distSq);
-
-          if (dist < 0.1) continue;
-
-          let forceMag = 0;
-
-          // ✅ IONIC ATTRACTION: Opposite charges attract, like charges repel
-          const chargeProduct = pi.charge * pj.charge;
-          if (Math.abs(chargeProduct) > 0.01) {
-            // Coulomb's law: F = k * q1 * q2 / r²
-            const ionicForce = -(IONIC_FORCE_STRENGTH * chargeProduct) / distSq;
-            forceMag += ionicForce;
-          }
-
-          // Check if in same molecule (covalent bond with fixed distance)
-          const inSameMolecule = pi.moleculeId !== null && pi.moleculeId === pj.moleculeId;
-
-          if (inSameMolecule) {
-            // ✅ FIXED COVALENT BOND DISTANCE
-            const targetDist = 15; // Fixed bond length in pixels
-            const springConstant = 5.0;
-
-            // Hooke's law spring force: F = -k(x - x0)
-            const displacement = dist - targetDist;
-            forceMag += springConstant * displacement / dist;
-          } else {
-            // Not in same molecule - calculate bond properties
-            const bondProps = calculateBondProperties(pi.element, pj.element);
-
-            if (bondProps && bondProps.canBond) {
-              // Attractive force based on electronegativity difference
-              const enDiff = Math.abs(pi.element.electronegativity - pj.element.electronegativity);
-              const equilibriumDist = bondProps.bondLength * 8;
-
-              // Lennard-Jones-like potential
-              if (dist < equilibriumDist) {
-                // Repulsion when too close
-                forceMag += (FORCE_STRENGTH * bondProps.strength * 0.5) / distSq;
-              } else {
-                // Attraction when farther
-                const attraction = -bondProps.strength * enDiff * 0.3;
-                forceMag += (attraction * FORCE_STRENGTH) / distSq;
-              }
-            } else {
-              // Repulsion for non-bonding elements
-              forceMag += (FORCE_STRENGTH * 0.2) / distSq;
-            }
-          }
-
-          // Clamp force
-          forceMag = Math.max(-MAX_FORCE, Math.min(MAX_FORCE, forceMag));
-
-          // Normalize direction
-          const nx = dx / dist;
-          const ny = dy / dist;
-
-          // Apply force (negative for attraction, positive for repulsion)
-          const fx = -nx * forceMag;
-          const fy = -ny * forceMag;
-
-          pi.force.x += fx;
-          pi.force.y += fy;
-          pj.force.x -= fx;
-          pj.force.y -= fy;
-        }
-      }
-    }
-
-    function handleCollisions() {
-      // Check all particle pairs for collisions
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const pi = particles[i];
-          const pj = particles[j];
-
-          // Calculate distance between particles
-          const dx = pj.pos.x - pi.pos.x;
-          const dy = pj.pos.y - pi.pos.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const minDist = pi.radius + pj.radius;
-
-          // Check if particles are overlapping
-          if (dist < minDist && dist > 0) {
-            // Collision normal (normalized direction vector)
-            const nx = dx / dist;
-            const ny = dy / dist;
-
-            // Separate particles to prevent overlap
-            const overlap = minDist - dist;
-            const separationX = nx * overlap * 0.5;
-            const separationY = ny * overlap * 0.5;
-
-            pi.pos.x -= separationX;
-            pi.pos.y -= separationY;
-            pj.pos.x += separationX;
-            pj.pos.y += separationY;
-
-            // Calculate relative velocity
-            const dvx = pj.vel.x - pi.vel.x;
-            const dvy = pj.vel.y - pi.vel.y;
-
-            // Calculate relative velocity in collision normal direction
-            const dvn = dvx * nx + dvy * ny;
-
-            // Only resolve if particles are moving towards each other
-            if (dvn < 0) {
-              // Calculate impulse scalar (for equal mass elastic collision)
-              const impulse = -(1 + RESTITUTION) * dvn / (1/pi.mass + 1/pj.mass);
-
-              // Apply impulse to both particles
-              const impulseX = impulse * nx;
-              const impulseY = impulse * ny;
-
-              pi.vel.x -= impulseX / pi.mass;
-              pi.vel.y -= impulseY / pi.mass;
-              pj.vel.x += impulseX / pj.mass;
-              pj.vel.y += impulseY / pj.mass;
-            }
-          }
-        }
-      }
-    }
-
-    function step(dt, canvas) {
-      // Check for chemical reactions
-      checkReactions();
-
-      // Update molecules
-      for (const molecule of molecules) {
-        molecule.update(particles, dt);
-        molecule.handleBoundaries(particles, canvas.width, canvas.height);
-      }
-
-      // Compute forces between particles (only free particles)
-      computeForces();
-
-      // Apply forces to update velocities (only free particles)
-      for (let p of particles) {
-        if (p.moleculeId === null) {
-          p.vel.x += (p.force.x / p.mass) * dt;
-          p.vel.y += (p.force.y / p.mass) * dt;
+        // Normalize
+        const maxA = Math.max(...this.densityA) || 1;
+        const maxB = Math.max(...this.densityB) || 1;
+        for (let i = 0; i < this.densityA.length; i++) {
+          this.densityA[i] /= maxA;
+          this.densityB[i] /= maxB;
         }
       }
 
-      // Update all particle positions (only free particles, molecules update their own)
-      for (let p of particles) {
-        p.update(dt);
+      renderDensity(ctx, imageData) {
+        this.computeDensity();
+        const data = imageData.data;
+        const colorFn = COLORS[CONFIG.colorScheme];
+
+        for (let i = 0; i < this.densityA.length; i++) {
+          const [r, g, b] = colorFn(this.densityA[i], this.densityB[i]);
+          const pi = i * 4;
+          data[pi] = r;
+          data[pi + 1] = g;
+          data[pi + 2] = b;
+          data[pi + 3] = 255;
+        }
       }
 
-      // Handle particle-particle collisions (only free particles)
-      handleCollisions();
+      renderParticles(ctx) {
+        // Clear with gradient background matching sim3
+        const gradient = ctx.createLinearGradient(0, 0, this.width, this.height);
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(1, '#1a1a2e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.width, this.height);
 
-      // Handle boundary collisions (only free particles)
-      for (let p of particles) {
-        p.handleBoundaries(canvas.width, canvas.height);
+        // Particle radius - matching sim3 style
+        const radiusA = 5;
+        const radiusB = 5;
+
+        // Adaptive shadow blur - reduce for high particle counts for performance
+        const totalParticles = this.particlesA.length + this.particlesB.length;
+        let shadowBlur;
+        if (isMobile() || totalParticles > 800) {
+          shadowBlur = 3;
+        } else if (totalParticles > 500) {
+          shadowBlur = 6;
+        } else {
+          shadowBlur = 10;
+        }
+
+        // Draw activators (cyan - matching sim3 particle A)
+        ctx.shadowBlur = shadowBlur;
+        ctx.shadowColor = 'rgba(0, 212, 255, 0.6)';
+        ctx.fillStyle = 'rgb(0, 212, 255)';
+        for (const p of this.particlesA) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, radiusA, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Draw inhibitors (orange - matching sim3 particle B)
+        ctx.shadowColor = 'rgba(255, 107, 53, 0.6)';
+        ctx.fillStyle = 'rgb(255, 107, 53)';
+        for (const p of this.particlesB) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, radiusB, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Reset shadow
+        ctx.shadowBlur = 0;
       }
-
-      // Update bonds between particles
-      updateBonds();
     }
 
-    function setParams(newParams) {
-      Object.assign(params, newParams);
+    // Mobile detection
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     }
 
-    function reset(canvas) {
-      initParticles(params.particleACount, params.particleBCount, params.speedA, params.speedB, canvas);
-    }
-
-    const Simulation = {
+    // Main simulation controller
+    const Sim = {
       canvas: null,
       ctx: null,
-      isPaused: true,
-      lastTime: 0,
-      fps: 60,
+      sim: null,
+      densityCanvas: null,
+      densityCtx: null,
+      imageData: null,
+      running: false,
+      fps: 0,
       frameCount: 0,
-      fpsTime: 0,
-      spawnTimer: 0,
-      secondGroupSpawned: false,
+      lastFpsTime: 0,
 
-      init(canvasElement, initialParams) {
-        this.canvas = canvasElement;
+      init() {
+        this.canvas = document.getElementById('simulationCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.resize();
+
+        // Size canvas to fill container
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+
+        CONFIG.WIDTH = this.canvas.width;
+        CONFIG.HEIGHT = this.canvas.height;
+
+        // Offscreen canvas for density rendering
+        this.densityCanvas = document.createElement('canvas');
+        this.densityCanvas.width = 150;
+        this.densityCanvas.height = 150;
+        this.densityCtx = this.densityCanvas.getContext('2d');
+        this.imageData = this.densityCtx.createImageData(150, 150);
+
+        this.sim = new TuringParticles(CONFIG.WIDTH, CONFIG.HEIGHT);
+        this.render();
+        this.loop();
+
+        // Handle resize
         window.addEventListener('resize', () => this.resize());
-        Object.assign(params, initialParams);
-        this.createParticles();
-        this.lastTime = performance.now();
-        this.animate();
       },
 
       resize() {
-        const rect = this.canvas.parentElement.getBoundingClientRect();
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
-
-        // Update particle radii on resize for mobile responsiveness
-        const deviceScale = getDeviceScale();
-        for (let p of particles) {
-          p.radius = params.radiusScale * BASE_RADIUS * deviceScale;
-        }
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+        CONFIG.WIDTH = this.canvas.width;
+        CONFIG.HEIGHT = this.canvas.height;
       },
 
-      createParticles() {
-        initParticles(this.canvas);
-      },
+      loop() {
+        requestAnimationFrame(() => this.loop());
 
-      animate() {
-        requestAnimationFrame(() => this.animate());
-        const currentTime = performance.now();
-        const deltaTime = (currentTime - this.lastTime) / 1000;
-        this.lastTime = currentTime;
-
+        // FPS calculation
         this.frameCount++;
-        this.fpsTime += deltaTime;
-        if (this.fpsTime >= 1) {
-          this.fps = Math.round(this.frameCount / this.fpsTime);
+        const now = performance.now();
+        if (now - this.lastFpsTime >= 1000) {
+          this.fps = this.frameCount;
           this.frameCount = 0;
-          this.fpsTime = 0;
+          this.lastFpsTime = now;
+          document.getElementById('fpsValue').textContent = this.fps;
+          document.getElementById('countA').textContent = this.sim.particlesA.length;
+          document.getElementById('countB').textContent = this.sim.particlesB.length;
         }
 
-        if (!this.isPaused) {
-          this.update(deltaTime);
+        if (this.running) {
+          // Slower step for visible movement, scaled by speed
+          this.sim.step(0.3 * CONFIG.speed);
         }
-        this.draw();
-        this.updateStats();
+
+        this.render();
       },
 
-      update(dt) {
-        dt = Math.min(dt, 0.033);
-        step(params.dt, this.canvas);
+      render() {
+        if (CONFIG.renderMode === 'density') {
+          this.sim.renderDensity(this.densityCtx, this.imageData);
+          this.densityCtx.putImageData(this.imageData, 0, 0);
+          // Scale up to main canvas
+          this.ctx.imageSmoothingEnabled = true;
+          this.ctx.drawImage(this.densityCanvas, 0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
+        } else {
+          this.sim.renderParticles(this.ctx);
+        }
       },
 
-      draw() {
-        this.ctx.fillStyle = 'rgba(10, 10, 10, 1)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Draw bonds first (behind particles)
-        if (params.showBonds && bonds.length > 0) {
-          this.ctx.lineWidth = isMobile() ? 1.5 : 2.5;
-          for (const bond of bonds) {
-            const pi = particles[bond.i];
-            const pj = particles[bond.j];
-
-            // Color based on bond type with improved visuals
-            if (bond.type === 'ionic') {
-              this.ctx.strokeStyle = 'rgba(255, 50, 255, 0.7)'; // Bright purple for ionic
-              this.ctx.lineWidth = isMobile() ? 2 : 3; // Thicker for ionic
-            } else if (bond.type === 'polar') {
-              this.ctx.strokeStyle = 'rgba(100, 255, 150, 0.6)'; // Green-cyan for polar
-              this.ctx.lineWidth = isMobile() ? 1.5 : 2.5;
-            } else if (bond.type === 'metallic') {
-              this.ctx.strokeStyle = 'rgba(200, 200, 255, 0.5)'; // Silver-blue for metallic
-              this.ctx.lineWidth = isMobile() ? 1 : 1.5; // Thinner for metallic
-              this.ctx.setLineDash([5, 3]); // Dashed line for metallic
-            } else {
-              this.ctx.strokeStyle = 'rgba(255, 255, 100, 0.6)'; // Yellow for covalent
-              this.ctx.lineWidth = isMobile() ? 1.5 : 2.5;
-            }
-
-            this.ctx.beginPath();
-            this.ctx.moveTo(pi.pos.x, pi.pos.y);
-            this.ctx.lineTo(pj.pos.x, pj.pos.y);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]); // Reset dash
-          }
-        }
-
-        // Draw all particles
-        for (const p of particles) {
-          p.draw(this.ctx);
-        }
-
-        // Draw molecule labels
-        for (const molecule of molecules) {
-          molecule.draw(this.ctx, particles);
-        }
-
-        this.ctx.shadowBlur = 0;
-      },
-
-      updateStats() {
-        document.getElementById('fpsValue').textContent = this.fps;
-
-        let totalSpeed = 0;
-        let freeParticles = 0;
-        for (const p of particles) {
-          totalSpeed += p.getSpeed();
-          if (p.moleculeId === null) freeParticles++;
-        }
-        const avgSpeed = particles.length > 0 ? (totalSpeed / particles.length).toFixed(1) : 0;
-
-        document.getElementById('totalParticles').textContent = `${freeParticles}/${particles.length}`;
-        document.getElementById('totalBonds').textContent = `${molecules.length} mol`;
-        document.getElementById('avgSpeed').textContent = avgSpeed;
-      },
-
+      play() { this.running = true; },
+      pause() { this.running = false; },
       reset() {
-        this.pause();
-        this.createParticles();
-        this.draw();
-      },
-
-      pause() {
-        this.isPaused = true;
-      },
-
-      play() {
-        this.isPaused = false;
-        this.lastTime = performance.now();
+        this.sim = new TuringParticles(CONFIG.WIDTH, CONFIG.HEIGHT);
+        this.render();
       }
     };
 
-    // UI Controller
-    const UIController = {
-      sidebar: null,
-      overlay: null,
-      playButton: null,
-      resetButton: null,
+    // UI Setup
+    document.addEventListener('DOMContentLoaded', () => {
+      Sim.init();
 
-      init() {
-        this.sidebar = document.getElementById('simulationSidebar');
-        this.overlay = document.getElementById('simulationOverlay');
-        this.playButton = document.getElementById('playButton');
-        this.resetButton = document.getElementById('resetButton');
+      const overlay = document.getElementById('overlay');
+      const hideOverlay = () => overlay.classList.remove('active');
+      const showOverlay = () => overlay.classList.add('active');
 
-        this.setupSidebarToggle();
-        this.setupControls();
-        this.setupOverlay();
-        this.setupCanvas();
-        this.showOverlay();
-      },
+      // Playback buttons
+      document.getElementById('playBtn').onclick = () => { Sim.play(); hideOverlay(); };
+      document.getElementById('pauseBtn').onclick = () => { Sim.pause(); showOverlay(); };
+      document.getElementById('resetBtn').onclick = () => { Sim.pause(); Sim.reset(); showOverlay(); };
+      document.getElementById('overlayPlay').onclick = () => { Sim.play(); hideOverlay(); };
 
-      setupSidebarToggle() {
-        const toggle = document.getElementById('sidebarToggle');
-        const controlBtn = document.getElementById('sidebarControlBtn');
-        const mobileExpandBtn = document.getElementById('mobileExpandBtn');
-        const mobileCollapseBtn = document.getElementById('mobileCollapseBtn');
+      // Parameter sliders
+      const sliders = [
+        { id: 'diffusionA', key: 'DA', display: 'daValue', decimals: 2 },
+        { id: 'diffusionB', key: 'DB', display: 'dbValue', decimals: 2 },
+        { id: 'reactionRadius', key: 'r', display: 'radiusValue', decimals: 0 },
+        { id: 'k1', key: 'k1', display: 'k1Value', decimals: 2 },
+        { id: 'k2', key: 'k2', display: 'k2Value', decimals: 2 },
+        { id: 'k3', key: 'k3', display: 'k3Value', decimals: 2 },
+        { id: 'decayA', key: 'decayA', display: 'decayAValue', decimals: 3 },
+        { id: 'decayB', key: 'decayB', display: 'decayBValue', decimals: 3 },
+        { id: 'particleCount', key: 'initialParticles', display: 'particleCountValue', decimals: 0 },
+        { id: 'simSpeed', key: 'speed', display: 'speedValue', decimals: 1 }
+      ];
 
-        const updateButtons = () => {
-          const isCollapsed = this.sidebar.classList.contains('collapsed');
-          // Desktop toggle button
-          if (toggle && !isMobile()) {
-            toggle.textContent = isCollapsed ? '☰' : '✕';
-          }
-          if (controlBtn) {
-            controlBtn.textContent = isCollapsed ? '→' : '←';
+      sliders.forEach(({ id, key, display, decimals }) => {
+        const el = document.getElementById(id);
+        el.oninput = (e) => {
+          CONFIG[key] = parseFloat(e.target.value);
+          document.getElementById(display).textContent = decimals > 0 ? CONFIG[key].toFixed(decimals) : CONFIG[key];
+        };
+      });
+
+      // Preset buttons
+      document.querySelectorAll('.preset-btn[data-preset]').forEach(btn => {
+        btn.onclick = () => {
+          const preset = PRESETS[btn.dataset.preset];
+          if (preset) {
+            Object.assign(CONFIG, preset);
+            // Update UI with correct decimal places
+            document.getElementById('diffusionA').value = CONFIG.DA;
+            document.getElementById('daValue').textContent = CONFIG.DA.toFixed(2);
+            document.getElementById('diffusionB').value = CONFIG.DB;
+            document.getElementById('dbValue').textContent = CONFIG.DB.toFixed(2);
+            document.getElementById('reactionRadius').value = CONFIG.r;
+            document.getElementById('radiusValue').textContent = CONFIG.r;
+            document.getElementById('k1').value = CONFIG.k1;
+            document.getElementById('k1Value').textContent = CONFIG.k1.toFixed(2);
+            document.getElementById('k2').value = CONFIG.k2;
+            document.getElementById('k2Value').textContent = CONFIG.k2.toFixed(2);
+            document.getElementById('k3').value = CONFIG.k3;
+            document.getElementById('k3Value').textContent = CONFIG.k3.toFixed(2);
+            document.getElementById('decayA').value = CONFIG.decayA;
+            document.getElementById('decayAValue').textContent = CONFIG.decayA.toFixed(3);
+            document.getElementById('decayB').value = CONFIG.decayB;
+            document.getElementById('decayBValue').textContent = CONFIG.decayB.toFixed(3);
+            Sim.reset();
           }
         };
+      });
 
-        if (toggle) {
-          toggle.addEventListener('click', () => {
-            this.sidebar.classList.toggle('collapsed');
-            updateButtons();
-          });
-        }
+      // Render mode
+      document.getElementById('renderMode').onchange = (e) => {
+        CONFIG.renderMode = e.target.value;
+      };
 
-        if (controlBtn) {
-          controlBtn.addEventListener('click', () => {
-            this.sidebar.classList.toggle('collapsed');
-            updateButtons();
-          });
-        }
+      // Color scheme
+      document.getElementById('colorScheme').onchange = (e) => {
+        CONFIG.colorScheme = e.target.value;
+      };
 
-        // Mobile expand button - expands sidebar when clicked
-        if (mobileExpandBtn) {
-          mobileExpandBtn.addEventListener('click', () => {
-            this.sidebar.classList.remove('collapsed');
-            updateButtons();
-          });
-        }
+      // Sidebar toggle
+      const sidebar = document.getElementById('simulationSidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      toggle.onclick = () => {
+        sidebar.classList.toggle('collapsed');
+        toggle.textContent = sidebar.classList.contains('collapsed') ? '\u2630' : '\u2715';
+      };
 
-        // Mobile collapse button - collapses sidebar when clicked
-        if (mobileCollapseBtn) {
-          mobileCollapseBtn.addEventListener('click', () => {
-            this.sidebar.classList.add('collapsed');
-            updateButtons();
-          });
-        }
-
-        // Initialize button states
-        updateButtons();
-
-        // Update on resize/orientation change
-        window.addEventListener('resize', updateButtons);
-      },
-
-      setupControls() {
-        // Populate element dropdowns
-        this.populateElementSelects();
-
-        const wallModeSelect = document.getElementById('wallMode');
-        wallModeSelect.addEventListener('change', (e) => {
-          params.wallMode = e.target.value;
-        });
-
-        // Element selection handlers
-        const element1Select = document.getElementById('element1Select');
-        element1Select.addEventListener('change', (e) => {
-          const symbol = e.target.value;
-          selectedElements[0] = elementsData.find(el => el.symbol === symbol);
-        });
-
-        const element2Select = document.getElementById('element2Select');
-        element2Select.addEventListener('change', (e) => {
-          const symbol = e.target.value;
-          selectedElements[1] = elementsData.find(el => el.symbol === symbol);
-        });
-
-        const element3Select = document.getElementById('element3Select');
-        element3Select.addEventListener('change', (e) => {
-          const symbol = e.target.value;
-          selectedElements[2] = elementsData.find(el => el.symbol === symbol);
-        });
-
-        // Element count handlers
-        const element1CountInput = document.getElementById('element1Count');
-        const element1CountValue = document.getElementById('element1CountValue');
-        element1CountInput.addEventListener('input', (e) => {
-          params.element1Count = parseInt(e.target.value);
-          element1CountValue.textContent = params.element1Count;
-        });
-
-        const element2CountInput = document.getElementById('element2Count');
-        const element2CountValue = document.getElementById('element2CountValue');
-        element2CountInput.addEventListener('input', (e) => {
-          params.element2Count = parseInt(e.target.value);
-          element2CountValue.textContent = params.element2Count;
-        });
-
-        const element3CountInput = document.getElementById('element3Count');
-        const element3CountValue = document.getElementById('element3CountValue');
-        element3CountInput.addEventListener('input', (e) => {
-          params.element3Count = parseInt(e.target.value);
-          element3CountValue.textContent = params.element3Count;
-        });
-
-        const particleSpeedInput = document.getElementById('particleSpeed');
-        const particleSpeedValue = document.getElementById('particleSpeedValue');
-        particleSpeedInput.addEventListener('input', (e) => {
-          params.particleSpeed = parseFloat(e.target.value) * 100;
-          particleSpeedValue.textContent = (params.particleSpeed / 100).toFixed(1);
-        });
-
-        const radiusScaleInput = document.getElementById('radiusScale');
-        const radiusScaleValue = document.getElementById('radiusScaleValue');
-        radiusScaleInput.addEventListener('input', (e) => {
-          params.radiusScale = parseFloat(e.target.value);
-          radiusScaleValue.textContent = params.radiusScale.toFixed(1);
-        });
-
-        const bondStrengthInput = document.getElementById('bondStrength');
-        const bondStrengthValue = document.getElementById('bondStrengthValue');
-        bondStrengthInput.addEventListener('input', (e) => {
-          params.bondStrength = parseFloat(e.target.value);
-          bondStrengthValue.textContent = params.bondStrength.toFixed(1);
-        });
-
-        const temperatureInput = document.getElementById('temperature');
-        const temperatureValue = document.getElementById('temperatureValue');
-        temperatureInput.addEventListener('input', (e) => {
-          params.temperature = parseInt(e.target.value);
-          temperatureValue.textContent = params.temperature;
-        });
-
-        const showBondsCheckbox = document.getElementById('showBonds');
-        showBondsCheckbox.addEventListener('change', (e) => {
-          params.showBonds = e.target.checked;
-        });
-      },
-
-      populateElementSelects() {
-        const selects = [
-          document.getElementById('element1Select'),
-          document.getElementById('element2Select'),
-          document.getElementById('element3Select')
-        ];
-
-        selects.forEach((select, index) => {
-          select.innerHTML = '';
-          elementsData.forEach(element => {
-            const option = document.createElement('option');
-            option.value = element.symbol;
-            option.textContent = `${element.name} (${element.symbol})`;
-            select.appendChild(option);
-          });
-
-          // Set default selections
-          if (selectedElements[index]) {
-            select.value = selectedElements[index].symbol;
-          }
-        });
-      },
-
-      setupOverlay() {
-        this.playButton.addEventListener('click', () => {
-          Simulation.play();
-          this.hideOverlay();
-        });
-
-        this.resetButton.addEventListener('click', () => {
-          Simulation.reset();
-          this.showOverlay();
-        });
-      },
-
-      setupCanvas() {
-        const canvas = document.getElementById('simulationCanvas');
-
-        // Support both click and touch events
-        const pauseSimulation = () => {
-          Simulation.pause();
-          this.showOverlay();
-        };
-
-        canvas.addEventListener('click', pauseSimulation);
-        canvas.addEventListener('touchstart', (e) => {
-          e.preventDefault(); // Prevent double-firing on mobile
-          pauseSimulation();
-        });
-      },
-
-      showOverlay() {
-        this.overlay.classList.add('active');
-      },
-
-      hideOverlay() {
-        this.overlay.classList.remove('active');
-      }
-    };
-
-    // Initialize everything on page load
-    window.addEventListener('DOMContentLoaded', async () => {
-      // Load elements from CSV first
-      await loadElements();
-
-      const canvas = document.getElementById('simulationCanvas');
-      Simulation.init(canvas, params);
-      UIController.init();
+      // Mobile buttons
+      document.getElementById('mobileExpandBtn').onclick = () => sidebar.classList.remove('collapsed');
+      document.getElementById('mobileCollapseBtn').onclick = () => sidebar.classList.add('collapsed');
     });
   </script>
 
