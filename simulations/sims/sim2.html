@@ -325,147 +325,142 @@
     }
 
 
-    /* Help Icon */
-    .help-icon {
-      position: relative;
-      width: 20px;
-      height: 20px;
+    /* Info Link in Nav */
+    .info-link {
+      margin-left: auto;
+    }
+
+    .info-link .help-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
       background: rgba(74, 158, 255, 0.2);
       border: 2px solid #4a9eff;
-      border-radius: 50%;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .info-link .help-icon span:first-child {
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: help;
-      transition: all 0.3s ease;
-      margin-left: 1rem;
-    }
-
-    .help-icon span {
-      color: #4a9eff;
-      font-size: 18px;
+      width: 20px;
+      height: 20px;
+      background: #4a9eff;
+      border-radius: 50%;
+      color: #0a0a0a;
+      font-size: 14px;
       font-weight: 700;
-      user-select: none;
       line-height: 1;
     }
 
-    .help-icon:hover {
-      background: rgba(74, 158, 255, 0.3);
-      transform: scale(1.1);
-    }
-
-    /* Help Tooltip */
-    .help-tooltip {
-      position: absolute;
-      top: calc(100% + 15px);
-      right: 0;
-      width: 350px;
-      background: rgba(20, 20, 40, 0.98);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(74, 158, 255, 0.3);
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1000;
-      pointer-events: none;
-    }
-
-    .help-tooltip::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      right: 12px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 8px solid rgba(74, 158, 255, 0.3);
-    }
-
-    .help-icon:hover .help-tooltip {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .help-tooltip h3 {
+    .info-link .info-text {
       color: #4a9eff;
-      font-size: 1.1rem;
+      font-size: 14px;
       font-weight: 600;
-      margin: 0 0 0.75rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 0.5rem;
     }
 
-    .help-tooltip p {
-      color: #e0e0e0;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin: 0 0 0.75rem 0;
+    .info-link .help-icon:hover {
+      background: rgba(74, 158, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
     }
 
-    .help-tooltip ul {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 0.75rem 0;
-    }
 
-    .help-tooltip li {
-      color: #b0b0b0;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      margin-bottom: 0.5rem;
-      padding-left: 1.25rem;
+    /* Mobile menu button styles */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
       position: relative;
     }
 
-    .help-tooltip li::before {
-      content: '→';
-      position: absolute;
-      left: 0;
-      color: #4a9eff;
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
     }
 
-    .help-tooltip strong {
-      color: #fff;
-      font-weight: 600;
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
     }
 
-    .help-controls {
-      background: rgba(74, 158, 255, 0.1);
-      border-left: 3px solid #4a9eff;
-      padding: 0.75rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      margin-bottom: 0 !important;
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
     }
 
-    /* Responsive */
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
     @media (max-width: 768px) {
-      .help-tooltip {
-        width: 280px;
-        right: -10px;
+      .mobile-menu-toggle {
+        display: flex;
       }
-      
-      .help-icon {
-        margin-left: 0.5rem;
-        width: 28px;
-        height: 28px;
-      }
-      
-      .help-icon span {
-        font-size: 16px;
-      }
-    }
 
-    @media (max-width: 480px) {
-      .help-tooltip {
-        width: calc(100vw - 40px);
-        right: -20px;
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+
+      .info-link {
+        margin-left: 0;
+        margin-top: auto;
+        border-bottom: none !important;
+        padding: 1rem;
+      }
+
+      .info-link .help-icon {
+        justify-content: center;
+        padding: 12px 20px;
+        background: rgba(74, 158, 255, 0.15);
+        border-radius: 8px;
+      }
+
+      .info-link .info-text {
+        color: #fff;
       }
     }
   </style>
@@ -483,26 +478,21 @@
       <div class="logo">
         <a>Gravitational N-Body Simulation</a>
       </div>
-      <div class="help-icon" id="helpIcon">
-          <span>?</span>
-          <div class="help-tooltip" id="helpTooltip">
-            <h3>About This Simulation</h3>
-            <p><strong>Gravitational N-Body Simulation</strong></p>
-            <ul>
-              <li><strong>Gravity:</strong> Particles attract each other based on mass and distance</li>
-              <li><strong>Collisions:</strong> Particles bounce with energy transfer to heat</li>
-              <li><strong>Thermal Energy:</strong> Blue (cold) → Orange (hot) color transition</li>
-              <li><strong>Radiation:</strong> Hot particles gradually cool down over time</li>
-            </ul>
-            <p class="help-controls"><strong>Controls:</strong> Click canvas to pause. Adjust parameters in the sidebar to see different behaviors.</p>
-          </div>
-        </div>
-      <ul class="nav-links">
-        <li><a href="#hero">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <!--<li><a href="podcast.html">Podcast</a></li>-->
-        <li><a href="simulations/index.html">Simulations</a></li>
-        <li><a href="contact.html">Contact</a></li>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+        <li class="info-link">
+          <a href="sim2_info.html" class="help-icon" title="View simulation info">
+            <span>!</span> <span class="info-text">Info</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </header>

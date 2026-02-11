@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gravitational N-Body Simulation - Learn about the physics and implementation details.">
+  <title>Gravitational N-Body Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+    }
+
+    /* Mobile menu button styles */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">N-Body Simulation Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="sim2.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">Gravitational N-Body Simulation</h1>
+      <p class="info-subtitle">Interactive gravitational dynamics with thermal energy tracking</p>
+
+      <!-- What is N-Body Simulation -->
+      <section class="info-section">
+        <h2 class="section-title">What is N-Body Simulation?</h2>
+        <p>
+          An N-body simulation is a computational method that predicts the motion of particles under the influence
+          of physical forces, typically gravity. The term <span class="highlight">"N-body"</span> refers to the
+          number of objects being simulated, where each object interacts with all others.
+        </p>
+        <p>
+          This type of simulation was first developed by <span class="highlight">Erik Holmberg</span> in 1941
+          using light bulbs to model galactic dynamics. Modern N-body simulations are essential tools in
+          astrophysics, used to study galaxy formation, stellar clusters, and planetary systems.
+        </p>
+      </section>
+
+      <!-- Physics Behind the Simulation -->
+      <section class="info-section">
+        <h2 class="section-title">Physics Behind the Simulation</h2>
+        <p>This simulation models several key physical principles:</p>
+        <ul>
+          <li>
+            <strong>Gravitational Attraction:</strong> Every particle attracts every other particle with a force
+            proportional to the product of their masses and inversely proportional to the square of the distance.
+          </li>
+          <li>
+            <strong>Elastic Collisions:</strong> When particles collide, momentum is exchanged based on mass ratios.
+            Energy can be lost to thermal energy depending on the elasticity coefficient.
+          </li>
+          <li>
+            <strong>Thermal Energy:</strong> Kinetic energy lost during inelastic collisions is converted to thermal
+            energy, visualized as a color change from blue (cold) to orange/red (hot).
+          </li>
+          <li>
+            <strong>Radiative Cooling:</strong> Hot particles gradually lose thermal energy over time, simulating
+            the emission of thermal radiation into space.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>Newton's Law of Universal Gravitation:</p>
+        <div class="formula">
+          F = G * (m₁ * m₂) / r²
+        </div>
+        <p>
+          Where <span class="highlight">G</span> is the gravitational constant, <span class="highlight">m₁</span> and
+          <span class="highlight">m₂</span> are the masses, and <span class="highlight">r</span> is the distance between them.
+        </p>
+        <p>The simulation uses a softening parameter to prevent numerical instabilities:</p>
+        <div class="formula">
+          F = G * (m₁ * m₂) / (r² + ε²)
+        </div>
+        <p>
+          Where <span class="highlight">ε</span> (epsilon) is the softening length, preventing infinite forces
+          when particles get very close together.
+        </p>
+        <p>Collision energy transfer follows conservation of momentum:</p>
+        <div class="formula">
+          m₁v₁ + m₂v₂ = m₁v₁' + m₂v₂'
+        </div>
+      </section>
+
+      <!-- Simulation Controls -->
+      <section class="info-section">
+        <h2 class="section-title">Simulation Controls</h2>
+        <ul>
+          <li>
+            <strong>Particle Count:</strong> Number of gravitating bodies (1-1000). More particles = more complex gravitational interactions.
+          </li>
+          <li>
+            <strong>Speed:</strong> Initial velocity multiplier for particles. Higher values create more dynamic, energetic systems.
+          </li>
+          <li>
+            <strong>Gravity Strength:</strong> Controls the gravitational constant G. Higher values cause stronger attraction.
+          </li>
+          <li>
+            <strong>Elasticity:</strong> Coefficient of restitution (0-1). 1 = perfectly elastic, 0 = perfectly inelastic collisions.
+          </li>
+          <li>
+            <strong>Radiation Loss:</strong> Rate at which thermal energy dissipates over time, simulating radiative cooling.
+          </li>
+          <li>
+            <strong>Thermal Threshold:</strong> Maximum thermal energy for color scale. Particles at this value appear fully hot (orange/red).
+          </li>
+        </ul>
+      </section>
+
+      <!-- Thermal Visualization -->
+      <section class="info-section">
+        <h2 class="section-title">Thermal Visualization</h2>
+        <p>
+          The simulation includes real-time thermal energy tracking:
+        </p>
+        <ul>
+          <li>
+            <strong>Color Gradient:</strong> Particles transition from blue (cold, low thermal energy) to orange/red
+            (hot, high thermal energy) based on accumulated collision energy.
+          </li>
+          <li>
+            <strong>Average Thermal Display:</strong> The stats panel shows the average thermal energy across all
+            particles, indicating the overall "temperature" of the system.
+          </li>
+          <li>
+            <strong>Energy Conservation:</strong> Watch as kinetic energy converts to thermal during collisions,
+            then radiates away over time, demonstrating thermodynamic principles.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Interesting Behaviors -->
+      <section class="info-section">
+        <h2 class="section-title">Interesting Behaviors to Observe</h2>
+        <ul>
+          <li>
+            <strong>Gravitational Collapse:</strong> With high gravity and low initial speed, particles will
+            collapse toward the center of mass.
+          </li>
+          <li>
+            <strong>Orbital Systems:</strong> Some particles may form temporary orbital pairs or groups around
+            heavier bodies.
+          </li>
+          <li>
+            <strong>Thermal Hotspots:</strong> Areas with frequent collisions will appear as bright orange
+            clusters, cooling down as particles disperse.
+          </li>
+          <li>
+            <strong>Equilibrium States:</strong> With balanced parameters, the system may reach a quasi-stable
+            state where average thermal energy stabilizes.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes Section (Empty for user) -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Viren Patel - Technology enthusiast, podcast host, and simulation developer. Explore my portfolio of projects and listen to Decoded with Viren.">
-  <title>A & B Particle Simulation - Viren Patel</title>
+  <title>Dual Particle Simulation - Viren Patel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -629,7 +629,7 @@
         <a href="index.html">Viren Patel</a>
       </div>
       <div class="logo">
-        <a>A & B Particle Simulation</a>
+        <a>Dual Particle Simulation</a>
       </div>
       <ul class="nav-links">
         <li><a href="#hero">Home</a></li>
@@ -718,6 +718,14 @@
 
       <div class="control-group">
         <label class="control-label">
+          Collision Elasticity 
+          <span class="control-value" id="elasticityValue">1.0</span>
+        </label>
+        <input type="range" class="control-input" id="elasticity" min="0" max="1" step="0.05" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
           Bond Length Factor
           <span class="control-value" id="bondLengthFactorValue">1.0</span>
           <label style="float: right; display: flex; align-items: center; gap: 5px; font-size: 12px; text-transform: none; cursor: pointer;">
@@ -729,8 +737,11 @@
       </div>
 
       <div class="control-group">
+        <label>
+          Force (-ve attract / +ve repel)
+        </label>
         <label class="control-label">
-          Force A-A (-ve attract / +ve repel)
+          Force A-A 
           <span class="control-value" id="force_aaValue">0.5</span>
         </label>
         <input type="range" class="control-input" id="force_aa" min="-5" max="5" step="0.1" value="0.5">
@@ -738,7 +749,7 @@
 
       <div class="control-group">
         <label class="control-label">
-          Force A-B (-ve attract / +ve repel)
+          Force A-B 
           <span class="control-value" id="force_abValue">-0.3</span>
         </label>
         <input type="range" class="control-input" id="force_ab" min="-5" max="5" step="0.1" value="-0.3">
@@ -746,7 +757,7 @@
 
       <div class="control-group">
         <label class="control-label">
-          Force B-B (-ve attract / +ve repel)
+          Force B-B 
           <span class="control-value" id="force_bbValue">0.5</span>
         </label>
         <input type="range" class="control-input" id="force_bb" min="-5" max="5" step="0.1" value="0.5">
@@ -780,11 +791,11 @@
         </div>
         <div class="stat-item">
           <span class="stat-particle-a">A Particles:</span>
-          <span class="stat-value stat-particle-a" id="particleACount">50</span>
+          <span class="stat-value stat-particle-a" id="particleACountStat">50</span>
         </div>
         <div class="stat-item">
           <span class="stat-particle-b">B Particles:</span>
-          <span class="stat-value stat-particle-b" id="particleBCount">50</span>
+          <span class="stat-value stat-particle-b" id="particleBCountStat">50</span>
         </div>
         <div class="stat-item">
           <span>Total Energy:</span>
@@ -833,11 +844,11 @@
       spawnMode: 'both',
       spawnDelay: 10.0,
       wallMode: 'solid',
-      simulateBonds: true
+      simulateBonds: true,
+      elasticity: 1.0 // 1.0 = perfectly elastic, 0.0 = perfectly inelastic
     };
 
     const BASE_RADIUS = 5;
-    const RESTITUTION = 1.0; // Elastic collisions (1.0 = perfectly elastic)
 
     // Mobile detection and scaling
     function isMobile() {
@@ -1123,8 +1134,10 @@
 
             // Only resolve if particles are moving towards each other
             if (dvn < 0) {
-              // Calculate impulse scalar (for equal mass elastic collision)
-              const impulse = -(1 + RESTITUTION) * dvn / (1/pi.mass + 1/pj.mass);
+              // Calculate impulse scalar based on elasticity
+              // elasticity=1: perfectly elastic (full momentum transfer)
+              // elasticity=0: perfectly inelastic (particles share momentum)
+              const impulse = -(1 + params.elasticity) * dvn / (1/pi.mass + 1/pj.mass);
 
               // Apply impulse to both particles
               const impulseX = impulse * nx;
@@ -1302,8 +1315,8 @@
           else particleBCount++;
           totalEnergy += p.getKineticEnergy();
         }
-        document.getElementById('particleACount').textContent = particleACount;
-        document.getElementById('particleBCount').textContent = particleBCount;
+        document.getElementById('particleACountStat').textContent = particleACount;
+        document.getElementById('particleBCountStat').textContent = particleBCount;
         //document.getElementById('totalEnergy').textContent = Math.round(totalEnergy);
       },
 
@@ -1454,6 +1467,13 @@
         radiusScaleInput.addEventListener('input', (e) => {
           params.radiusScale = parseFloat(e.target.value);
           radiusScaleValue.textContent = params.radiusScale.toFixed(1);
+        });
+
+        const elasticityInput = document.getElementById('elasticity');
+        const elasticityValue = document.getElementById('elasticityValue');
+        elasticityInput.addEventListener('input', (e) => {
+          params.elasticity = parseFloat(e.target.value);
+          elasticityValue.textContent = params.elasticity.toFixed(2);
         });
 
         const bondLengthFactorInput = document.getElementById('bondLengthFactor');
