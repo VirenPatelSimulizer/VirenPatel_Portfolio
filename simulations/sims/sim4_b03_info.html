@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tri-Particle Simulation - Learn about the physics of three interacting particle species with tunable forces.">
+  <title>Tri-Particle Simulation Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .highlight-a { color: #00d4ff; font-weight: 500; }
+    .highlight-b { color: #ff6b35; font-weight: 500; }
+    .highlight-c { color: #a855f7; font-weight: 500; }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .force-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 0.95rem;
+    }
+
+    .force-matrix th,
+    .force-matrix td {
+      padding: 10px 14px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .force-matrix th {
+      background: rgba(74, 158, 255, 0.15);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .force-matrix td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .force-matrix .repel { color: #ff6b6b; }
+    .force-matrix .attract { color: #4ade80; }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+
+      .force-matrix {
+        font-size: 0.8rem;
+      }
+
+      .force-matrix th,
+      .force-matrix td {
+        padding: 6px 8px;
+      }
+    }
+
+    /* Mobile menu button styles */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">Tri-Particle Simulation Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="sim4_b03.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">Tri-Particle Simulation</h1>
+      <p class="info-subtitle">Three interacting species with tunable pairwise forces, elastic collisions, and emergent structure</p>
+
+      <!-- Overview -->
+      <section class="info-section">
+        <h2 class="section-title">Overview</h2>
+        <p>
+          This simulation extends a classical two-species particle system to <span class="highlight">three distinct species</span>&mdash;labelled
+          <span class="highlight-a">A</span>, <span class="highlight-b">B</span>, and <span class="highlight-c">C</span>.
+          Each species pair has its own tunable force parameter, creating six independent interaction channels.
+          By adjusting these forces from attractive to repulsive, a rich space of emergent behaviors opens up:
+          clustering, segregation, chasing dynamics, and mixed-phase structures.
+        </p>
+        <p>
+          The physics engine is deliberately simple&mdash;inverse-square forces plus hard-sphere collisions&mdash;so
+          the complexity you see on screen comes entirely from the <em>combinatorics</em> of three-way interactions,
+          not from any hidden higher-order rules.
+        </p>
+      </section>
+
+      <!-- Physics Model -->
+      <section class="info-section">
+        <h2 class="section-title">Physics Model</h2>
+        <p>Every particle interacts with every other particle through two mechanisms:</p>
+        <ul>
+          <li>
+            <strong>Inverse-Square Pairwise Forces:</strong> Each pair of particles experiences a radial force
+            whose magnitude falls off with the square of the distance. The sign of the force depends on the
+            species pair: negative values produce attraction, positive values produce repulsion.
+          </li>
+          <li>
+            <strong>Hard-Sphere Elastic Collisions:</strong> When two particles overlap, they are separated and
+            their velocities are updated using an impulse-based collision response. The elasticity coefficient
+            controls how much kinetic energy is conserved&mdash;from perfectly elastic (1.0) to perfectly
+            inelastic (0.0).
+          </li>
+        </ul>
+        <p>
+          These two mechanisms are computed every time step. Forces update velocities, velocities update positions,
+          and then overlaps are resolved. Boundary conditions can be set to either solid walls (elastic bounce)
+          or wrap-around (toroidal topology).
+        </p>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>The pairwise force between particles <em>i</em> and <em>j</em> is:</p>
+        <div class="formula">
+          F_ij = &alpha;(type_i, type_j) &middot; K / r&sup2;
+        </div>
+        <p>
+          Where <span class="highlight">&alpha;</span> is the signed force coefficient for the species pair
+          (negative = attract, positive = repel), <span class="highlight">K</span> is a global force strength
+          constant (1000), and <span class="highlight">r</span> is the distance between particle centers.
+          The force is clamped to &plusmn;10 to prevent numerical explosions at very small separations.
+        </p>
+        <p>Velocity update (Euler integration):</p>
+        <div class="formula">
+          v(t + dt) = v(t) + (F / m) &middot; dt
+        </div>
+        <p>Collision impulse (along the contact normal <em>n</em>):</p>
+        <div class="formula">
+          J = -(1 + e) &middot; (v_rel &middot; n) / (1/m_i + 1/m_j)
+        </div>
+        <p>
+          Where <span class="highlight">e</span> is the elasticity coefficient (0&ndash;1) and
+          <span class="highlight">v_rel</span> is the relative velocity of the two particles.
+        </p>
+      </section>
+
+      <!-- Interaction Matrix -->
+      <section class="info-section">
+        <h2 class="section-title">Interaction Matrix</h2>
+        <p>
+          With three species there are six unique pair interactions. The default configuration is:
+        </p>
+        <table class="force-matrix">
+          <thead>
+            <tr>
+              <th>Pair</th>
+              <th>Default Force</th>
+              <th>Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="highlight-a">A</span>&ndash;<span class="highlight-a">A</span></td>
+              <td class="repel">+0.5</td>
+              <td>Self-repulsion &mdash; A particles spread apart</td>
+            </tr>
+            <tr>
+              <td><span class="highlight-a">A</span>&ndash;<span class="highlight-b">B</span></td>
+              <td class="attract">&minus;0.3</td>
+              <td>Cross-attraction &mdash; A and B cluster together</td>
+            </tr>
+            <tr>
+              <td><span class="highlight-a">A</span>&ndash;<span class="highlight-c">C</span></td>
+              <td class="repel">+0.2</td>
+              <td>Mild repulsion &mdash; A and C avoid each other</td>
+            </tr>
+            <tr>
+              <td><span class="highlight-b">B</span>&ndash;<span class="highlight-b">B</span></td>
+              <td class="repel">+0.5</td>
+              <td>Self-repulsion &mdash; B particles spread apart</td>
+            </tr>
+            <tr>
+              <td><span class="highlight-b">B</span>&ndash;<span class="highlight-c">C</span></td>
+              <td class="attract">&minus;0.5</td>
+              <td>Strong cross-attraction &mdash; B and C bind tightly</td>
+            </tr>
+            <tr>
+              <td><span class="highlight-c">C</span>&ndash;<span class="highlight-c">C</span></td>
+              <td class="repel">+0.3</td>
+              <td>Self-repulsion &mdash; C particles spread apart</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The matrix is <em>symmetric</em>&mdash;the force that A exerts on B is equal and opposite to
+          the force B exerts on A (Newton's Third Law). This means only 6 parameters are needed
+          rather than 9.
+        </p>
+      </section>
+
+      <!-- Why Three Species? -->
+      <section class="info-section">
+        <h2 class="section-title">Why Three Species?</h2>
+        <p>
+          Moving from two to three species is not just an incremental change&mdash;it is a
+          <span class="highlight">combinatorial leap</span>. With two species you have 3 force parameters
+          (A-A, A-B, B-B). With three species you have 6. This more than doubles the parameter space and
+          enables qualitatively new phenomena:
+        </p>
+        <ul>
+          <li>
+            <strong>Frustrated Systems:</strong> A attracts B, B attracts C, but A repels C. The system cannot
+            satisfy all interactions simultaneously, leading to dynamic rearrangement and oscillation.
+          </li>
+          <li>
+            <strong>Mediator Particles:</strong> One species can act as a bridge between two others that would
+            otherwise repel. For example, if A-C repel but both attract B, then B particles form an interface layer.
+          </li>
+          <li>
+            <strong>Rock-Paper-Scissors Dynamics:</strong> Setting up cyclic chase relationships
+            (A chases B, B chases C, C chases A) produces persistent swirling motion with no equilibrium.
+          </li>
+          <li>
+            <strong>Phase Separation:</strong> With the right balance of self-repulsion and cross-attraction,
+            you can see distinct "phases" form&mdash;regions dominated by one or two species with sharp boundaries.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Controls Reference -->
+      <section class="info-section">
+        <h2 class="section-title">Controls Reference</h2>
+        <ul>
+          <li>
+            <strong>Particle Counts (A, B, C):</strong> Number of each species (10&ndash;500). Higher counts
+            create denser, more interactive systems but reduce frame rate.
+          </li>
+          <li>
+            <strong>Speed:</strong> Initial velocity magnitude for all particles. Higher speeds create more
+            energetic systems where particles can escape local clusters.
+          </li>
+          <li>
+            <strong>Radius Scale:</strong> Multiplier on particle size (0.5&ndash;3.0). Larger particles collide
+            more often and form bonds at greater distances.
+          </li>
+          <li>
+            <strong>Collision Elasticity:</strong> Energy conservation during collisions (0&ndash;1). At 0, collisions
+            are fully inelastic and particles stick together. At 1, collisions are perfectly elastic.
+          </li>
+          <li>
+            <strong>Bond Length Factor:</strong> Controls the distance threshold for visualizing bonds between
+            attracted particles. Only pairs with negative (attractive) force show bonds.
+          </li>
+          <li>
+            <strong>Force Sliders:</strong> Six sliders controlling the signed force magnitude for each species
+            pair. Negative values attract, positive values repel. Range: &minus;5 to +5.
+          </li>
+          <li>
+            <strong>Wall Mode:</strong> "Solid Walls" bounces particles off edges. "Wrap-Around" creates a
+            toroidal space where particles exiting one side re-enter from the opposite side.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Interesting Configurations -->
+      <section class="info-section">
+        <h2 class="section-title">Interesting Configurations to Try</h2>
+        <ul>
+          <li>
+            <strong>Universal Attraction:</strong> Set all forces to &minus;0.5. All particles collapse into
+            a single dense cluster. Reduce elasticity to 0.2 to see them stick.
+          </li>
+          <li>
+            <strong>Species Segregation:</strong> Set self-forces (A-A, B-B, C-C) to &minus;1.0 and all
+            cross-forces to +2.0. Each species clusters with its own kind while repelling the others.
+          </li>
+          <li>
+            <strong>Cyclic Chase:</strong> Set A-B = &minus;2, B-C = &minus;2, C-A = &minus;2, and the
+            reverse pairs (B-A, C-B, A-C) to +2. Since forces here are symmetric this creates mutual
+            attraction in those specific pairs while other pairs repel, producing swirling clusters.
+          </li>
+          <li>
+            <strong>B as Glue:</strong> A-A = +1, C-C = +1, A-C = +1, but A-B = &minus;2 and B-C = &minus;2,
+            B-B = +0.5. A and C particles only come together when B particles bridge them.
+          </li>
+          <li>
+            <strong>Gas-Liquid Transition:</strong> Start with all forces at 0 (ideal gas). Slowly increase
+            cross-attraction while keeping self-repulsion. Watch droplets nucleate and grow.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Computational Notes -->
+      <section class="info-section">
+        <h2 class="section-title">Computational Notes</h2>
+        <p>
+          The simulation uses a <span class="highlight">brute-force O(N&sup2;)</span> approach: every particle
+          checks every other particle for forces and collisions each frame. This is simple and exact, but limits
+          practical particle counts to a few hundred on most devices.
+        </p>
+        <p>
+          Integration uses the <span class="highlight">symplectic Euler method</span> with a fixed time step
+          (dt = 0.016s, approximately 60 Hz). Forces are clamped to &plusmn;10 to prevent numerical instability
+          when particles approach very closely. Collision resolution uses position correction (separating overlapping
+          particles) followed by impulse-based velocity exchange.
+        </p>
+        <p>
+          On mobile devices, particle radii are automatically scaled down (75% on tablets, 60% on phones) to
+          maintain visual clarity and performance at smaller screen sizes.
+        </p>
+      </section>
+
+      <!-- Connections to Real Physics -->
+      <section class="info-section">
+        <h2 class="section-title">Connections to Real Physics</h2>
+        <p>
+          While this simulation uses simplified inverse-square forces, the three-species interaction model
+          has direct analogies in several real physical systems:
+        </p>
+        <ul>
+          <li>
+            <strong>Charged Colloids:</strong> Mixtures of differently-charged colloidal particles in solution
+            exhibit species-dependent attraction and repulsion, forming crystals and gels.
+          </li>
+          <li>
+            <strong>Nuclear Physics:</strong> Protons and neutrons interact via the strong force with
+            charge-dependent electromagnetic corrections&mdash;a two-force, multi-species system.
+          </li>
+          <li>
+            <strong>Ternary Alloys:</strong> Three-component metal alloys exhibit phase separation governed
+            by pairwise mixing enthalpies, directly analogous to our force matrix.
+          </li>
+          <li>
+            <strong>Ecological Models:</strong> Predator-prey-resource dynamics with three trophic levels
+            produce cyclic population oscillations similar to the chasing patterns seen here.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes Section -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

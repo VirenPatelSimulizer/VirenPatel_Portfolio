@@ -1290,7 +1290,65 @@
           <div class="status-divider"></div>
           <button class="status-btn status-btn-save" id="exportLayoutBtn" title="Export Layout">💾</button>
           <button class="status-btn status-btn-load" id="importLayoutBtn" title="Import Layout">📂</button>
-          <button class="status-btn status-btn-data" id="exportBtn" disabled title="Export Results">📊</button>
+          <div style="position: relative; display: inline-block;">
+            <button class="status-btn status-btn-data" id="exportBtn" disabled title="Export Results">📊</button>
+            <div id="exportDropdown" style="
+              display: none;
+              position: absolute;
+              bottom: 100%;
+              right: 0;
+              margin-bottom: 6px;
+              background: rgba(20,20,40,0.98);
+              border: 1px solid rgba(74,255,128,0.3);
+              border-radius: 8px;
+              overflow: hidden;
+              z-index: 1000;
+              min-width: 160px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            ">
+              <button id="exportJsonBtn" style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 10px 14px;
+                background: none;
+                border: none;
+                color: #ccc;
+                font-size: 12px;
+                cursor: pointer;
+                text-align: left;
+                transition: background 0.15s;
+              " onmouseover="this.style.background='rgba(74,255,128,0.15)'" onmouseout="this.style.background='none'">
+                <span style="font-size: 14px;">{ }</span>
+                <div>
+                  <div style="font-weight: 600; color: #fff;">JSON</div>
+                  <div style="font-size: 10px; color: #888;">Full structured data</div>
+                </div>
+              </button>
+              <div style="height: 1px; background: rgba(255,255,255,0.08);"></div>
+              <button id="exportCsvBtn" style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 10px 14px;
+                background: none;
+                border: none;
+                color: #ccc;
+                font-size: 12px;
+                cursor: pointer;
+                text-align: left;
+                transition: background 0.15s;
+              " onmouseover="this.style.background='rgba(74,158,255,0.15)'" onmouseout="this.style.background='none'">
+                <span style="font-size: 14px;">📋</span>
+                <div>
+                  <div style="font-weight: 600; color: #fff;">CSV</div>
+                  <div style="font-size: 10px; color: #888;">Spreadsheet-friendly</div>
+                </div>
+              </button>
+            </div>
+          </div>
           <input type="file" id="importLayoutInput" accept=".json" style="display: none;">
         </div>
 
@@ -2246,10 +2304,6 @@
         for (let i = this.nodes.length - 1; i >= 0; i--) {
           const node = this.nodes[i];
           if (node.containsPoint(pos.x, pos.y)) {
-            if (node.params.isOutput) {
-              // Can't delete output node
-              return;
-            }
             // Show confirmation and delete
             if (confirm(`Delete "${node.params.name}" node?`)) {
               this.removeNode(node);
@@ -3195,8 +3249,6 @@
       }
 
       toggleNodeSelection(node) {
-        if (node.params.isOutput) return; // Can't select output node for multi-select
-
         const idx = this.selectedNodes.indexOf(node);
         if (idx >= 0) {
           // Deselect
@@ -3230,10 +3282,8 @@
       selectAllNodes() {
         this.clearSelection();
         for (const node of this.nodes) {
-          if (!node.params.isOutput) {
-            node.selected = true;
-            this.selectedNodes.push(node);
-          }
+          node.selected = true;
+          this.selectedNodes.push(node);
         }
         this.updateSelectionInfo();
         this.updateCopyButton();
@@ -3249,8 +3299,6 @@
         const maxY = Math.max(this.selectionStart.y, this.selectionEnd.y);
 
         for (const node of this.nodes) {
-          if (node.params.isOutput) continue;
-
           const nodeRight = node.x + node.width;
           const nodeBottom = node.y + node.height;
 
@@ -3311,7 +3359,7 @@
           connections: []
         };
 
-        // Copy connections between selected nodes (including operation type and weight)
+        // Copy connections between selected nodes (including operation type, weight, and outputGroup)
         for (const conn of this.connections) {
           const fromIdx = this.selectedNodes.indexOf(conn.from);
           const toIdx = this.selectedNodes.indexOf(conn.to);
@@ -3320,7 +3368,9 @@
               fromIdx,
               toIdx,
               operation: conn.operation || '+',
-              weight: conn.weight || 50
+              weight: conn.weight || 50,
+              outputGroup: conn.outputGroup || 1,
+              outputGroups: conn.outputGroups || [conn.outputGroup || 1]
             });
           }
         }
@@ -3372,13 +3422,15 @@
           newNodes.push(newNode);
         }
 
-        // Create connections between new nodes (preserving operation type and weight)
+        // Create connections between new nodes (preserving operation type, weight, and outputGroups)
         for (const conn of this.clipboard.connections) {
           this.connections.push({
             from: newNodes[conn.fromIdx],
             to: newNodes[conn.toIdx],
             operation: conn.operation || '+',
-            weight: conn.weight || 50
+            weight: conn.weight || 50,
+            outputGroup: conn.outputGroup || 1,
+            outputGroups: conn.outputGroups || [conn.outputGroup || 1]
           });
         }
 
@@ -3412,9 +3464,7 @@
         if (this.selectedNodes.length === 0) return;
 
         for (const node of this.selectedNodes) {
-          if (!node.params.isOutput) {
-            this.removeNode(node);
-          }
+          this.removeNode(node);
         }
         this.clearSelection();
       }
@@ -3858,6 +3908,30 @@
                 </div>
               </div>
             </div>
+            <div id="outputNodesAssignment" style="display: none; margin-top: 12px;">
+              <div style="
+                background: linear-gradient(135deg, rgba(30,35,50,0.9) 0%, rgba(20,25,40,0.95) 100%);
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(74,158,255,0.2);
+              ">
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  margin-bottom: 10px;
+                  padding-bottom: 8px;
+                  border-bottom: 1px solid rgba(255,255,255,0.08);
+                ">
+                  <span style="font-size: 14px;">🔀</span>
+                  <span style="font-size: 11px; color: #4a9eff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Route to Nodes</span>
+                </div>
+                <div id="outputNodesList"></div>
+                <div style="font-size: 9px; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+                  Toggle groups for each node. Display nodes can share groups freely.
+                </div>
+              </div>
+            </div>
             <div class="control-group" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
               <label class="control-label" style="font-weight: 600; color: #ff6b6b;">Test Limits (Legacy Binning)</label>
               <p style="font-size: 9px; color: #666; margin-bottom: 8px;">Units outside limits are rejected. Limits apply to MEASURED value.</p>
@@ -4101,6 +4175,295 @@
                 }
               });
             }
+
+            // Output Groups handler with node assignment
+            const outputGroupsSelect = document.getElementById('prop_outputGroups');
+            const group1RangeDiv = document.getElementById('group1Range');
+            const group2RangeDiv = document.getElementById('group2Range');
+            const outputNodesAssignment = document.getElementById('outputNodesAssignment');
+            const outputNodesList = document.getElementById('outputNodesList');
+
+            // Helper function to update output nodes display
+            const updateOutputNodesDisplay = () => {
+              const numGroups = node.params.outputGroups || 1;
+              const outgoingConns = this.connections.filter(c => c.from === node);
+
+              // Show/hide the assignment section
+              if (numGroups > 1 && outgoingConns.length > 0) {
+                outputNodesAssignment.style.display = 'block';
+
+                // Group colors for visual distinction
+                const groupColors = {
+                  1: { bg: 'rgba(74,255,128,0.15)', border: '#4aff80', text: '#4aff80', label: 'Group 1 (Primary)' },
+                  2: { bg: 'rgba(255,159,74,0.15)', border: '#ff9f4a', text: '#ff9f4a', label: 'Group 2 (Secondary)' },
+                  3: { bg: 'rgba(255,74,74,0.15)', border: '#ff4a4a', text: '#ff4a4a', label: 'Group 3 (Remainder)' }
+                };
+
+                // Determine which groups are claimed by non-Measurement nodes
+                const claimedGroups = {}; // { groupNum: connectionIdx }
+                outgoingConns.forEach((conn, idx) => {
+                  if (!conn.to.params.isRead && !conn.to.params.isOutput) {
+                    // Non-measurement node - check its groups
+                    const groups = conn.outputGroups || [conn.outputGroup || 1];
+                    groups.forEach(g => {
+                      if (!claimedGroups[g]) claimedGroups[g] = idx;
+                    });
+                  }
+                });
+
+                // Build the node list HTML with improved layout
+                let html = '';
+                outgoingConns.forEach((conn, idx) => {
+                  // Migrate from single outputGroup to array outputGroups
+                  if (!conn.outputGroups) {
+                    conn.outputGroups = conn.outputGroup ? [conn.outputGroup] : [1];
+                  }
+                  const isMeasurement = conn.to.params.isRead || conn.to.params.isOutput;
+                  const groups = conn.outputGroups;
+
+                  // Type badge letter and color
+                  const typeLetter = conn.to.type.charAt(0).toUpperCase();
+                  const nodeColor = conn.to.params.color || '#888';
+
+                  html += `
+                    <div style="
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      padding: 10px;
+                      margin-bottom: 8px;
+                      background: rgba(30,30,50,0.6);
+                      border: 1px solid rgba(255,255,255,0.08);
+                      border-radius: 8px;
+                    ">
+                      <div style="
+                        width: 32px;
+                        height: 32px;
+                        background: ${nodeColor};
+                        border-radius: 6px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: #000;
+                        flex-shrink: 0;
+                      ">${typeLetter}</div>
+                      <div style="flex: 1; min-width: 0;">
+                        <div style="
+                          font-size: 12px;
+                          color: #fff;
+                          font-weight: 600;
+                          margin-bottom: 6px;
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                        ">${conn.to.params.name}${isMeasurement ? ' <span style="color:#888;font-weight:400;font-size:10px;">(Display)</span>' : ''}</div>
+                        <div style="display: flex; gap: 4px;">
+                          ${[1, 2, 3].filter(g => g <= numGroups).map(g => {
+                            const isChecked = groups.includes(g);
+                            const gColor = groupColors[g];
+                            const isClaimedByOther = !isMeasurement && claimedGroups[g] !== undefined && claimedGroups[g] !== idx;
+                            const isDisabled = isClaimedByOther;
+                            const claimerName = isClaimedByOther ? outgoingConns[claimedGroups[g]]?.to?.params?.name : '';
+
+                            return `
+                              <label style="
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                min-width: 36px;
+                                height: 24px;
+                                padding: 0 8px;
+                                background: ${isChecked ? gColor.border : 'rgba(40,40,60,0.8)'};
+                                border: 2px solid ${isChecked ? gColor.border : 'rgba(255,255,255,0.15)'};
+                                border-radius: 12px;
+                                cursor: ${isDisabled ? 'not-allowed' : 'pointer'};
+                                opacity: ${isDisabled ? '0.35' : '1'};
+                                font-size: 11px;
+                                font-weight: 600;
+                                color: ${isChecked ? '#000' : '#666'};
+                                transition: all 0.15s ease;
+                                user-select: none;
+                              " title="${isDisabled ? 'Used by ' + claimerName : (isChecked ? 'Click to remove G' + g : 'Click to add G' + g)}">
+                                <input type="checkbox"
+                                  id="conn_${idx}_g${g}"
+                                  ${isChecked ? 'checked' : ''}
+                                  ${isDisabled ? 'disabled' : ''}
+                                  style="display: none;">
+                                G${g}
+                              </label>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                });
+
+                outputNodesList.innerHTML = html;
+
+                // Attach change handlers for group checkboxes
+                outgoingConns.forEach((conn, idx) => {
+                  [1, 2, 3].filter(g => g <= numGroups).forEach(g => {
+                    const checkboxEl = document.getElementById(`conn_${idx}_g${g}`);
+                    if (checkboxEl) {
+                      checkboxEl.addEventListener('change', (e) => {
+                        if (!conn.outputGroups) conn.outputGroups = [];
+
+                        if (e.target.checked) {
+                          // Add group
+                          if (!conn.outputGroups.includes(g)) {
+                            conn.outputGroups.push(g);
+                            conn.outputGroups.sort();
+                          }
+                        } else {
+                          // Remove group
+                          conn.outputGroups = conn.outputGroups.filter(x => x !== g);
+                        }
+
+                        // Keep legacy outputGroup in sync (use first group or 1)
+                        conn.outputGroup = conn.outputGroups[0] || 1;
+
+                        updateOutputNodesDisplay(); // Refresh to update colors and validation
+                        this.draw(); // Redraw canvas
+                      });
+                    }
+                  });
+                });
+              } else {
+                outputNodesAssignment.style.display = 'none';
+              }
+            };
+
+            // Group range inputs with overlap validation
+            const group1MinInput = document.getElementById('prop_group1Min');
+            const group1MaxInput = document.getElementById('prop_group1Max');
+            const group2MinInput = document.getElementById('prop_group2Min');
+            const group2MaxInput = document.getElementById('prop_group2Max');
+
+            // Helper to check for range overlap and show warning
+            const validateRanges = () => {
+              const g1Min = node.params.group1Min || 95;
+              const g1Max = node.params.group1Max || 105;
+              const g2Min = node.params.group2Min || 90;
+              const g2Max = node.params.group2Max || 94;
+              const numGroups = node.params.outputGroups || 1;
+
+              // Remove any existing warning
+              const existingWarning = document.getElementById('rangeOverlapWarning');
+              if (existingWarning) existingWarning.remove();
+
+              if (numGroups >= 3) {
+                // Check for overlap between Group 1 and Group 2
+                // Overlap occurs if ranges intersect: !(g1Max < g2Min || g2Max < g1Min)
+                const hasOverlap = !(g1Max < g2Min || g2Max < g1Min);
+
+                if (hasOverlap) {
+                  const warningDiv = document.createElement('div');
+                  warningDiv.id = 'rangeOverlapWarning';
+                  warningDiv.style.cssText = `
+                    margin-top: 8px;
+                    padding: 8px;
+                    background: rgba(255,74,74,0.2);
+                    border: 1px solid #ff4a4a;
+                    border-radius: 4px;
+                    font-size: 10px;
+                    color: #ff6b6b;
+                  `;
+                  warningDiv.innerHTML = '⚠️ <strong>Warning:</strong> Group 1 and Group 2 ranges overlap! Units may be assigned unpredictably.';
+                  const group2RangeDiv = document.getElementById('group2Range');
+                  if (group2RangeDiv) {
+                    group2RangeDiv.appendChild(warningDiv);
+                  }
+                }
+
+                // Highlight inputs with overlap
+                [group1MinInput, group1MaxInput, group2MinInput, group2MaxInput].forEach(input => {
+                  if (input) {
+                    input.style.borderColor = hasOverlap ? '#ff4a4a' : 'rgba(255,255,255,0.2)';
+                  }
+                });
+              } else {
+                // Reset border colors when not using 3 groups
+                [group1MinInput, group1MaxInput, group2MinInput, group2MaxInput].forEach(input => {
+                  if (input) {
+                    input.style.borderColor = 'rgba(255,255,255,0.2)';
+                  }
+                });
+              }
+
+              // Also validate that min < max within each group
+              if (numGroups >= 2 && g1Min >= g1Max && group1MinInput && group1MaxInput) {
+                group1MinInput.style.borderColor = '#ff4a4a';
+                group1MaxInput.style.borderColor = '#ff4a4a';
+              }
+              if (numGroups >= 3 && g2Min >= g2Max && group2MinInput && group2MaxInput) {
+                group2MinInput.style.borderColor = '#ff4a4a';
+                group2MaxInput.style.borderColor = '#ff4a4a';
+              }
+            };
+
+            if (outputGroupsSelect) {
+              // Initial display
+              updateOutputNodesDisplay();
+
+              outputGroupsSelect.addEventListener('change', (e) => {
+                const val = parseInt(e.target.value);
+                node.params.outputGroups = val;
+
+                // Show/hide range inputs
+                if (group1RangeDiv) group1RangeDiv.style.display = val >= 2 ? 'block' : 'none';
+                if (group2RangeDiv) group2RangeDiv.style.display = val >= 3 ? 'block' : 'none';
+
+                // Reset connections to valid groups when reducing group count
+                const outgoingConns = this.connections.filter(c => c.from === node);
+                outgoingConns.forEach(conn => {
+                  // Filter out groups that exceed the new count
+                  if (conn.outputGroups) {
+                    conn.outputGroups = conn.outputGroups.filter(g => g <= val);
+                    if (conn.outputGroups.length === 0) {
+                      conn.outputGroups = [1]; // Default to group 1 if all removed
+                    }
+                  }
+                  // Keep legacy outputGroup in sync
+                  conn.outputGroup = conn.outputGroups ? conn.outputGroups[0] : 1;
+                });
+
+                // Update the nodes display and validate ranges
+                updateOutputNodesDisplay();
+                validateRanges();
+                this.draw();
+              });
+            }
+
+            if (group1MinInput) {
+              group1MinInput.addEventListener('input', (e) => {
+                node.params.group1Min = parseFloat(e.target.value);
+                validateRanges();
+              });
+            }
+            if (group1MaxInput) {
+              group1MaxInput.addEventListener('input', (e) => {
+                node.params.group1Max = parseFloat(e.target.value);
+                validateRanges();
+              });
+            }
+            if (group2MinInput) {
+              group2MinInput.addEventListener('input', (e) => {
+                node.params.group2Min = parseFloat(e.target.value);
+                validateRanges();
+              });
+            }
+            if (group2MaxInput) {
+              group2MaxInput.addEventListener('input', (e) => {
+                node.params.group2Max = parseFloat(e.target.value);
+                validateRanges();
+              });
+            }
+
+            // Run initial validation
+            setTimeout(validateRanges, 100);
           }
         }
 
@@ -4108,8 +4471,6 @@
       }
 
       removeNode(node) {
-        if (node.params.isOutput) return; // Can't remove output node
-
         // Remove connections
         this.connections = this.connections.filter(c => c.from !== node && c.to !== node);
 
@@ -4192,15 +4553,38 @@
 
           const isHighlighted = highlightedConnections.has(conn);
 
+          // Determine connection color based on output group (for tester nodes with multiple groups)
+          const outputGroupColors = { 1: '#4aff80', 2: '#ff9f4a', 3: '#ff4a4a' };
+          let connectionColor = 'rgba(74, 255, 128, 0.5)';
+          let connectionColorSolid = '#4aff80';
+
+          // Check if source is a tester with multiple output groups
+          const connOutputGroups = conn.outputGroups || (conn.outputGroup ? [conn.outputGroup] : []);
+          if (conn.from.type === 'tester' && (conn.from.params.outputGroups || 1) > 1 && connOutputGroups.length > 0) {
+            if (connOutputGroups.length === 1) {
+              // Single group - use that group's color
+              connectionColor = outputGroupColors[connOutputGroups[0]] || '#4aff80';
+              connectionColorSolid = connectionColor;
+            } else {
+              // Multiple groups - use multi-group color
+              connectionColor = '#88aaff';
+              connectionColorSolid = '#88aaff';
+            }
+            // Add slight transparency for non-highlighted
+            if (!isHighlighted) {
+              connectionColor = connectionColor + '99'; // Add alpha
+            }
+          }
+
           // Glow effect for highlighted connections
           if (isHighlighted) {
             ctx.save();
-            ctx.shadowColor = conn.from.params.color || '#4aff80';
+            ctx.shadowColor = conn.from.params.color || connectionColorSolid;
             ctx.shadowBlur = 15 / this.zoom;
-            ctx.strokeStyle = conn.from.params.color || '#4aff80';
+            ctx.strokeStyle = conn.from.params.color || connectionColorSolid;
             ctx.lineWidth = 4 / this.zoom;
           } else {
-            ctx.strokeStyle = 'rgba(74, 255, 128, 0.5)';
+            ctx.strokeStyle = connectionColor;
             ctx.lineWidth = 2 / this.zoom;
           }
 
@@ -4236,7 +4620,7 @@
 
           // Arrow head - calculate angle based on last segment of curve
           const angle = Math.atan2(toPort.y - cp2y, toPort.x - cp2x);
-          ctx.fillStyle = isHighlighted ? (conn.from.params.color || '#4aff80') : 'rgba(74, 255, 128, 0.8)';
+          ctx.fillStyle = isHighlighted ? (conn.from.params.color || connectionColorSolid) : connectionColorSolid;
           ctx.beginPath();
           ctx.moveTo(toPort.x, toPort.y);
           ctx.lineTo(toPort.x - 10 * Math.cos(angle - 0.3), toPort.y - 10 * Math.sin(angle - 0.3));
@@ -4319,6 +4703,64 @@
             ctx.font = `${10 / this.zoom}px Arial`;
             ctx.textAlign = 'center';
             ctx.fillText(`${weight}%`, midX + badgeRadius + 17 / this.zoom, midY + 3 / this.zoom);
+          }
+
+          // Draw output group indicator badge for tester connections with multiple groups
+          const connGroups = conn.outputGroups || (conn.outputGroup ? [conn.outputGroup] : []);
+          if (conn.from.type === 'tester' && (conn.from.params.outputGroups || 1) > 1 && connGroups.length > 0) {
+            const groupBadgeColors = { 1: '#4aff80', 2: '#ff9f4a', 3: '#ff4a4a' };
+
+            // Position the group badge near the source/tester node (at t=0.15 on the curve)
+            const gt = 0.15;
+            const gx = Math.pow(1-gt,3)*fromPort.x + 3*Math.pow(1-gt,2)*gt*cp1x + 3*(1-gt)*gt*gt*cp2x + gt*gt*gt*toPort.x;
+            const gy = Math.pow(1-gt,3)*fromPort.y + 3*Math.pow(1-gt,2)*gt*cp1y + 3*(1-gt)*gt*gt*cp2y + gt*gt*gt*toPort.y;
+
+            // Determine badge text and color based on number of groups
+            let badgeText, badgeColor, badgeWidth;
+            if (connGroups.length === 1) {
+              badgeText = `G${connGroups[0]}`;
+              badgeColor = groupBadgeColors[connGroups[0]] || '#4aff80';
+              badgeWidth = 16 / this.zoom;
+            } else {
+              // Multiple groups - show combined
+              badgeText = connGroups.map(g => `G${g}`).join('+');
+              badgeColor = '#88aaff'; // Multi-group color
+              badgeWidth = (8 + connGroups.length * 12) / this.zoom;
+            }
+
+            // Draw rounded rectangle badge for multi-group, circle for single
+            const gBadgeHeight = 16 / this.zoom;
+            ctx.fillStyle = 'rgba(20, 20, 40, 0.95)';
+
+            if (connGroups.length === 1) {
+              // Circle for single group
+              ctx.beginPath();
+              ctx.arc(gx, gy, 8 / this.zoom, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = badgeColor;
+              ctx.lineWidth = 2 / this.zoom;
+              ctx.beginPath();
+              ctx.arc(gx, gy, 8 / this.zoom, 0, Math.PI * 2);
+              ctx.stroke();
+            } else {
+              // Rounded rect for multiple groups
+              const rx = gx - badgeWidth / 2;
+              const ry = gy - gBadgeHeight / 2;
+              ctx.beginPath();
+              ctx.roundRect(rx, ry, badgeWidth, gBadgeHeight, 4 / this.zoom);
+              ctx.fill();
+              ctx.strokeStyle = badgeColor;
+              ctx.lineWidth = 2 / this.zoom;
+              ctx.beginPath();
+              ctx.roundRect(rx, ry, badgeWidth, gBadgeHeight, 4 / this.zoom);
+              ctx.stroke();
+            }
+
+            ctx.fillStyle = badgeColor;
+            ctx.font = `bold ${9 / this.zoom}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(badgeText, gx, gy);
           }
         }
 
@@ -7522,7 +7964,26 @@
         document.getElementById('runSimBtn').addEventListener('click', () => this.runSimulation());
         document.getElementById('pauseSimBtn').addEventListener('click', () => this.togglePause());
         document.getElementById('resetSimBtn').addEventListener('click', () => this.reset());
-        document.getElementById('exportBtn').addEventListener('click', () => this.exportResults());
+        // Export dropdown toggle
+        const exportBtn = document.getElementById('exportBtn');
+        const exportDropdown = document.getElementById('exportDropdown');
+        exportBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isVisible = exportDropdown.style.display === 'block';
+          exportDropdown.style.display = isVisible ? 'none' : 'block';
+        });
+        document.getElementById('exportJsonBtn').addEventListener('click', () => {
+          exportDropdown.style.display = 'none';
+          this.exportResults('json');
+        });
+        document.getElementById('exportCsvBtn').addEventListener('click', () => {
+          exportDropdown.style.display = 'none';
+          this.exportResults('csv');
+        });
+        // Close dropdown when clicking elsewhere
+        document.addEventListener('click', () => {
+          exportDropdown.style.display = 'none';
+        });
 
         // Action buttons (status bar)
         document.getElementById('runSimBtn2').addEventListener('click', () => this.runSimulation());
@@ -7926,18 +8387,31 @@
         document.getElementById('totalUnits').textContent = results.totalUnits.toLocaleString();
       }
 
-      exportResults() {
+      exportResults(format = 'json') {
         if (!this.simulation.results) return;
 
+        const results = this.simulation.results;
+        const params = this.simulation.params;
+
+        if (format === 'csv') {
+          this.exportResultsCSV(results, params);
+        } else {
+          this.exportResultsJSON(results, params);
+        }
+
+        this.showNotification(`Results exported as ${format.toUpperCase()}!`, 'success');
+      }
+
+      exportResultsJSON(results, params) {
         const exportData = {
           timestamp: new Date().toISOString(),
-          parameters: this.simulation.params,
-          spatLimits: this.simulation.results.spatLimits,
-          spatResults: this.simulation.results.spatResults,
-          dpatResults: this.simulation.results.dpatResults,
-          totalUnits: this.simulation.results.totalUnits,
-          totalDefects: this.simulation.results.totalDefects,
-          lotSummaries: this.simulation.results.lots.map(lot => ({
+          parameters: params,
+          spatLimits: results.spatLimits,
+          spatResults: results.spatResults,
+          dpatResults: results.dpatResults,
+          totalUnits: results.totalUnits,
+          totalDefects: results.totalDefects,
+          lotSummaries: results.lots.map(lot => ({
             lotIndex: lot.lotIndex,
             mean: lot.stats.mean,
             sigma: lot.stats.sigma,
@@ -7952,6 +8426,82 @@
         const a = document.createElement('a');
         a.href = url;
         a.download = `dpat_spat_simulation_${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      exportResultsCSV(results, params) {
+        const rows = [];
+
+        // --- Sheet 1: Summary ---
+        rows.push('=== SIMULATION SUMMARY ===');
+        rows.push('Parameter,Value');
+        rows.push(`Timestamp,${new Date().toISOString()}`);
+        rows.push(`Total Units,${results.totalUnits}`);
+        rows.push(`Total Defects,${results.totalDefects}`);
+        rows.push(`Number of Lots,${params.numLots || ''}`);
+        rows.push(`Units per Lot,${params.unitsPerLot || ''}`);
+        rows.push(`Baseline Mean,${params.baselineMean || ''}`);
+        rows.push(`Baseline Sigma,${params.baselineSigma || ''}`);
+        rows.push(`PAT k-Factor,${params.patKFactor || ''}`);
+        rows.push(`SPAT Training Lots,${params.spatTrainingLots || ''}`);
+        rows.push(`DPAT Window Size,${params.dpatWindow || ''}`);
+        rows.push(`Defect Limit (sigma),${params.defectLimit || ''}`);
+        rows.push('');
+
+        // --- Sheet 2: SPAT vs DPAT Comparison ---
+        rows.push('=== SPAT vs DPAT COMPARISON ===');
+        rows.push('Metric,SPAT,DPAT');
+        const sr = results.spatResults || {};
+        const dr = results.dpatResults || {};
+        rows.push(`Fallout Rate (%),${sr.falloutRate != null ? sr.falloutRate.toFixed(4) : ''},${dr.falloutRate != null ? dr.falloutRate.toFixed(4) : ''}`);
+        rows.push(`Escape Rate (%),${sr.escapeRate != null ? sr.escapeRate.toFixed(4) : ''},${dr.escapeRate != null ? dr.escapeRate.toFixed(4) : ''}`);
+        rows.push(`False Rejects,${sr.falseRejects ?? ''},${dr.falseRejects ?? ''}`);
+        rows.push(`Escapes,${sr.escapes ?? ''},${dr.escapes ?? ''}`);
+        rows.push(`Total Tested,${sr.totalTested ?? ''},${dr.totalTested ?? ''}`);
+        rows.push('');
+
+        // --- Sheet 3: SPAT Limits ---
+        if (results.spatLimits) {
+          rows.push('=== SPAT LIMITS ===');
+          rows.push('Parameter,Value');
+          rows.push(`Lower Limit,${results.spatLimits.lower != null ? results.spatLimits.lower.toFixed(6) : ''}`);
+          rows.push(`Upper Limit,${results.spatLimits.upper != null ? results.spatLimits.upper.toFixed(6) : ''}`);
+          rows.push(`Training Mean,${results.spatLimits.mean != null ? results.spatLimits.mean.toFixed(6) : ''}`);
+          rows.push(`Training Sigma,${results.spatLimits.sigma != null ? results.spatLimits.sigma.toFixed(6) : ''}`);
+          rows.push('');
+        }
+
+        // --- Sheet 4: Lot Summaries ---
+        rows.push('=== LOT SUMMARIES ===');
+        rows.push('Lot Index,Mean,Sigma,Min,Max,Defect Count,Unit Count');
+        results.lots.forEach(lot => {
+          const defectCount = lot.units.filter(u => u.isDefect).length;
+          rows.push(`${lot.lotIndex},${lot.stats.mean.toFixed(6)},${lot.stats.sigma.toFixed(6)},${lot.stats.min.toFixed(6)},${lot.stats.max.toFixed(6)},${defectCount},${lot.units.length}`);
+        });
+        rows.push('');
+
+        // --- Sheet 5: Per-Unit Data ---
+        rows.push('=== UNIT DATA ===');
+        rows.push('Lot Index,Unit Index,Measured Value,Is Defect,SPAT Result,DPAT Result');
+        results.lots.forEach(lot => {
+          lot.units.forEach((unit, unitIdx) => {
+            const measVal = unit.measuredValue != null ? unit.measuredValue.toFixed(6) : '';
+            const isDefect = unit.isDefect ? 'YES' : 'NO';
+            const spatResult = unit.spatReject ? 'REJECT' : 'PASS';
+            const dpatResult = unit.dpatReject ? 'REJECT' : 'PASS';
+            rows.push(`${lot.lotIndex},${unitIdx},${measVal},${isDefect},${spatResult},${dpatResult}`);
+          });
+        });
+
+        const csvContent = rows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dpat_spat_simulation_${Date.now()}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -7977,7 +8527,9 @@
           toId: conn.to.id,
           weight: conn.weight || 50,
           locked: conn.locked || false,
-          operation: conn.operation || '+'
+          operation: conn.operation || '+',
+          outputGroup: conn.outputGroup || 1,
+          outputGroups: conn.outputGroups || [conn.outputGroup || 1]
         }));
 
         // Collect simulation settings from UI
@@ -8087,7 +8639,9 @@
                   to: toNode,
                   weight: connData.weight || 50,
                   locked: connData.locked || false,
-                  operation: connData.operation || '+'
+                  operation: connData.operation || '+',
+                  outputGroup: connData.outputGroup || 1,
+                  outputGroups: connData.outputGroups || [connData.outputGroup || 1]
                 };
                 this.nodeGraph.connections.push(connection);
               }

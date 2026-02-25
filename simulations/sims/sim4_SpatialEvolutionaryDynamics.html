@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Spatial Evolutionary Dynamics - Grid-based agent simulation combining evolution and strategy behavior.">
+  <title>Spatial Evolutionary Dynamics - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E', {});
+  </script>
+
+  <style>
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    .simulation-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 320px;
+      max-width: 320px;
+      height: 100%;
+      max-height: 100vh;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+
+    .simulation-sidebar.collapsed { transform: translateX(-100%); }
+
+    .sidebar-toggle {
+      position: fixed;
+      left: 320px;
+      top: 80px;
+      width: 36px;
+      height: 36px;
+      background: rgba(30, 30, 50, 0.95);
+      border: 2px solid rgba(74, 158, 255, 0.5);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a9eff;
+      font-size: 18px;
+      transition: left 0.3s ease, background 0.2s, transform 0.2s;
+      z-index: 150;
+    }
+    .sidebar-toggle:hover {
+      background: rgba(74, 158, 255, 0.3);
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .sidebar-toggle.collapsed {
+      left: 0;
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .control-group { margin-bottom: 18px; }
+
+    .control-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #b0b0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-value {
+      float: right;
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .control-input {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #4a9eff;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .control-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(74, 158, 255, 0.5);
+    }
+
+    .playback-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .playback-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .play-btn { background: #2ecc71; color: #fff; }
+    .play-btn:hover { background: #27ae60; transform: translateY(-1px); }
+    .pause-btn { background: #f39c12; color: #fff; }
+    .pause-btn:hover { background: #d68910; transform: translateY(-1px); }
+    .reset-btn { background: #e74c3c; color: #fff; }
+    .reset-btn:hover { background: #c0392b; transform: translateY(-1px); }
+
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      padding: 8px 12px;
+      background: rgba(74, 158, 255, 0.2);
+      border: 1px solid rgba(74, 158, 255, 0.4);
+      border-radius: 4px;
+      color: #4a9eff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .preset-btn:hover {
+      background: rgba(74, 158, 255, 0.4);
+      border-color: #4a9eff;
+      transform: translateY(-1px);
+    }
+
+    .simulation-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      margin-left: 320px;
+      transition: margin-left 0.3s ease;
+      overflow: hidden;
+    }
+
+    .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper {
+      margin-left: 0;
+    }
+
+    #simulationCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 50;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .simulation-stats {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 40, 0.9);
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      z-index: 50;
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item { display: flex; gap: 6px; }
+    .stat-value { color: #4a9eff; font-weight: 600; }
+    .stat-cooperative { color: #2ecc71; font-weight: 600; }
+    .stat-competitive { color: #e74c3c; font-weight: 600; }
+    .stat-strategic { color: #f39c12; font-weight: 600; }
+
+    .population-graph {
+      position: absolute;
+      bottom: 70px;
+      right: 20px;
+      width: 280px;
+      height: 140px;
+      background: rgba(20, 20, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 50;
+    }
+
+    .population-graph canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .graph-title {
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .simulation-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 40px;
+      background: rgba(20, 20, 40, 0.95);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 60;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .simulation-overlay.active { display: flex; }
+
+    .overlay-text {
+      color: #b0b0b0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .overlay-buttons { display: flex; gap: 12px; }
+
+    .overlay-button {
+      padding: 12px 32px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .overlay-button.play { background: #2ecc71; color: #fff; }
+    .overlay-button.play:hover { background: #27ae60; transform: translateY(-2px); }
+
+    .mobile-expand-btn, .mobile-collapse-btn { display: none; }
+
+    .strategy-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .legend-dot.cooperative { background: #2ecc71; }
+    .legend-dot.competitive { background: #e74c3c; }
+    .legend-dot.strategic { background: #f39c12; }
+
+    /* Nav Info Button */
+    .nav-info-btn {
+      background: rgba(74, 158, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .nav-info-btn:hover {
+      background: rgba(74, 158, 255, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .simulation-sidebar { width: 100%; max-width: 100%; height: auto; max-height: 50vh; }
+      .simulation-canvas-wrapper { margin-left: 0; margin-top: 0; }
+      .sidebar-toggle { display: none; }
+      .mobile-expand-btn, .mobile-collapse-btn { display: block; position: absolute; z-index: 70; }
+    }
+
+    footer { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../../index.html" class="logo">Viren<span>Patel</span></a>
+      <ul class="nav-links">
+        <li><a href="../../about.html">About</a></li>
+        <li><a href="../../podcast.html">Podcast</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../../simulations/index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+        <li><a href="sim4_SpatialEvolutionaryDynamics_info.html" class="nav-info-btn">ⓘ Info</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-title">Spatial Evolution</div>
+
+      <div class="control-group">
+        <div class="playback-buttons">
+          <button class="playback-btn play-btn" id="playBtn">&#9658; Play</button>
+          <button class="playback-btn pause-btn" id="pauseBtn">&#10074;&#10074; Pause</button>
+          <button class="playback-btn reset-btn" id="resetBtn">&#8635; Reset</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Behavior Presets</label>
+        <div class="preset-buttons">
+          <button class="preset-btn" data-preset="balanced">Balanced</button>
+          <button class="preset-btn" data-preset="competitive">War</button>
+          <button class="preset-btn" data-preset="cooperative">Peace</button>
+          <button class="preset-btn" data-preset="strategic">Tactical</button>
+          <button class="preset-btn" data-preset="chaos">Chaos</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Strategy Legend</label>
+        <div class="strategy-legend">
+          <div class="legend-item"><div class="legend-dot cooperative"></div>Cooperative</div>
+          <div class="legend-item"><div class="legend-dot competitive"></div>Competitive</div>
+          <div class="legend-item"><div class="legend-dot strategic"></div>Strategic</div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Cell Size (px) <span class="control-value" id="cellSizeValue">8</span></label>
+        <input type="range" class="control-input" id="cellSize" min="4" max="20" step="1" value="8">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Initial Population % <span class="control-value" id="initialPopValue">30</span></label>
+        <input type="range" class="control-input" id="initialPop" min="10" max="80" step="5" value="30">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Base Lifespan <span class="control-value" id="lifespanValue">50</span></label>
+        <input type="range" class="control-input" id="lifespan" min="20" max="200" step="10" value="50">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Reproduction Rate <span class="control-value" id="reproRateValue">0.30</span></label>
+        <input type="range" class="control-input" id="reproRate" min="0.05" max="0.80" step="0.05" value="0.30">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Random Death Rate <span class="control-value" id="deathRateValue">0.01</span></label>
+        <input type="range" class="control-input" id="deathRate" min="0" max="0.10" step="0.01" value="0.01">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Cooperative % <span class="control-value" id="coopPctValue">33</span></label>
+        <input type="range" class="control-input" id="coopPct" min="0" max="100" step="5" value="33">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Competitive % <span class="control-value" id="compPctValue">33</span></label>
+        <input type="range" class="control-input" id="compPct" min="0" max="100" step="5" value="33">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Strategic % <span class="control-value" id="stratPctValue">34</span></label>
+        <input type="range" class="control-input" id="stratPct" min="0" max="100" step="5" value="34">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Simulation Speed <span class="control-value" id="speedValue">1.0</span></label>
+        <input type="range" class="control-input" id="simSpeed" min="0.2" max="5.0" step="0.2" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Takeover Strength <span class="control-value" id="takeoverValue">0.50</span></label>
+        <input type="range" class="control-input" id="takeoverStrength" min="0.1" max="1.0" step="0.05" value="0.50">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Movement Noise <span class="control-value" id="noiseValue">0.80</span></label>
+        <input type="range" class="control-input" id="movementNoise" min="0" max="2.0" step="0.1" value="0.80">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Damping <span class="control-value" id="dampingValue">0.85</span></label>
+        <input type="range" class="control-input" id="damping" min="0.5" max="0.98" step="0.02" value="0.85">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Particle Size <span class="control-value" id="particleSizeValue">0.35</span></label>
+        <input type="range" class="control-input" id="particleRadius" min="0.15" max="0.50" step="0.05" value="0.35">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Field Glow <span class="control-value" id="glowValue">1.00</span></label>
+        <input type="range" class="control-input" id="glowIntensity" min="0" max="2.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" style="cursor: pointer;">
+          <input type="checkbox" id="showGridToggle" style="margin-right: 8px; cursor: pointer;">
+          Show Grid Lines
+        </label>
+      </div>
+    </div>
+
+    <div class="simulation-canvas-wrapper">
+      <canvas id="simulationCanvas"></canvas>
+
+      <button class="mobile-expand-btn" id="mobileExpandBtn">&#9660;</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">&#9650;</button>
+
+      <a href="../index.html" class="back-button">
+        <span class="back-arrow">&larr;</span>
+        <span class="back-text">Back</span>
+      </a>
+
+      <div class="simulation-stats">
+        <div class="stat-item"><span>Tick:</span><span class="stat-value" id="tickValue">0</span></div>
+        <div class="stat-item"><span>Pop:</span><span class="stat-value" id="popValue">0</span></div>
+        <div class="stat-item"><span class="stat-cooperative">Coop:</span><span class="stat-cooperative" id="coopCount">0</span></div>
+        <div class="stat-item"><span class="stat-competitive">Comp:</span><span class="stat-competitive" id="compCount">0</span></div>
+        <div class="stat-item"><span class="stat-strategic">Strat:</span><span class="stat-strategic" id="stratCount">0</span></div>
+      </div>
+
+      <div class="population-graph">
+        <span class="graph-title">Population Over Time</span>
+        <canvas id="populationGraph"></canvas>
+      </div>
+
+      <div class="simulation-overlay active" id="overlay">
+        <div class="overlay-text">Spatial Evolutionary Dynamics: Particles move with Brownian motion while competing for grid-based territory. Cooperative, competitive, and strategic behaviors create emergent patterns of territorial clusters, invasion waves, and dynamic equilibrium.</div>
+        <div class="overlay-buttons">
+          <button class="overlay-button play" id="overlayPlay">Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+  </footer>
+
+  <script>
+    /**
+     * SPATIAL EVOLUTIONARY DYNAMICS ENGINE - PARTICLE-GRID HYBRID
+     *
+     * A hybrid simulation combining continuous particle movement with grid-based evolutionary logic.
+     *
+     * Architecture:
+     * - Grid: Authoritative logic layer - 2D array, one agent per cell maximum
+     * - Agent: Has both grid position (x,y) and continuous position (px,py) with velocity
+     * - Strategies: Cooperative, Competitive, Strategic
+     *
+     * Movement System:
+     * - Particles move with Brownian motion (Gaussian noise + damping)
+     * - Grid positions update when particles cross cell boundaries
+     * - If target cell is occupied, movement is reverted (bounce back)
+     *
+     * Tick Order:
+     * 1. Move particles (every frame for smooth animation)
+     * 2. Sync grid positions after cell transitions
+     * 3. Age agents (per logic tick)
+     * 4. Process deaths and track freed cells
+     * 5. Strategic agents claim freed cells
+     * 6. Normal reproduction (unchanged strategy logic)
+     * 7. Apply births
+     *
+     * Performance: O(N) per tick with local-only neighbor checks
+     */
+
+    // ==================== CONFIGURATION ====================
+    const CONFIG = {
+      // Grid cell size in pixels (grid dimensions calculated from canvas size)
+      cellSize: 8,
+
+      // Population settings
+      initialPopulationPercent: 30,
+      baseLifespan: 50,
+      baseReproductionRate: 0.30,
+      randomDeathRate: 0.01,
+
+      // Strategy distribution (should sum to 100)
+      cooperativePercent: 33,
+      competitivePercent: 33,
+      strategicPercent: 34,
+
+      // Competitive takeover
+      takeoverStrength: 0.50,
+
+      // Simulation
+      speed: 1.0,
+      showGrid: false,
+
+      // === PARTICLE MOVEMENT (Hybrid System) ===
+      movementNoise: 0.8,     // Brownian motion intensity
+      damping: 0.85,          // Velocity damping per frame (0-1)
+      particleRadius: 0.35,   // Particle radius as fraction of cell size
+
+      // === VISUAL EFFECTS ===
+      glowIntensity: 1.0      // Field glow intensity (0 = off, 1 = normal, 2 = intense)
+    };
+
+    // Behavior presets
+    const PRESETS = {
+      balanced: {
+        cellSize: 8, baseLifespan: 50, baseReproductionRate: 0.30, randomDeathRate: 0.01,
+        cooperativePercent: 33, competitivePercent: 33, strategicPercent: 34,
+        takeoverStrength: 0.50, movementNoise: 0.8, damping: 0.85, glowIntensity: 1.0
+      },
+      competitive: {
+        cellSize: 8, baseLifespan: 40, baseReproductionRate: 0.40, randomDeathRate: 0.02,
+        cooperativePercent: 10, competitivePercent: 70, strategicPercent: 20,
+        takeoverStrength: 0.70, movementNoise: 1.2, damping: 0.80, glowIntensity: 1.2  // Intense glow for war
+      },
+      cooperative: {
+        cellSize: 10, baseLifespan: 80, baseReproductionRate: 0.25, randomDeathRate: 0.005,
+        cooperativePercent: 70, competitivePercent: 10, strategicPercent: 20,
+        takeoverStrength: 0.30, movementNoise: 0.5, damping: 0.90, glowIntensity: 1.5  // Strong glow for peaceful zones
+      },
+      strategic: {
+        cellSize: 8, baseLifespan: 60, baseReproductionRate: 0.35, randomDeathRate: 0.01,
+        cooperativePercent: 20, competitivePercent: 20, strategicPercent: 60,
+        takeoverStrength: 0.50, movementNoise: 0.7, damping: 0.88, glowIntensity: 1.0
+      },
+      chaos: {
+        cellSize: 6, baseLifespan: 25, baseReproductionRate: 0.60, randomDeathRate: 0.03,
+        cooperativePercent: 33, competitivePercent: 34, strategicPercent: 33,
+        takeoverStrength: 0.80, movementNoise: 1.5, damping: 0.75, glowIntensity: 0.8  // Less glow, more chaos
+      }
+    };
+
+    // ==================== AGENT CLASS ====================
+    // Hybrid Particle-Grid: Agent has both grid position (x,y) and continuous position (px,py)
+    class Agent {
+      static nextId = 1;
+
+      constructor(strategy, x, y, cellSize = 1) {
+        this.id = Agent.nextId++;
+        // Grid coordinates (authoritative for logic)
+        this.x = x;
+        this.y = y;
+        // Continuous pixel position (for smooth rendering)
+        this.px = (x + 0.5) * cellSize;
+        this.py = (y + 0.5) * cellSize;
+        // Velocity for Brownian motion
+        this.vx = 0;
+        this.vy = 0;
+        // Cell size reference for position calculations
+        this.cellSize = cellSize;
+
+        this.strategy = strategy; // 'cooperative', 'competitive', 'strategic'
+        this.age = 0;
+        // Strategic agents get +20% lifespan
+        const baseLife = CONFIG.baseLifespan + Math.floor((Math.random() - 0.5) * 20);
+        this.lifespan = strategy === 'strategic' ? Math.floor(baseLife * 1.2) : baseLife;
+        this.baseReproductionRate = CONFIG.baseReproductionRate;
+        this.fitnessScore = 1.0;
+        this.hasReproducedThisTick = false;
+      }
+
+      // Gaussian random for Brownian motion
+      static gaussianRandom() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+      }
+
+      // Update continuous position with Brownian motion
+      // Returns { movedCell: boolean, newX: int, newY: int } if particle wants to change cells
+      updateMovement(gridWidth, gridHeight) {
+        // Apply Brownian force
+        this.vx += Agent.gaussianRandom() * CONFIG.movementNoise;
+        this.vy += Agent.gaussianRandom() * CONFIG.movementNoise;
+
+        // Apply damping
+        this.vx *= CONFIG.damping;
+        this.vy *= CONFIG.damping;
+
+        // Update continuous position
+        this.px += this.vx;
+        this.py += this.vy;
+
+        // Calculate which grid cell this position maps to
+        const newCellX = Math.floor(this.px / this.cellSize);
+        const newCellY = Math.floor(this.py / this.cellSize);
+
+        // Check if we're trying to move to a different cell
+        if (newCellX !== this.x || newCellY !== this.y) {
+          // Validate bounds
+          if (newCellX >= 0 && newCellX < gridWidth && newCellY >= 0 && newCellY < gridHeight) {
+            return { movedCell: true, newX: newCellX, newY: newCellY };
+          } else {
+            // Hit boundary - bounce back
+            this.bounceFromEdge(gridWidth, gridHeight);
+            return { movedCell: false };
+          }
+        }
+
+        return { movedCell: false };
+      }
+
+      // Bounce particle back when hitting grid boundary
+      bounceFromEdge(gridWidth, gridHeight) {
+        const minX = 0;
+        const maxX = gridWidth * this.cellSize;
+        const minY = 0;
+        const maxY = gridHeight * this.cellSize;
+
+        if (this.px < minX) {
+          this.px = minX + (minX - this.px);
+          this.vx = Math.abs(this.vx) * 0.5;
+        } else if (this.px >= maxX) {
+          this.px = maxX - (this.px - maxX) - 0.01;
+          this.vx = -Math.abs(this.vx) * 0.5;
+        }
+
+        if (this.py < minY) {
+          this.py = minY + (minY - this.py);
+          this.vy = Math.abs(this.vy) * 0.5;
+        } else if (this.py >= maxY) {
+          this.py = maxY - (this.py - maxY) - 0.01;
+          this.vy = -Math.abs(this.vy) * 0.5;
+        }
+      }
+
+      // Revert movement when target cell is occupied
+      revertMovement() {
+        // Snap back to center of current cell with slight bounce
+        const centerX = (this.x + 0.5) * this.cellSize;
+        const centerY = (this.y + 0.5) * this.cellSize;
+
+        // Bounce effect - reverse velocity slightly
+        this.vx *= -0.3;
+        this.vy *= -0.3;
+
+        // Move back towards cell center
+        this.px = this.px + (centerX - this.px) * 0.5;
+        this.py = this.py + (centerY - this.py) * 0.5;
+      }
+
+      // Sync grid position after successful cell change
+      syncToCell(newX, newY) {
+        this.x = newX;
+        this.y = newY;
+      }
+
+      // Update cell size (called when canvas resizes)
+      updateCellSize(newCellSize) {
+        // Maintain relative position within cell
+        const relX = (this.px / this.cellSize) - this.x;
+        const relY = (this.py / this.cellSize) - this.y;
+        this.cellSize = newCellSize;
+        this.px = (this.x + relX) * newCellSize;
+        this.py = (this.y + relY) * newCellSize;
+      }
+
+      // Create offspring with inherited traits - spawns at center of target cell
+      createOffspring(x, y, cellSize) {
+        const child = new Agent(this.strategy, x, y, cellSize);
+        child.lifespan = this.lifespan + Math.floor((Math.random() - 0.5) * 4);
+        child.baseReproductionRate = this.baseReproductionRate;
+        child.fitnessScore = this.fitnessScore;
+        // Give offspring a small random initial velocity
+        child.vx = Agent.gaussianRandom() * CONFIG.movementNoise * 0.5;
+        child.vy = Agent.gaussianRandom() * CONFIG.movementNoise * 0.5;
+        return child;
+      }
+
+      // Get color based on strategy
+      getColor() {
+        switch (this.strategy) {
+          case 'cooperative': return '#2ecc71';
+          case 'competitive': return '#e74c3c';
+          case 'strategic': return '#f39c12';
+          default: return '#888888';
+        }
+      }
+
+      // Get slightly varied color based on age/fitness
+      getRenderColor() {
+        const base = this.getColor();
+        const ageFactor = Math.max(0.5, 1 - (this.age / this.lifespan) * 0.5);
+        return this.adjustBrightness(base, ageFactor);
+      }
+
+      adjustBrightness(hex, factor) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        const nr = Math.floor(r * factor);
+        const ng = Math.floor(g * factor);
+        const nb = Math.floor(b * factor);
+        return `rgb(${nr}, ${ng}, ${nb})`;
+      }
+    }
+
+    // ==================== GRID CLASS ====================
+    // Authoritative logic layer - one agent per cell maximum
+    class Grid {
+      constructor(width, height, cellSize = 8) {
+        this.width = width;
+        this.height = height;
+        this.cellSize = cellSize;
+        this.cells = [];
+        this.clear();
+      }
+
+      clear() {
+        this.cells = [];
+        for (let y = 0; y < this.height; y++) {
+          this.cells[y] = [];
+          for (let x = 0; x < this.width; x++) {
+            this.cells[y][x] = null;
+          }
+        }
+      }
+
+      // Update cell size and sync all agents
+      updateCellSize(newCellSize) {
+        this.cellSize = newCellSize;
+        for (let y = 0; y < this.height; y++) {
+          for (let x = 0; x < this.width; x++) {
+            const agent = this.cells[y][x];
+            if (agent) {
+              agent.updateCellSize(newCellSize);
+            }
+          }
+        }
+      }
+
+      getCell(x, y) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) return null;
+        return this.cells[y][x];
+      }
+
+      setCell(x, y, agent) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
+        this.cells[y][x] = agent;
+        if (agent) {
+          agent.x = x;
+          agent.y = y;
+        }
+      }
+
+      removeCell(x, y) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) return;
+        this.cells[y][x] = null;
+      }
+
+      // Move agent from one cell to another (atomic operation)
+      moveAgent(fromX, fromY, toX, toY) {
+        const agent = this.cells[fromY][fromX];
+        if (!agent) return false;
+        if (this.cells[toY][toX] !== null) return false; // Target occupied
+
+        this.cells[fromY][fromX] = null;
+        this.cells[toY][toX] = agent;
+        agent.syncToCell(toX, toY);
+        return true;
+      }
+
+      // Get Moore neighborhood (8 surrounding cells)
+      getMooreNeighbors(x, y) {
+        const neighbors = { empty: [], occupied: [] };
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = x + dx;
+            const ny = y + dy;
+            if (nx < 0 || nx >= this.width || ny < 0 || ny >= this.height) continue;
+            const cell = this.cells[ny][nx];
+            if (cell === null) {
+              neighbors.empty.push({ x: nx, y: ny });
+            } else {
+              neighbors.occupied.push({ x: nx, y: ny, agent: cell });
+            }
+          }
+        }
+        return neighbors;
+      }
+
+      // Count same-type neighbors for an agent
+      countSameTypeNeighbors(agent) {
+        let count = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = agent.x + dx;
+            const ny = agent.y + dy;
+            if (nx < 0 || nx >= this.width || ny < 0 || ny >= this.height) continue;
+            const neighbor = this.cells[ny][nx];
+            if (neighbor && neighbor.strategy === agent.strategy) {
+              count++;
+            }
+          }
+        }
+        return count;
+      }
+
+      // Count different-type neighbors for an agent
+      countDifferentTypeNeighbors(agent) {
+        let count = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = agent.x + dx;
+            const ny = agent.y + dy;
+            if (nx < 0 || nx >= this.width || ny < 0 || ny >= this.height) continue;
+            const neighbor = this.cells[ny][nx];
+            if (neighbor && neighbor.strategy !== agent.strategy) {
+              count++;
+            }
+          }
+        }
+        return count;
+      }
+
+      // Get all agents
+      getAllAgents() {
+        const agents = [];
+        for (let y = 0; y < this.height; y++) {
+          for (let x = 0; x < this.width; x++) {
+            if (this.cells[y][x] !== null) {
+              agents.push(this.cells[y][x]);
+            }
+          }
+        }
+        return agents;
+      }
+
+      // Count agents by strategy
+      countByStrategy() {
+        const counts = { cooperative: 0, competitive: 0, strategic: 0, total: 0 };
+        for (let y = 0; y < this.height; y++) {
+          for (let x = 0; x < this.width; x++) {
+            const agent = this.cells[y][x];
+            if (agent) {
+              counts[agent.strategy]++;
+              counts.total++;
+            }
+          }
+        }
+        return counts;
+      }
+    }
+
+    // ==================== SIMULATION CLASS ====================
+    // Hybrid Particle-Grid: Movement is continuous, logic is grid-based
+    class Simulation {
+      constructor(canvasWidth, canvasHeight, cellSize = 8) {
+        // Calculate grid dimensions from canvas size and cell size
+        const gridWidth = Math.floor(canvasWidth / cellSize);
+        const gridHeight = Math.floor(canvasHeight / cellSize);
+
+        this.canvasWidth = canvasWidth;
+        this.canvasHeight = canvasHeight;
+        this.cellSize = cellSize;
+        this.grid = new Grid(gridWidth, gridHeight, cellSize);
+        this.tick = 0;
+        this.freedCellsThisTick = new Set(); // For strategic agents
+        this.pendingBirths = [];
+        this.pendingDeaths = [];
+        this.pendingMoves = []; // For cell transitions
+
+        // Statistics
+        this.stats = {
+          cooperative: 0,
+          competitive: 0,
+          strategic: 0,
+          total: 0,
+          avgFitness: { cooperative: 0, competitive: 0, strategic: 0 }
+        };
+
+        // Population history for graph (stores last N ticks)
+        this.maxHistoryLength = 200;
+        this.populationHistory = {
+          cooperative: [],
+          competitive: [],
+          strategic: []
+        };
+      }
+
+      // Resize simulation when canvas changes
+      resize(canvasWidth, canvasHeight) {
+        const newGridWidth = Math.floor(canvasWidth / this.cellSize);
+        const newGridHeight = Math.floor(canvasHeight / this.cellSize);
+
+        // Only rebuild if grid dimensions changed
+        if (newGridWidth !== this.grid.width || newGridHeight !== this.grid.height) {
+          this.canvasWidth = canvasWidth;
+          this.canvasHeight = canvasHeight;
+          // Preserve existing agents that still fit in new grid
+          const existingAgents = this.grid.getAllAgents().filter(
+            agent => agent.x < newGridWidth && agent.y < newGridHeight
+          );
+          this.grid = new Grid(newGridWidth, newGridHeight, this.cellSize);
+          for (const agent of existingAgents) {
+            agent.updateCellSize(this.cellSize);
+            this.grid.setCell(agent.x, agent.y, agent);
+          }
+        } else {
+          this.canvasWidth = canvasWidth;
+          this.canvasHeight = canvasHeight;
+        }
+      }
+
+      updateCellSize(newCellSize) {
+        this.cellSize = newCellSize;
+        this.grid.updateCellSize(newCellSize);
+      }
+
+      init() {
+        this.grid.clear();
+        this.tick = 0;
+        Agent.nextId = 1;
+
+        // Clear population history
+        this.populationHistory = {
+          cooperative: [],
+          competitive: [],
+          strategic: []
+        };
+
+        const totalCells = this.grid.width * this.grid.height;
+        const targetPop = Math.floor(totalCells * (CONFIG.initialPopulationPercent / 100));
+
+        // Normalize strategy percentages
+        const total = CONFIG.cooperativePercent + CONFIG.competitivePercent + CONFIG.strategicPercent;
+        const coopRatio = CONFIG.cooperativePercent / total;
+        const compRatio = CONFIG.competitivePercent / total;
+
+        // Place agents randomly
+        let placed = 0;
+        const positions = [];
+        for (let y = 0; y < this.grid.height; y++) {
+          for (let x = 0; x < this.grid.width; x++) {
+            positions.push({ x, y });
+          }
+        }
+        this.shuffleArray(positions);
+
+        for (let i = 0; i < targetPop && i < positions.length; i++) {
+          const { x, y } = positions[i];
+          const r = Math.random();
+          let strategy;
+          if (r < coopRatio) strategy = 'cooperative';
+          else if (r < coopRatio + compRatio) strategy = 'competitive';
+          else strategy = 'strategic';
+
+          const agent = new Agent(strategy, x, y, this.cellSize);
+          this.grid.setCell(x, y, agent);
+          placed++;
+        }
+
+        this.updateStats();
+      }
+
+      shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      }
+
+      // Called every animation frame for smooth particle movement
+      updateParticleMovement() {
+        const agents = this.grid.getAllAgents();
+        this.pendingMoves = [];
+
+        // Phase 1: Calculate all movement intentions
+        for (const agent of agents) {
+          const result = agent.updateMovement(this.grid.width, this.grid.height);
+          if (result.movedCell) {
+            this.pendingMoves.push({
+              agent: agent,
+              fromX: agent.x,
+              fromY: agent.y,
+              toX: result.newX,
+              toY: result.newY
+            });
+          }
+        }
+
+        // Phase 2: Resolve cell transitions (first-come-first-served after shuffle)
+        this.shuffleArray(this.pendingMoves);
+        const claimedCells = new Set();
+
+        for (const move of this.pendingMoves) {
+          const key = `${move.toX},${move.toY}`;
+          const targetOccupied = this.grid.getCell(move.toX, move.toY) !== null;
+          const alreadyClaimed = claimedCells.has(key);
+
+          if (!targetOccupied && !alreadyClaimed) {
+            // Execute move
+            const success = this.grid.moveAgent(move.fromX, move.fromY, move.toX, move.toY);
+            if (success) {
+              claimedCells.add(key);
+            } else {
+              move.agent.revertMovement();
+            }
+          } else {
+            // Can't move - revert
+            move.agent.revertMovement();
+          }
+        }
+      }
+
+      // Main logic tick (called at slower rate than movement)
+      step() {
+        this.tick++;
+        this.freedCellsThisTick.clear();
+        this.pendingBirths = [];
+        this.pendingDeaths = [];
+
+        // Get all agents and shuffle for random order
+        const agents = this.grid.getAllAgents();
+        this.shuffleArray(agents);
+
+        // Calculate population ratios for anti-monoculture mechanic
+        const counts = this.grid.countByStrategy();
+        const totalPop = counts.total;
+        const dominantRatios = {
+          cooperative: totalPop > 0 ? counts.cooperative / totalPop : 0,
+          competitive: totalPop > 0 ? counts.competitive / totalPop : 0,
+          strategic: totalPop > 0 ? counts.strategic / totalPop : 0
+        };
+
+        // Phase 1: Age and mark deaths
+        for (const agent of agents) {
+          agent.age++;
+          agent.hasReproducedThisTick = false;
+
+          // Calculate effective death rate with anti-monoculture penalty
+          let effectiveDeathRate = CONFIG.randomDeathRate;
+
+          // Global anti-monoculture stabilizer: if agent's type > 70% of population, +0.01 death rate
+          if (dominantRatios[agent.strategy] > 0.70) {
+            effectiveDeathRate += 0.01;
+          }
+
+          // Check death conditions
+          if (agent.age > agent.lifespan) {
+            this.pendingDeaths.push(agent);
+          } else if (Math.random() < effectiveDeathRate) {
+            this.pendingDeaths.push(agent);
+          }
+        }
+
+        // Apply deaths and track freed cells
+        for (const agent of this.pendingDeaths) {
+          this.freedCellsThisTick.add(`${agent.x},${agent.y}`);
+          this.grid.removeCell(agent.x, agent.y);
+        }
+
+        // Phase 2: Strategic agents get priority on freed cells
+        const aliveAgents = this.grid.getAllAgents();
+        this.shuffleArray(aliveAgents);
+
+        for (const agent of aliveAgents) {
+          if (agent.strategy === 'strategic' && !agent.hasReproducedThisTick) {
+            const neighbors = this.grid.getMooreNeighbors(agent.x, agent.y);
+            // Check if any neighbor cell was just freed
+            for (const empty of neighbors.empty) {
+              const key = `${empty.x},${empty.y}`;
+              if (this.freedCellsThisTick.has(key)) {
+                // Priority reproduction!
+                if (Math.random() < agent.baseReproductionRate * 1.5) {
+                  const child = agent.createOffspring(empty.x, empty.y, this.cellSize);
+                  this.pendingBirths.push(child);
+                  agent.hasReproducedThisTick = true;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        // Apply priority births
+        for (const child of this.pendingBirths) {
+          if (this.grid.getCell(child.x, child.y) === null) {
+            this.grid.setCell(child.x, child.y, child);
+          }
+        }
+        this.pendingBirths = [];
+
+        // Phase 3: Normal reproduction for all agents
+        this.shuffleArray(aliveAgents);
+
+        for (const agent of aliveAgents) {
+          if (agent.hasReproducedThisTick) continue;
+          if (this.grid.getCell(agent.x, agent.y) === null) continue; // Agent might have been taken over
+
+          if (Math.random() < agent.baseReproductionRate) {
+            this.attemptReproduction(agent);
+          }
+        }
+
+        // Apply normal births
+        for (const child of this.pendingBirths) {
+          if (this.grid.getCell(child.x, child.y) === null) {
+            this.grid.setCell(child.x, child.y, child);
+          }
+        }
+
+        this.updateStats();
+      }
+
+      attemptReproduction(agent) {
+        const neighbors = this.grid.getMooreNeighbors(agent.x, agent.y);
+        const sameTypeCount = this.grid.countSameTypeNeighbors(agent);
+        const diffTypeCount = this.grid.countDifferentTypeNeighbors(agent);
+
+        switch (agent.strategy) {
+          case 'cooperative':
+            // Cooperative synergy bonus: more same-type neighbors = better reproduction
+            // synergyBonus = 1 + (sameTypeNeighbors * 0.1), capped at 1.5
+            const synergyBonus = Math.min(1.5, 1 + (sameTypeCount * 0.1));
+            const coopEffectiveRate = agent.baseReproductionRate * synergyBonus;
+
+            // Only spawn in empty cells
+            if (neighbors.empty.length > 0 && Math.random() < coopEffectiveRate / agent.baseReproductionRate) {
+              const target = neighbors.empty[Math.floor(Math.random() * neighbors.empty.length)];
+              const child = agent.createOffspring(target.x, target.y, this.cellSize);
+              this.pendingBirths.push(child);
+              agent.hasReproducedThisTick = true;
+            }
+            break;
+
+          case 'competitive':
+            // Competitive self-density penalty: too many same-type neighbors reduces reproduction
+            let compEffectiveRate = agent.baseReproductionRate;
+            if (sameTypeCount >= 5) {
+              compEffectiveRate *= 0.25; // 75% penalty
+            } else if (sameTypeCount >= 3) {
+              compEffectiveRate *= 0.5; // 50% penalty
+            }
+
+            if (neighbors.empty.length > 0) {
+              // Spawn in empty cell (with density penalty applied)
+              if (Math.random() < compEffectiveRate / agent.baseReproductionRate) {
+                const target = neighbors.empty[Math.floor(Math.random() * neighbors.empty.length)];
+                const child = agent.createOffspring(target.x, target.y, this.cellSize);
+                this.pendingBirths.push(child);
+                agent.hasReproducedThisTick = true;
+              }
+            } else if (neighbors.occupied.length > 0) {
+              // Attempt takeover - ALWAYS costs energy regardless of success
+              // Aggression energy cost
+              agent.fitnessScore *= 0.98;
+              agent.lifespan = Math.max(1, agent.lifespan - 1);
+
+              const target = neighbors.occupied[Math.floor(Math.random() * neighbors.occupied.length)];
+              const fitnessRatio = agent.fitnessScore / target.agent.fitnessScore;
+              const takeoverChance = CONFIG.takeoverStrength * fitnessRatio;
+
+              if (Math.random() < takeoverChance) {
+                // Takeover successful - remove target and spawn child
+                this.grid.removeCell(target.x, target.y);
+                const child = agent.createOffspring(target.x, target.y, this.cellSize);
+                this.grid.setCell(target.x, target.y, child);
+                agent.hasReproducedThisTick = true;
+                // Increase fitness for successful takeover
+                agent.fitnessScore = Math.min(2.0, agent.fitnessScore + 0.1);
+              }
+            }
+            break;
+
+          case 'strategic':
+            // Strategic boundary advantage: being at a boundary (1 empty + 1 different-type) = 1.4x reproduction
+            let stratEffectiveRate = agent.baseReproductionRate;
+            if (neighbors.empty.length >= 1 && diffTypeCount >= 1) {
+              stratEffectiveRate *= 1.4; // Boundary advantage
+            }
+
+            // Normal reproduction in empty cells (priority was handled above)
+            if (neighbors.empty.length > 0 && Math.random() < stratEffectiveRate / agent.baseReproductionRate) {
+              const target = neighbors.empty[Math.floor(Math.random() * neighbors.empty.length)];
+              const child = agent.createOffspring(target.x, target.y, this.cellSize);
+              this.pendingBirths.push(child);
+              agent.hasReproducedThisTick = true;
+            }
+            break;
+        }
+      }
+
+      updateStats() {
+        const counts = this.grid.countByStrategy();
+        this.stats = counts;
+
+        // Calculate average fitness
+        const fitnessSums = { cooperative: 0, competitive: 0, strategic: 0 };
+        const agents = this.grid.getAllAgents();
+        for (const agent of agents) {
+          fitnessSums[agent.strategy] += agent.fitnessScore;
+        }
+
+        this.stats.avgFitness = {
+          cooperative: counts.cooperative > 0 ? fitnessSums.cooperative / counts.cooperative : 0,
+          competitive: counts.competitive > 0 ? fitnessSums.competitive / counts.competitive : 0,
+          strategic: counts.strategic > 0 ? fitnessSums.strategic / counts.strategic : 0
+        };
+
+        // Update population history
+        this.populationHistory.cooperative.push(counts.cooperative);
+        this.populationHistory.competitive.push(counts.competitive);
+        this.populationHistory.strategic.push(counts.strategic);
+
+        // Trim history to max length
+        if (this.populationHistory.cooperative.length > this.maxHistoryLength) {
+          this.populationHistory.cooperative.shift();
+          this.populationHistory.competitive.shift();
+          this.populationHistory.strategic.shift();
+        }
+      }
+
+      // Render with continuous particle positions for smooth visuals
+      render(ctx, width, height) {
+        const cellSize = this.cellSize;
+
+        // Clear canvas with gradient
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(1, '#1a1a2e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw grid lines first if enabled (underneath everything)
+        if (CONFIG.showGrid) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.lineWidth = 0.5;
+          for (let y = 0; y <= this.grid.height; y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, y * cellSize);
+            ctx.lineTo(this.grid.width * cellSize, y * cellSize);
+            ctx.stroke();
+          }
+          for (let x = 0; x <= this.grid.width; x++) {
+            ctx.beginPath();
+            ctx.moveTo(x * cellSize, 0);
+            ctx.lineTo(x * cellSize, this.grid.height * cellSize);
+            ctx.stroke();
+          }
+        }
+
+        const agents = this.grid.getAllAgents();
+        const particleRadius = cellSize * CONFIG.particleRadius;
+        const glowIntensity = CONFIG.glowIntensity;
+        const glowRadius = cellSize * (1.2 + glowIntensity * 0.5); // Glow size scales with intensity
+
+        // === LAYER 1: Field/Aura Layer ===
+        // Draw large, soft glows that blend together to create visible zones
+        if (glowIntensity > 0) {
+          ctx.globalCompositeOperation = 'lighter'; // Additive blending for glow overlap
+
+          // Field layer opacity based on intensity
+          const fieldAlpha = 0.15 * glowIntensity;
+          const fieldMidAlpha = 0.05 * glowIntensity;
+
+          for (const agent of agents) {
+            // Create radial gradient for field effect
+            const fieldGradient = ctx.createRadialGradient(
+              agent.px, agent.py, 0,
+              agent.px, agent.py, glowRadius
+            );
+
+            switch (agent.strategy) {
+              case 'cooperative':
+                fieldGradient.addColorStop(0, `rgba(46, 204, 113, ${fieldAlpha})`);
+                fieldGradient.addColorStop(0.5, `rgba(46, 204, 113, ${fieldMidAlpha})`);
+                fieldGradient.addColorStop(1, 'rgba(46, 204, 113, 0)');
+                break;
+              case 'competitive':
+                fieldGradient.addColorStop(0, `rgba(231, 76, 60, ${fieldAlpha})`);
+                fieldGradient.addColorStop(0.5, `rgba(231, 76, 60, ${fieldMidAlpha})`);
+                fieldGradient.addColorStop(1, 'rgba(231, 76, 60, 0)');
+                break;
+              case 'strategic':
+                fieldGradient.addColorStop(0, `rgba(243, 156, 18, ${fieldAlpha})`);
+                fieldGradient.addColorStop(0.5, `rgba(243, 156, 18, ${fieldMidAlpha})`);
+                fieldGradient.addColorStop(1, 'rgba(243, 156, 18, 0)');
+                break;
+            }
+
+            ctx.fillStyle = fieldGradient;
+            ctx.beginPath();
+            ctx.arc(agent.px, agent.py, glowRadius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // === LAYER 2: Inner Glow Layer ===
+          // Smaller, brighter glow closer to particles
+          const innerAlpha = 0.3 * glowIntensity;
+          const innerMidAlpha = 0.1 * glowIntensity;
+
+          for (const agent of agents) {
+            const innerGlowRadius = particleRadius * (2 + glowIntensity);
+            const innerGradient = ctx.createRadialGradient(
+              agent.px, agent.py, particleRadius * 0.5,
+              agent.px, agent.py, innerGlowRadius
+            );
+
+            switch (agent.strategy) {
+              case 'cooperative':
+                innerGradient.addColorStop(0, `rgba(46, 204, 113, ${innerAlpha})`);
+                innerGradient.addColorStop(0.6, `rgba(46, 204, 113, ${innerMidAlpha})`);
+                innerGradient.addColorStop(1, 'rgba(46, 204, 113, 0)');
+                break;
+              case 'competitive':
+                innerGradient.addColorStop(0, `rgba(231, 76, 60, ${innerAlpha})`);
+                innerGradient.addColorStop(0.6, `rgba(231, 76, 60, ${innerMidAlpha})`);
+                innerGradient.addColorStop(1, 'rgba(231, 76, 60, 0)');
+                break;
+              case 'strategic':
+                innerGradient.addColorStop(0, `rgba(243, 156, 18, ${innerAlpha})`);
+                innerGradient.addColorStop(0.6, `rgba(243, 156, 18, ${innerMidAlpha})`);
+                innerGradient.addColorStop(1, 'rgba(243, 156, 18, 0)');
+                break;
+            }
+
+            ctx.fillStyle = innerGradient;
+            ctx.beginPath();
+            ctx.arc(agent.px, agent.py, innerGlowRadius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Reset composite operation for solid particles
+          ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // === LAYER 3: Solid Particles ===
+        // Draw the actual particles on top
+        ctx.shadowBlur = particleRadius * 0.6;
+
+        for (const agent of agents) {
+          // Set shadow/glow color
+          switch (agent.strategy) {
+            case 'cooperative':
+              ctx.shadowColor = 'rgba(46, 204, 113, 0.8)';
+              break;
+            case 'competitive':
+              ctx.shadowColor = 'rgba(231, 76, 60, 0.8)';
+              break;
+            case 'strategic':
+              ctx.shadowColor = 'rgba(243, 156, 18, 0.8)';
+              break;
+          }
+
+          ctx.fillStyle = agent.getRenderColor();
+          ctx.beginPath();
+          ctx.arc(agent.px, agent.py, particleRadius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Reset shadow
+        ctx.shadowBlur = 0;
+      }
+
+      // Render population graph
+      renderGraph(ctx, width, height) {
+        const history = this.populationHistory;
+        const len = history.cooperative.length;
+
+        if (len < 2) return;
+
+        // Clear with transparent background (already has container bg)
+        ctx.clearRect(0, 0, width, height);
+
+        // Calculate max value for scaling
+        let maxVal = 1;
+        for (let i = 0; i < len; i++) {
+          maxVal = Math.max(maxVal,
+            history.cooperative[i],
+            history.competitive[i],
+            history.strategic[i]
+          );
+        }
+
+        // Add padding for labels
+        const padTop = 15;
+        const padBottom = 5;
+        const padLeft = 5;
+        const padRight = 5;
+        const graphWidth = width - padLeft - padRight;
+        const graphHeight = height - padTop - padBottom;
+
+        // Draw subtle grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= 4; i++) {
+          const y = padTop + (graphHeight * i / 4);
+          ctx.beginPath();
+          ctx.moveTo(padLeft, y);
+          ctx.lineTo(width - padRight, y);
+          ctx.stroke();
+        }
+
+        // Helper to draw a line
+        const drawLine = (data, color) => {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+
+          for (let i = 0; i < len; i++) {
+            const x = padLeft + (i / (len - 1)) * graphWidth;
+            const y = padTop + graphHeight - (data[i] / maxVal) * graphHeight;
+
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          ctx.stroke();
+        };
+
+        // Draw lines for each strategy
+        drawLine(history.cooperative, '#2ecc71');
+        drawLine(history.competitive, '#e74c3c');
+        drawLine(history.strategic, '#f39c12');
+
+        // Draw small legend dots
+        const legendY = 8;
+        const dotSize = 4;
+
+        ctx.fillStyle = '#2ecc71';
+        ctx.beginPath();
+        ctx.arc(width - 75, legendY, dotSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.arc(width - 50, legendY, dotSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(width - 25, legendY, dotSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw max value label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '9px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(maxVal.toString(), width - padRight - 2, padTop + 8);
+      }
+    }
+
+    // ==================== MAIN CONTROLLER ====================
+    const Sim = {
+      canvas: null,
+      ctx: null,
+      graphCanvas: null,
+      graphCtx: null,
+      simulation: null,
+      running: false,
+      lastLogicUpdate: 0,
+      tickInterval: 100, // ms per logic tick
+
+      init() {
+        this.canvas = document.getElementById('simulationCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // Initialize graph canvas
+        this.graphCanvas = document.getElementById('populationGraph');
+        this.graphCtx = this.graphCanvas.getContext('2d');
+
+        // Size canvas to fill the wrapper
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+
+        // Size graph canvas (account for padding in container)
+        this.graphCanvas.width = 260;
+        this.graphCanvas.height = 120;
+
+        // Create simulation with pixel-based cell size
+        this.simulation = new Simulation(this.canvas.width, this.canvas.height, CONFIG.cellSize);
+        this.simulation.init();
+        this.render();
+        this.loop();
+
+        window.addEventListener('resize', () => this.resize());
+      },
+
+      resize() {
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+
+        // Resize simulation (preserves agents where possible)
+        this.simulation.resize(this.canvas.width, this.canvas.height);
+
+        this.render();
+      },
+
+      loop() {
+        requestAnimationFrame(() => this.loop());
+
+        if (this.running) {
+          const now = performance.now();
+
+          // Update particle movement every frame for smooth animation
+          this.simulation.updateParticleMovement();
+
+          // Update logic at slower tick rate
+          const elapsed = now - this.lastLogicUpdate;
+          const interval = this.tickInterval / CONFIG.speed;
+
+          if (elapsed >= interval) {
+            this.simulation.step();
+            this.lastLogicUpdate = now;
+          }
+        }
+
+        this.render();
+        this.updateUI();
+      },
+
+      render() {
+        this.simulation.render(this.ctx, this.canvas.width, this.canvas.height);
+        this.simulation.renderGraph(this.graphCtx, this.graphCanvas.width, this.graphCanvas.height);
+      },
+
+      updateUI() {
+        document.getElementById('tickValue').textContent = this.simulation.tick;
+        document.getElementById('popValue').textContent = this.simulation.stats.total;
+        document.getElementById('coopCount').textContent = this.simulation.stats.cooperative;
+        document.getElementById('compCount').textContent = this.simulation.stats.competitive;
+        document.getElementById('stratCount').textContent = this.simulation.stats.strategic;
+      },
+
+      play() { this.running = true; this.lastLogicUpdate = performance.now(); },
+      pause() { this.running = false; },
+      reset() {
+        this.simulation = new Simulation(this.canvas.width, this.canvas.height, CONFIG.cellSize);
+        this.simulation.init();
+        this.render();
+        this.updateUI();
+      }
+    };
+
+    // ==================== UI INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      Sim.init();
+
+      const overlay = document.getElementById('overlay');
+      const hideOverlay = () => overlay.classList.remove('active');
+      const showOverlay = () => overlay.classList.add('active');
+
+      // Playback buttons
+      document.getElementById('playBtn').onclick = () => { Sim.play(); hideOverlay(); };
+      document.getElementById('pauseBtn').onclick = () => { Sim.pause(); showOverlay(); };
+      document.getElementById('resetBtn').onclick = () => { Sim.pause(); Sim.reset(); showOverlay(); };
+      document.getElementById('overlayPlay').onclick = () => { Sim.play(); hideOverlay(); };
+
+      // Parameter sliders
+      const sliders = [
+        { id: 'cellSize', key: 'cellSize', display: 'cellSizeValue', decimals: 0 },
+        { id: 'initialPop', key: 'initialPopulationPercent', display: 'initialPopValue', decimals: 0 },
+        { id: 'lifespan', key: 'baseLifespan', display: 'lifespanValue', decimals: 0 },
+        { id: 'reproRate', key: 'baseReproductionRate', display: 'reproRateValue', decimals: 2 },
+        { id: 'deathRate', key: 'randomDeathRate', display: 'deathRateValue', decimals: 2 },
+        { id: 'coopPct', key: 'cooperativePercent', display: 'coopPctValue', decimals: 0 },
+        { id: 'compPct', key: 'competitivePercent', display: 'compPctValue', decimals: 0 },
+        { id: 'stratPct', key: 'strategicPercent', display: 'stratPctValue', decimals: 0 },
+        { id: 'simSpeed', key: 'speed', display: 'speedValue', decimals: 1 },
+        { id: 'takeoverStrength', key: 'takeoverStrength', display: 'takeoverValue', decimals: 2 },
+        { id: 'movementNoise', key: 'movementNoise', display: 'noiseValue', decimals: 2 },
+        { id: 'damping', key: 'damping', display: 'dampingValue', decimals: 2 },
+        { id: 'particleRadius', key: 'particleRadius', display: 'particleSizeValue', decimals: 2 },
+        { id: 'glowIntensity', key: 'glowIntensity', display: 'glowValue', decimals: 2 }
+      ];
+
+      sliders.forEach(({ id, key, display, decimals, alsoSet }) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.oninput = (e) => {
+            const value = parseFloat(e.target.value);
+            CONFIG[key] = value;
+            if (alsoSet) CONFIG[alsoSet] = value;
+            document.getElementById(display).textContent = decimals > 0 ? value.toFixed(decimals) : value;
+          };
+        }
+      });
+
+      // Grid toggle
+      document.getElementById('showGridToggle').onchange = (e) => {
+        CONFIG.showGrid = e.target.checked;
+      };
+
+      // Preset buttons
+      document.querySelectorAll('.preset-btn[data-preset]').forEach(btn => {
+        btn.onclick = () => {
+          const preset = PRESETS[btn.dataset.preset];
+          if (preset) {
+            Object.assign(CONFIG, preset);
+            // Update sliders
+            const syncSlider = (id, value, displayId, decimals) => {
+              const el = document.getElementById(id);
+              const disp = document.getElementById(displayId);
+              if (el) el.value = value;
+              if (disp) disp.textContent = decimals > 0 ? value.toFixed(decimals) : value;
+            };
+            syncSlider('cellSize', CONFIG.cellSize, 'cellSizeValue', 0);
+            syncSlider('lifespan', CONFIG.baseLifespan, 'lifespanValue', 0);
+            syncSlider('reproRate', CONFIG.baseReproductionRate, 'reproRateValue', 2);
+            syncSlider('deathRate', CONFIG.randomDeathRate, 'deathRateValue', 2);
+            syncSlider('coopPct', CONFIG.cooperativePercent, 'coopPctValue', 0);
+            syncSlider('compPct', CONFIG.competitivePercent, 'compPctValue', 0);
+            syncSlider('stratPct', CONFIG.strategicPercent, 'stratPctValue', 0);
+            syncSlider('takeoverStrength', CONFIG.takeoverStrength, 'takeoverValue', 2);
+            syncSlider('movementNoise', CONFIG.movementNoise, 'noiseValue', 2);
+            syncSlider('damping', CONFIG.damping, 'dampingValue', 2);
+            syncSlider('glowIntensity', CONFIG.glowIntensity, 'glowValue', 2);
+            Sim.reset();
+          }
+        };
+      });
+
+      // Sidebar toggle
+      const sidebar = document.getElementById('simulationSidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      toggle.onclick = () => {
+        sidebar.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
+        toggle.textContent = sidebar.classList.contains('collapsed') ? '\u2630' : '\u2715';
+      };
+
+      // Mobile buttons
+      document.getElementById('mobileExpandBtn').onclick = () => {
+        sidebar.classList.remove('collapsed');
+        toggle.classList.remove('collapsed');
+      };
+      document.getElementById('mobileCollapseBtn').onclick = () => {
+        sidebar.classList.add('collapsed');
+        toggle.classList.add('collapsed');
+      };
+    });
+  </script>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

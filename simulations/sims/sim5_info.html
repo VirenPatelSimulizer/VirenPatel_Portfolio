@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ant Colony Food Simulation - Learn about stigmergy, pheromone trails, and swarm intelligence.">
+  <title>Ant Colony Food Simulation Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">Ant Colony Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="sim5.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">Ant Colony Food Simulation</h1>
+      <p class="info-subtitle">Stigmergy-based foraging with dual pheromone trails</p>
+
+      <!-- What is it -->
+      <section class="info-section">
+        <h2 class="section-title">What is Ant Colony Foraging?</h2>
+        <p>
+          Ant colonies are one of nature's most remarkable examples of <span class="highlight">swarm intelligence</span>.
+          Individual ants follow simple local rules &mdash; deposit pheromones, follow trails, avoid explored areas &mdash;
+          yet the colony as a whole efficiently discovers and exploits food sources across vast territories.
+        </p>
+        <p>
+          This phenomenon is called <span class="highlight">stigmergy</span>: indirect coordination through
+          environmental modification. Ants communicate not by talking to each other, but by leaving chemical
+          traces in the environment that influence the behavior of others. This principle has inspired powerful
+          optimization algorithms used in routing, logistics, and network design.
+        </p>
+      </section>
+
+      <!-- Physics / Algorithm -->
+      <section class="info-section">
+        <h2 class="section-title">Algorithm Behind the Simulation</h2>
+        <p>This simulation implements a dual-pheromone foraging model:</p>
+        <ul>
+          <li>
+            <strong>Dual Pheromone System:</strong> Two types of chemical signals &mdash;
+            <span class="highlight">food pheromone</span> (orange, deposited when carrying food) and
+            <span class="highlight">exploration pheromone</span> (cyan, deposited while searching).
+            Food pheromone attracts; exploration pheromone repels (marking already-searched areas).
+          </li>
+          <li>
+            <strong>Three-Sensor Antennae:</strong> Each ant has left, forward, and right sensors at a
+            configurable distance and angle. The ant steers toward the sensor detecting the strongest
+            food pheromone signal, or away from exploration pheromone.
+          </li>
+          <li>
+            <strong>Pheromone Evaporation:</strong> Pheromones decay over time (food: ~0.95/frame,
+            exploration: ~0.97/frame), balancing trail maintenance with adaptability to changing conditions.
+          </li>
+          <li>
+            <strong>Random Wander:</strong> When no pheromone signal is detected, ants perform a random
+            walk, ensuring exploration of unvisited areas.
+          </li>
+          <li>
+            <strong>Return-Home Timer:</strong> Ants return to the colony after 30 seconds without finding
+            food, preventing indefinite wandering.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>Pheromone concentration evolves through deposition and evaporation:</p>
+        <div class="formula">
+          P(t+1) = P(t) &times; evaporation_rate + deposit_amount
+        </div>
+        <p>
+          Where <span class="highlight">evaporation_rate</span> (0.90-0.99) controls how quickly trails
+          fade, and <span class="highlight">deposit_amount</span> (1-50) determines trail strength.
+        </p>
+        <p>Ant steering is based on sensor comparison:</p>
+        <div class="formula">
+          turn_direction = argmax(P_left, P_forward, P_right) + wander_noise
+        </div>
+      </section>
+
+      <!-- Controls -->
+      <section class="info-section">
+        <h2 class="section-title">Simulation Controls</h2>
+        <ul>
+          <li>
+            <strong>Number of Ants:</strong> Colony size (10-500). More ants = faster food discovery but more competition.
+          </li>
+          <li>
+            <strong>Ant Speed:</strong> Movement speed (0.2-3.0 units/frame).
+          </li>
+          <li>
+            <strong>Pheromone Deposit Rate:</strong> Trail strength per step (1-50). Higher values create stronger, more persistent trails.
+          </li>
+          <li>
+            <strong>Pheromone Evaporation:</strong> Retention rate per frame (0.90-0.99). Higher = longer-lasting trails.
+          </li>
+          <li>
+            <strong>Wander Strength:</strong> Random walk component (0-1). Higher values increase exploration at the cost of trail following.
+          </li>
+          <li>
+            <strong>Sensor Angle / Distance:</strong> Antenna configuration (10-90 degrees, 5-50 pixels). Controls the ant's "field of view."
+          </li>
+          <li>
+            <strong>Food Source Size / Count:</strong> Food patch radius (10-80) and number of sources (1-5).
+          </li>
+        </ul>
+      </section>
+
+      <!-- Interesting Behaviors -->
+      <section class="info-section">
+        <h2 class="section-title">Interesting Behaviors to Observe</h2>
+        <ul>
+          <li>
+            <strong>Trail Emergence:</strong> Watch as scattered ants gradually converge on efficient
+            paths between the colony and food sources, forming highways of pheromone.
+          </li>
+          <li>
+            <strong>Path Optimization:</strong> Over time, shorter paths accumulate more pheromone
+            (more ants complete the trip), naturally selecting for optimal routes.
+          </li>
+          <li>
+            <strong>Exploration-Exploitation Balance:</strong> The dual pheromone system prevents ants
+            from re-exploring exhausted areas while maintaining scouts for new food sources.
+          </li>
+          <li>
+            <strong>Trail Collapse:</strong> When a food source is depleted, watch how the trail
+            gradually fades through evaporation and ants redirect to remaining sources.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

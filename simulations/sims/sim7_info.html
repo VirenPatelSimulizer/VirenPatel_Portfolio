@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ideal Gas Law Simulation - Learn about kinetic theory and how PV=nRT emerges from particle mechanics.">
+  <title>Ideal Gas Law Simulation Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">Ideal Gas Law Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="sim7.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">Ideal Gas Law Simulation</h1>
+      <p class="info-subtitle">Kinetic theory of gases with real-time PV=nRT verification</p>
+
+      <!-- What is it -->
+      <section class="info-section">
+        <h2 class="section-title">What is the Ideal Gas Law?</h2>
+        <p>
+          The <span class="highlight">Ideal Gas Law</span> (PV = nRT) is one of the most important
+          equations in physics and chemistry. It relates the macroscopic properties of a gas &mdash;
+          <span class="highlight">pressure</span> (P), <span class="highlight">volume</span> (V),
+          <span class="highlight">amount</span> (n), and <span class="highlight">temperature</span> (T)
+          &mdash; through the universal gas constant R.
+        </p>
+        <p>
+          What makes this simulation remarkable is that PV = nRT is not programmed in &mdash; it
+          <span class="highlight">emerges naturally</span> from simulating individual molecules bouncing
+          around in a container. This demonstrates how macroscopic thermodynamic laws arise from
+          microscopic particle mechanics, a cornerstone of <span class="highlight">statistical mechanics</span>.
+        </p>
+      </section>
+
+      <!-- Physics -->
+      <section class="info-section">
+        <h2 class="section-title">Physics Behind the Simulation</h2>
+        <p>This simulation connects microscopic and macroscopic physics:</p>
+        <ul>
+          <li>
+            <strong>Kinetic Theory:</strong> Temperature is defined as the average kinetic energy of
+            particles: T &prop; &frac12;m&#10216;v&sup2;&#10217;. Hotter gas = faster particles.
+          </li>
+          <li>
+            <strong>Pressure from Collisions:</strong> Pressure is measured as the total momentum
+            transferred to the container walls per unit area per unit time. More collisions or faster
+            particles = higher pressure.
+          </li>
+          <li>
+            <strong>Elastic Collisions:</strong> All particle-particle and particle-wall collisions are
+            perfectly elastic (coefficient of restitution = 1.0), conserving total kinetic energy.
+          </li>
+          <li>
+            <strong>Thermostat:</strong> A velocity rescaling thermostat gently adjusts particle speeds
+            to maintain the target temperature, simulating thermal contact with a heat reservoir.
+          </li>
+          <li>
+            <strong>Free Piston Mode:</strong> An optional movable wall adjusts the container volume to
+            maintain constant pressure, demonstrating isobaric processes.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>The Ideal Gas Law:</p>
+        <div class="formula">
+          PV = nRT
+        </div>
+        <p>The simulation verifies this by computing PV/nT in real-time, which should approximate R.</p>
+
+        <p>Temperature from kinetic energy (2D):</p>
+        <div class="formula">
+          T = m&#10216;v&sup2;&#10217; / (2k_B)
+        </div>
+
+        <p>Pressure from wall momentum transfer:</p>
+        <div class="formula">
+          P = &Delta;p / (&Delta;t &times; A)
+        </div>
+        <p>
+          Where <span class="highlight">&Delta;p</span> is the total momentum change from wall collisions,
+          <span class="highlight">&Delta;t</span> is the measurement interval, and
+          <span class="highlight">A</span> is the wall area.
+        </p>
+
+        <p>The simulation demonstrates the classical gas laws as special cases:</p>
+        <ul>
+          <li><strong>Boyle's Law:</strong> P &prop; 1/V (at constant T and n)</li>
+          <li><strong>Charles's Law:</strong> V &prop; T (at constant P and n)</li>
+          <li><strong>Gay-Lussac's Law:</strong> P &prop; T (at constant V and n)</li>
+          <li><strong>Avogadro's Law:</strong> V &prop; n (at constant P and T)</li>
+        </ul>
+      </section>
+
+      <!-- Controls -->
+      <section class="info-section">
+        <h2 class="section-title">Simulation Controls</h2>
+        <ul>
+          <li>
+            <strong>Temperature:</strong> Target temperature (100-800 K). Controls average particle kinetic energy.
+          </li>
+          <li>
+            <strong>Volume:</strong> Container size as percentage (30-100%). Smaller volume = higher pressure at same temperature.
+          </li>
+          <li>
+            <strong>Particle Count:</strong> Number of gas molecules (50-500). More particles = smoother statistics.
+          </li>
+          <li>
+            <strong>Free Piston:</strong> Toggle constant-pressure mode. When on, volume adjusts automatically to maintain pressure.
+          </li>
+          <li>
+            <strong>Pressure Amplification:</strong> Visual scale factor (0.5-20) for the pressure force arrows on walls.
+          </li>
+          <li>
+            <strong>Visualization Toggles:</strong> Velocity vectors, temperature coloring (blue=slow, red=fast),
+            pressure display (force arrows on walls), and particle trails.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Interesting Behaviors -->
+      <section class="info-section">
+        <h2 class="section-title">Interesting Experiments to Try</h2>
+        <ul>
+          <li>
+            <strong>Verify Boyle's Law:</strong> Keep temperature constant and vary volume. Watch pressure
+            increase inversely with volume in the stats panel.
+          </li>
+          <li>
+            <strong>Verify Charles's Law:</strong> Enable free piston mode and increase temperature. Watch
+            the volume expand to maintain constant pressure.
+          </li>
+          <li>
+            <strong>Maxwell-Boltzmann Distribution:</strong> Enable temperature coloring to see the
+            distribution of speeds &mdash; most particles are moderate, few are very fast or very slow.
+          </li>
+          <li>
+            <strong>PV/nT Ratio:</strong> Watch the real-time PV/nT calculation in the stats panel.
+            It should stay approximately constant regardless of how you change P, V, n, or T.
+          </li>
+          <li>
+            <strong>Particle Trails:</strong> Enable trails to visualize the random walk paths of
+            individual molecules, demonstrating the microscopic chaos that produces macroscopic order.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

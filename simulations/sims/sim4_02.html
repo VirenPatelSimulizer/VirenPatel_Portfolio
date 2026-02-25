@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Viren Patel - Technology enthusiast, podcast host, and simulation developer. Explore my portfolio of projects and listen to Decoded with Viren.">
+  <title>Trigonal Polar Molecule Simulation - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E');
+  </script>
+
+  <style>
+    /* Simulation Container */
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .simulation-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 320px;
+      max-width: 320px;
+      height: 100%;
+      max-height: 100vh;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+
+    .simulation-sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      left: 0;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 101;
+    }
+
+    .simulation-sidebar:not(.collapsed) .sidebar-toggle {
+      left: 320px;
+    }
+
+    .simulation-sidebar.collapsed .sidebar-toggle {
+      left: 0;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(30, 30, 50, 0.95);
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .sidebar-control-btn {
+      position: fixed;
+      left: 320px;
+      top: 80px;
+      width: 40px;
+      height: 40px;
+      background: rgba(74, 158, 255, 0.3);
+      border: 1px solid rgba(74, 158, 255, 0.6);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a9eff;
+      font-size: 20px;
+      font-weight: bold;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 150;
+    }
+
+    .sidebar-control-btn:hover {
+      background: rgba(74, 158, 255, 0.5);
+      border-color: #4a9eff;
+      transform: scale(1.1);
+    }
+
+    .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .sidebar-control-btn {
+      left: 20px;
+      top: 80px;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #b0b0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-value {
+      float: right;
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .control-input {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-input::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .control-input::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .control-select {
+      width: 100%;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .control-select option {
+      background: #1a1a2e;
+      color: #e0e0e0;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 20px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    /* Canvas Styles */
+    .simulation-canvas-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    #simulationCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* Back Button */
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      z-index: 150;
+    }
+
+    .back-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateX(-3px);
+      color: #4a9eff;
+    }
+
+    .back-arrow {
+      font-size: 18px;
+      transition: transform 0.3s;
+    }
+
+    .back-button:hover .back-arrow {
+      transform: translateX(-3px);
+    }
+
+    /* Overlay Controls */
+    .simulation-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .simulation-overlay.active {
+      display: flex;
+    }
+
+    .overlay-button {
+      padding: 15px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .overlay-button:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+    }
+
+    .overlay-button.play {
+      background: rgba(74, 158, 255, 0.2);
+      border-color: #4a9eff;
+    }
+
+    .overlay-button.reset {
+      background: rgba(255, 74, 74, 0.2);
+      border-color: #ff4a4a;
+    }
+
+    /* Stats Display */
+    .simulation-stats {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      font-size: 12px;
+      line-height: 1.6;
+      z-index: 50;
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      gap: 8px;
+    }
+
+    .stat-value {
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    /* Mobile Expand Button */
+    .mobile-expand-btn {
+      position: fixed;
+      right: 20px;
+      top: 80px;
+      width: 50px;
+      height: 50px;
+      background: rgba(137, 74, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(137, 74, 255, 0.3);
+      border-radius: 50%;
+      color: rgba(137, 74, 255, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Mobile Collapse Button */
+    .mobile-collapse-btn {
+      position: fixed;
+      right: 20px;
+      top: calc(50vh + 10px);
+      width: 50px;
+      height: 50px;
+      background: rgba(248, 71, 225, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(248, 71, 225, 0.4);
+      border-radius: 50%;
+      color: rgba(248, 71, 225, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.4s ease, transform 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (min-width: 769px) {
+      .mobile-expand-btn,
+      .mobile-collapse-btn {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .simulation-sidebar {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 50vh;
+        overflow-y: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        top: 0;
+        left: 0;
+        z-index: 100;
+        position: fixed;
+      }
+
+      .simulation-sidebar.collapsed {
+        transform: translateY(-100%);
+      }
+
+      .sidebar-toggle {
+        display: none;
+      }
+
+      .mobile-expand-btn {
+        display: flex;
+      }
+
+      .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mobile-collapse-btn {
+        display: flex;
+      }
+
+      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .simulation-canvas-wrapper {
+        padding-top: 0;
+      }
+
+      .sidebar-control-btn {
+        display: none;
+      }
+
+      .sidebar-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+      }
+
+      .control-label {
+        font-size: 11px;
+      }
+
+      .control-value {
+        font-size: 11px;
+      }
+
+      .control-group {
+        margin-bottom: 12px;
+      }
+
+      .overlay-button {
+        padding: 10px 25px;
+        font-size: 13px;
+      }
+
+      .back-button {
+        top: 10px;
+        left: 10px;
+        right: auto;
+        padding: 8px 15px;
+        font-size: 12px;
+        z-index: 50;
+      }
+
+      .back-text {
+        display: none;
+      }
+
+      .simulation-stats {
+        font-size: 9px;
+        padding: 8px 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+        top: 10px;
+      }
+
+      .simulation-container {
+        height: calc(100vh - 70px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .simulation-sidebar {
+        padding: 15px;
+      }
+
+      .sidebar-title {
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .control-label {
+        font-size: 10px;
+      }
+
+      .control-value {
+        font-size: 10px;
+      }
+
+      .control-group {
+        margin-bottom: 10px;
+      }
+
+      .control-input {
+        height: 5px;
+      }
+
+      .control-input::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+      }
+
+      .overlay-button {
+        padding: 8px 20px;
+        font-size: 12px;
+      }
+
+      .simulation-stats {
+        font-size: 8px;
+        padding: 6px 8px;
+        gap: 6px;
+      }
+
+      .back-button {
+        left: 10px;
+        right: auto;
+        padding: 6px 12px;
+        font-size: 11px;
+        z-index: 50;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel</a>
+      </div>
+      <div class="logo">
+        <a>Trigonal Polar Molecule Simulation</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <!-- Sidebar -->
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+      <div class="sidebar-title">Trigonal Molecule Controls</div>
+
+      <div class="section-label">Basic Parameters</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Molecule Count
+          <span class="control-value" id="particleCountValue">100</span>
+        </label>
+        <input type="range" class="control-input" id="particleCount" min="20" max="10000" step="10" value="100">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Radius Scale
+          <span class="control-value" id="radiusScaleValue">1.0</span>
+        </label>
+        <input type="range" class="control-input" id="radiusScale" min="0.5" max="3" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Wall Mode
+        </label>
+        <select class="control-select" id="wallMode">
+          <option value="solid">Solid Walls (Bounce)</option>
+          <option value="wrap">Wrap-Around (Continuous)</option>
+        </select>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Electrostatic Physics</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Electrostatic Force
+          <span class="control-value" id="electrostaticForceValue">1.5</span>
+        </label>
+        <input type="range" class="control-input" id="electrostaticForce" min="0" max="30" step="0.5" value="1.5">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Charge Polarity (δ+/δ-)
+          <span class="control-value" id="chargeBiasValue">0.7</span>
+        </label>
+        <input type="range" class="control-input" id="chargeBias" min="0" max="1" step="0.05" value="0.7">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Aggregation Damping
+          <span class="control-value" id="aggregationDampingValue">0.3</span>
+        </label>
+        <input type="range" class="control-input" id="aggregationDamping" min="0" max="1" step="0.05" value="0.3">
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Dynamics</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Simulation Speed
+          <span class="control-value" id="simulationSpeedValue">1.0x</span>
+        </label>
+        <input type="range" class="control-input" id="simulationSpeed" min="0.25" max="15" step="0.25" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Temperature (Noise)
+          <span class="control-value" id="temperatureValue">0.5</span>
+        </label>
+        <input type="range" class="control-input" id="temperature" min="0" max="3" step="0.1" value="0.5">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Linear Damping
+          <span class="control-value" id="dampingValue">0.98</span>
+        </label>
+        <input type="range" class="control-input" id="damping" min="0.9" max="1" step="0.005" value="0.98">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Rotation Damping
+          <span class="control-value" id="rotationDampingValue">0.95</span>
+        </label>
+        <input type="range" class="control-input" id="rotationDamping" min="0.8" max="0.99" step="0.01" value="0.95">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Local Damping (Energy Min.)
+          <span class="control-value" id="localDampingValue">0.30</span>
+        </label>
+        <input type="range" class="control-input" id="localDamping" min="0" max="1" step="0.05" value="0.3">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Global Drift
+          <span class="control-value" id="globalDriftValue">0.0</span>
+        </label>
+        <input type="range" class="control-input" id="globalDrift" min="0" max="2" step="0.1" value="0.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Drift Angle (deg)
+          <span class="control-value" id="driftAngleValue">0</span>
+        </label>
+        <input type="range" class="control-input" id="driftAngle" min="0" max="360" step="15" value="0">
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Visualization</div>
+
+      <div class="control-group">
+        <label class="control-label" style="cursor: pointer;">
+          <input type="checkbox" id="showDipoles" checked style="cursor: pointer; width: 16px; height: 16px; margin-right: 8px;">
+          Show Internal Bonds
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" style="cursor: pointer;">
+          <input type="checkbox" id="showBonds" checked style="cursor: pointer; width: 16px; height: 16px; margin-right: 8px;">
+          Show Intermolecular Bonds
+        </label>
+      </div>
+    </div>
+
+    <!-- Canvas Wrapper -->
+    <div class="simulation-canvas-wrapper">
+      <canvas id="simulationCanvas"></canvas>
+
+      <button class="mobile-expand-btn" id="mobileExpandBtn">▼</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">▲</button>
+
+      <div class="sidebar-control-btn" id="sidebarControlBtn">←</div>
+
+      <a href="../index.html" class="back-button" id="backButton">
+        <span class="back-arrow">←</span>
+        <span class="back-text">Back to Simulations</span>
+      </a>
+
+      <div class="simulation-stats" id="statsDisplay">
+        <div class="stat-item">
+          <span>FPS:</span>
+          <span class="stat-value" id="fpsValue">60</span>
+        </div>
+        <div class="stat-item">
+          <span>Molecules:</span>
+          <span class="stat-value" id="particleCountStat">100</span>
+        </div>
+        <div class="stat-item">
+          <span>Bonds:</span>
+          <span class="stat-value" id="bondCountStat">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Clusters:</span>
+          <span class="stat-value" id="clusterCountStat">0</span>
+        </div>
+      </div>
+
+      <div class="simulation-overlay active" id="simulationOverlay">
+        <button class="overlay-button play" id="playButton">Play</button>
+        <button class="overlay-button reset" id="resetButton">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * Trigonal Polar Molecule Simulation
+     *
+     * Molecule geometry:
+     *   - 120° angle between peripheral charges
+     *   - Center radius 2.5× peripheral radius
+     *   - Bond length scaled for simulation
+     *
+     * Physics:
+     *   - Center carries negative charge (-3)
+     *   - Three peripheral charges (+1 each)
+     *   - Electrostatic interactions between all charge points
+     *   - Clustering emerges naturally (peripheral→center attraction)
+     *   - Rotational dynamics with thermal noise
+     *
+     * Visual representation:
+     *           P (gold, small)
+     *            |
+     *        C (blue, large)  ← 120° between arms
+     *       /   \
+     *     P       P (gold, small)
+     */
+
+    const params = {
+      particleCount: 100,
+      radiusScale: 1.0,
+      wallMode: 'solid',
+      dt: 0.016,
+      simulationSpeed: 1.0,            // speed multiplier (1x to 5x)
+
+      // === Electrostatic interaction parameters ===
+      electrostaticForce: 1.5,         // strength of Coulomb-like charge interactions
+      chargeBias: 0.7,                 // charge polarity (0=neutral, 1=full δ+/δ-)
+      temperature: 0.5,                // Brownian noise strength
+      damping: 0.98,                   // velocity damping (linear)
+      rotationDamping: 0.95,           // angular velocity damping
+      localDamping: 0.3,               // energy dissipation from local interactions (energy minimization)
+      aggregationDamping: 0.3,         // velocity reduction for aligned close pairs
+      globalDriftStrength: 0.0,        // drift velocity magnitude
+      globalDriftAngle: 0,             // drift direction in degrees
+
+      // Visualization
+      showDipoles: true,
+      showBonds: true
+    };
+
+    const BASE_RADIUS = 8;
+    const TWO_PI = Math.PI * 2;
+
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    }
+
+    function getDeviceScale() {
+      if (window.innerWidth <= 480) return 0.6;
+      if (window.innerWidth <= 768) return 0.75;
+      return 1.0;
+    }
+
+    /**
+     * Trigonal Polar Molecule with proper geometry
+     *
+     * Molecule model:
+     *   - Central negative charge (-3)
+     *   - Three peripheral positive charges (+1 each)
+     *   - Peripheral charges at 120° spacing around center
+     *   - Forms triangular shape, enables hexagonal clustering
+     *
+     *           P(+)
+     *            |
+     *        C(-)  ← 120° between each arm
+     *       /   \
+     *     P(+)  P(+)
+     */
+    const TRIGONAL_ANGLE = (2 * Math.PI) / 3;  // 120° between peripheral charges
+    const CENTER_TO_PERIPHERAL_RATIO = 2.5;    // center is 2.5x bigger than peripheral
+
+    class Particle {
+      constructor(x, y) {
+        this.pos = { x, y };  // position of center (center of mass)
+        this.vel = { x: 0, y: 0 };
+        this.force = { x: 0, y: 0 };
+
+        // === Orientation state ===
+        // theta defines the orientation of the molecule
+        // Three peripheral charges are at theta, theta + 120°, theta + 240°
+        this.theta = Math.random() * TWO_PI;
+        this.angularVel = 0;
+        this.torque = 0;
+
+        this.mass = 1.0;
+        this.momentOfInertia = 0.5;
+
+        const deviceScale = getDeviceScale();
+        // Center radius (larger, negative charge)
+        this.centerRadius = params.radiusScale * BASE_RADIUS * deviceScale;
+        // Peripheral radius (2.5x smaller, positive charges)
+        this.peripheralRadius = this.centerRadius / CENTER_TO_PERIPHERAL_RATIO;
+        // Bond length (distance from center to peripheral)
+        this.bondLength = this.centerRadius * 1.2;
+        // Effective collision radius for the whole molecule
+        this.radius = this.centerRadius + this.peripheralRadius;
+
+        // Random initial velocity
+        const angle = Math.random() * TWO_PI;
+        const speed = 20 + Math.random() * 30;
+        this.vel.x = Math.cos(angle) * speed;
+        this.vel.y = Math.sin(angle) * speed;
+      }
+
+      /**
+       * Get position of center (negative charge)
+       */
+      getCenterPos() {
+        return { x: this.pos.x, y: this.pos.y };
+      }
+
+      /**
+       * Get position of peripheral charge 1 (+)
+       * Located at theta from center
+       */
+      getPeripheral1Pos() {
+        const angle = this.theta;
+        return {
+          x: this.pos.x + Math.cos(angle) * this.bondLength,
+          y: this.pos.y + Math.sin(angle) * this.bondLength
+        };
+      }
+
+      /**
+       * Get position of peripheral charge 2 (+)
+       * Located at theta + 120° from center
+       */
+      getPeripheral2Pos() {
+        const angle = this.theta + TRIGONAL_ANGLE;
+        return {
+          x: this.pos.x + Math.cos(angle) * this.bondLength,
+          y: this.pos.y + Math.sin(angle) * this.bondLength
+        };
+      }
+
+      /**
+       * Get position of peripheral charge 3 (+)
+       * Located at theta + 240° from center
+       */
+      getPeripheral3Pos() {
+        const angle = this.theta + 2 * TRIGONAL_ANGLE;
+        return {
+          x: this.pos.x + Math.cos(angle) * this.bondLength,
+          y: this.pos.y + Math.sin(angle) * this.bondLength
+        };
+      }
+
+      /**
+       * Get all charge centers for force calculation
+       * Returns array of {pos, charge, radius}
+       * Trigonal: 1 center (-3) + 3 peripheral (+1 each) = net neutral
+       */
+      getChargePoints() {
+        return [
+          { pos: this.getCenterPos(), charge: -3, radius: this.centerRadius },       // Center is δ-
+          { pos: this.getPeripheral1Pos(), charge: +1, radius: this.peripheralRadius }, // P1 is δ+
+          { pos: this.getPeripheral2Pos(), charge: +1, radius: this.peripheralRadius }, // P2 is δ+
+          { pos: this.getPeripheral3Pos(), charge: +1, radius: this.peripheralRadius }  // P3 is δ+
+        ];
+      }
+
+      /**
+       * Get orientation vector (points along first peripheral arm)
+       */
+      getOrientationVector() {
+        return {
+          x: Math.cos(this.theta),
+          y: Math.sin(this.theta)
+        };
+      }
+
+      getKineticEnergy() {
+        const linear = 0.5 * this.mass * (this.vel.x * this.vel.x + this.vel.y * this.vel.y);
+        const rotational = 0.5 * this.momentOfInertia * this.angularVel * this.angularVel;
+        return linear + rotational;
+      }
+
+      update(dt) {
+        // Linear motion with damping
+        this.vel.x *= params.damping;
+        this.vel.y *= params.damping;
+        this.pos.x += this.vel.x * dt;
+        this.pos.y += this.vel.y * dt;
+
+        // Angular motion with damping
+        this.angularVel += (this.torque / this.momentOfInertia) * dt;
+        this.angularVel *= params.rotationDamping;
+        this.theta += this.angularVel * dt;
+
+        // Keep theta in [0, 2π]
+        this.theta = ((this.theta % TWO_PI) + TWO_PI) % TWO_PI;
+      }
+
+      handleBoundaries(width, height) {
+        const margin = this.centerRadius + this.bondLength;
+        if (params.wallMode === 'solid') {
+          if (this.pos.x - margin < 0) {
+            this.pos.x = margin;
+            this.vel.x = Math.abs(this.vel.x);
+          } else if (this.pos.x + margin > width) {
+            this.pos.x = width - margin;
+            this.vel.x = -Math.abs(this.vel.x);
+          }
+          if (this.pos.y - margin < 0) {
+            this.pos.y = margin;
+            this.vel.y = Math.abs(this.vel.y);
+          } else if (this.pos.y + margin > height) {
+            this.pos.y = height - margin;
+            this.vel.y = -Math.abs(this.vel.y);
+          }
+        } else if (params.wallMode === 'wrap') {
+          if (this.pos.x < -margin) this.pos.x = width + margin;
+          else if (this.pos.x > width + margin) this.pos.x = -margin;
+          if (this.pos.y < -margin) this.pos.y = height + margin;
+          else if (this.pos.y > height + margin) this.pos.y = -margin;
+        }
+      }
+
+      draw(ctx) {
+        const p1 = this.getPeripheral1Pos();
+        const p2 = this.getPeripheral2Pos();
+        const p3 = this.getPeripheral3Pos();
+
+        // Draw bonds (center to peripheral lines)
+        if (params.showDipoles) {
+          ctx.strokeStyle = 'rgba(150, 150, 150, 0.6)';
+          ctx.lineWidth = this.peripheralRadius * 0.8;
+          ctx.beginPath();
+          ctx.moveTo(this.pos.x, this.pos.y);
+          ctx.lineTo(p1.x, p1.y);
+          ctx.moveTo(this.pos.x, this.pos.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.moveTo(this.pos.x, this.pos.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.stroke();
+        }
+
+        // Draw center (large, blue for negative)
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.centerRadius, 0, TWO_PI);
+        ctx.fillStyle = 'rgba(60, 120, 220, 0.9)';  // Blue for negative center
+        ctx.fill();
+
+        // Glow effect
+        const shadowBlur = isMobile() ? 5 : 10;
+        ctx.shadowBlur = shadowBlur;
+        ctx.shadowColor = 'rgba(60, 120, 220, 0.6)';
+
+        // Draw peripheral charges (small, yellow/gold for positive)
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(p1.x, p1.y, this.peripheralRadius, 0, TWO_PI);
+        ctx.fillStyle = 'rgba(255, 200, 80, 0.95)';  // Gold for positive
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p2.x, p2.y, this.peripheralRadius, 0, TWO_PI);
+        ctx.fillStyle = 'rgba(255, 200, 80, 0.95)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p3.x, p3.y, this.peripheralRadius, 0, TWO_PI);
+        ctx.fillStyle = 'rgba(255, 200, 80, 0.95)';
+        ctx.fill();
+      }
+    }
+
+    let particles = [];
+    let bonds = [];  // {i, j, strength} - indices and bond strength for visualization
+
+    /**
+     * TRIGONAL ELECTROSTATIC FORCE CALCULATION
+     *
+     * For each molecule pair within interaction radius:
+     *   1. Get all charge points (C-, P1+, P2+, P3+ for each molecule)
+     *   2. Compute all 16 charge-charge interactions (4 × 4)
+     *   3. Sum forces and torques
+     *
+     * Clustering emerges naturally:
+     *   - P(+) of one molecule attracted to C(-) of another
+     *   - Creates triangular/hexagonal clustering patterns
+     */
+    function computeDipoleForces() {
+      const INTERACTION_RADIUS = 100;
+      const BASE_STRENGTH = params.electrostaticForce * 200;
+      const CHARGE_BIAS = params.chargeBias;
+
+      // Reset forces and torques
+      for (const p of particles) {
+        p.force.x = 0;
+        p.force.y = 0;
+        p.torque = 0;
+      }
+
+      // Clear bonds
+      bonds = [];
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const pi = particles[i];
+          const pj = particles[j];
+
+          // Quick distance check (center to center)
+          const dx = pj.pos.x - pi.pos.x;
+          const dy = pj.pos.y - pi.pos.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq > INTERACTION_RADIUS * INTERACTION_RADIUS) continue;
+
+          const dist = Math.sqrt(distSq);
+          if (dist < 0.1) continue;
+
+          // Get all charge points for both molecules
+          // Each returns [{pos, charge, radius}, ...] with O(-2), H1(+1), H2(+1)
+          const chargesI = pi.getChargePoints();
+          const chargesJ = pj.getChargePoints();
+
+          let totalFx = 0, totalFy = 0;
+          let totalTorqueI = 0, totalTorqueJ = 0;
+          let bestAttractionStrength = 0;
+          let bestHBondDist = Infinity;
+          let hBondI = -1, hBondJ = -1;
+
+          // Compute all 9 charge-charge interactions (3 × 3)
+          for (let ci = 0; ci < chargesI.length; ci++) {
+            for (let cj = 0; cj < chargesJ.length; cj++) {
+              const c1 = chargesI[ci];
+              const c2 = chargesJ[cj];
+
+              const cdx = c2.pos.x - c1.pos.x;
+              const cdy = c2.pos.y - c1.pos.y;
+              const cDistSq = cdx * cdx + cdy * cdy;
+              const cDist = Math.sqrt(cDistSq) + 0.1;
+
+              // Charge interaction (Coulomb-like)
+              // q1 * q2 < 0 = attraction, > 0 = repulsion
+              const chargeProduct = c1.charge * c2.charge * CHARGE_BIAS;
+
+              // Force magnitude with softening
+              // Negative chargeProduct gives positive forceMag (attraction toward)
+              const softening = (c1.radius + c2.radius) * 2;
+              const forceMag = -chargeProduct * BASE_STRENGTH / (cDistSq + softening);
+
+              // Direction from c1 to c2
+              const cnx = cdx / cDist;
+              const cny = cdy / cDist;
+
+              // Force components
+              const fx = cnx * forceMag;
+              const fy = cny * forceMag;
+
+              totalFx += fx;
+              totalFy += fy;
+
+              // Track hydrogen bonds (H+ attracted to O-)
+              // This is when one charge is H(+1) and other is O(-2)
+              if (chargeProduct < 0) {
+                const attractStr = Math.abs(forceMag) / (BASE_STRENGTH + 1);
+                if (attractStr > bestAttractionStrength) {
+                  bestAttractionStrength = attractStr;
+                }
+                // Track closest H-O pair for bond visualization
+                if (cDist < bestHBondDist &&
+                    ((c1.charge > 0 && c2.charge < 0) || (c1.charge < 0 && c2.charge > 0))) {
+                  bestHBondDist = cDist;
+                  hBondI = ci;
+                  hBondJ = cj;
+                }
+              }
+
+              // === Torque calculation ===
+              // Torque = r × F where r is from molecule center to charge point
+
+              // Torque on molecule i
+              const riX = c1.pos.x - pi.pos.x;
+              const riY = c1.pos.y - pi.pos.y;
+              totalTorqueI += riX * (-fy) - riY * (-fx);
+
+              // Torque on molecule j
+              const rjX = c2.pos.x - pj.pos.x;
+              const rjY = c2.pos.y - pj.pos.y;
+              totalTorqueJ += rjX * fy - rjY * fx;
+            }
+          }
+
+          // Apply accumulated forces (Newton's third law)
+          pi.force.x += totalFx;
+          pi.force.y += totalFy;
+          pj.force.x -= totalFx;
+          pj.force.y -= totalFy;
+
+          // Apply torques
+          pi.torque += totalTorqueI * 0.003;
+          pj.torque += totalTorqueJ * 0.003;
+
+          // === Molecule-molecule collision (approximate as spheres) ===
+          const minDist = pi.centerRadius + pj.centerRadius + pi.bondLength * 0.5;
+          if (dist < minDist) {
+            const overlap = minDist - dist;
+            const repelForce = overlap * 100;
+
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            pi.force.x -= nx * repelForce;
+            pi.force.y -= ny * repelForce;
+            pj.force.x += nx * repelForce;
+            pj.force.y += ny * repelForce;
+
+            // Immediate separation
+            const sep = overlap * 0.5;
+            pi.pos.x -= nx * sep;
+            pi.pos.y -= ny * sep;
+            pj.pos.x += nx * sep;
+            pj.pos.y += ny * sep;
+          }
+
+          // Record hydrogen bond for visualization
+          if (bestAttractionStrength > 0.005 && bestHBondDist < minDist * 2.5) {
+            bonds.push({
+              i, j,
+              strength: Math.min(1, bestAttractionStrength * 8),
+              chargeI: hBondI,
+              chargeJ: hBondJ
+            });
+          }
+        }
+      }
+    }
+
+    /**
+     * Apply soft aggregation damping for bonded particles
+     * Reduces relative velocity to create cohesive movement
+     */
+    function applyAggregationDamping() {
+      if (params.aggregationDamping <= 0) return;
+
+      for (const bond of bonds) {
+        const pi = particles[bond.i];
+        const pj = particles[bond.j];
+
+        // Relative velocity
+        const dvx = pj.vel.x - pi.vel.x;
+        const dvy = pj.vel.y - pi.vel.y;
+
+        // Reduce relative velocity proportional to bond strength
+        const dampingFactor = params.aggregationDamping * bond.strength * 0.1;
+
+        pi.vel.x += dvx * dampingFactor;
+        pi.vel.y += dvy * dampingFactor;
+        pj.vel.x -= dvx * dampingFactor;
+        pj.vel.y -= dvy * dampingFactor;
+      }
+    }
+
+    /**
+     * Apply local damping for energy minimization
+     *
+     * Simulates energy dissipation from local interactions:
+     * - Particles in close proximity experience velocity damping
+     * - Damping is proportional to local "potential well depth"
+     * - Helps system settle into stable, low-energy configurations
+     * - Mimics realistic molecular relaxation behavior
+     */
+    function applyLocalDamping() {
+      if (params.localDamping <= 0) return;
+
+      const LOCAL_RADIUS = 60;  // Range for local damping effect
+      const LOCAL_RADIUS_SQ = LOCAL_RADIUS * LOCAL_RADIUS;
+
+      // Track total local interaction strength per particle
+      const localInteraction = new Array(particles.length).fill(0);
+
+      // Calculate local interaction density for each particle
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const pi = particles[i];
+          const pj = particles[j];
+
+          const dx = pj.pos.x - pi.pos.x;
+          const dy = pj.pos.y - pi.pos.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < LOCAL_RADIUS_SQ && distSq > 0.1) {
+            // Interaction strength falls off with distance squared
+            // Closer particles = stronger local potential = more damping
+            const strength = 1 - (distSq / LOCAL_RADIUS_SQ);
+            localInteraction[i] += strength;
+            localInteraction[j] += strength;
+          }
+        }
+      }
+
+      // Apply damping proportional to local interaction strength
+      for (let i = 0; i < particles.length; i++) {
+        if (localInteraction[i] > 0) {
+          const p = particles[i];
+
+          // Damping factor: more interactions = more energy dissipation
+          // Clamped to prevent over-damping
+          const interactionFactor = Math.min(localInteraction[i] / 5, 1);
+          const dampFactor = 1 - (params.localDamping * interactionFactor * 0.1);
+
+          // Apply velocity damping (energy loss)
+          p.vel.x *= dampFactor;
+          p.vel.y *= dampFactor;
+
+          // Also damp angular velocity for rotational relaxation
+          p.angularVel *= dampFactor;
+        }
+      }
+    }
+
+    /**
+     * Apply Brownian motion (temperature/thermal noise)
+     */
+    function applyBrownianMotion() {
+      if (params.temperature <= 0) return;
+
+      const noiseScale = params.temperature * 60;
+
+      for (const p of particles) {
+        // Random translational force
+        p.force.x += (Math.random() - 0.5) * noiseScale;
+        p.force.y += (Math.random() - 0.5) * noiseScale;
+
+        // Random rotational torque (thermal rotation)
+        p.torque += (Math.random() - 0.5) * noiseScale * 0.15;
+      }
+    }
+
+    /**
+     * Apply global drift to all particles (flow field)
+     */
+    function applyGlobalDrift() {
+      if (params.globalDriftStrength <= 0) return;
+
+      const driftAngleRad = params.globalDriftAngle * Math.PI / 180;
+      const driftX = Math.cos(driftAngleRad) * params.globalDriftStrength;
+      const driftY = Math.sin(driftAngleRad) * params.globalDriftStrength;
+
+      for (const p of particles) {
+        p.vel.x += driftX * params.dt;
+        p.vel.y += driftY * params.dt;
+      }
+    }
+
+    function initParticles(count, canvas) {
+      particles = [];
+      bonds = [];
+
+      // Molecule effective radius (center + bond length for peripherals)
+      const centerRadius = params.radiusScale * BASE_RADIUS * getDeviceScale();
+      const effectiveRadius = centerRadius * 2.5;  // Account for full molecule extent
+
+      function isValidPosition(x, y) {
+        for (const p of particles) {
+          const dx = x - p.pos.x;
+          const dy = y - p.pos.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < effectiveRadius * 2) return false;
+        }
+        return true;
+      }
+
+      const margin = effectiveRadius + 10;
+
+      for (let i = 0; i < count; i++) {
+        let attempts = 0;
+        let x, y;
+
+        do {
+          x = margin + Math.random() * (canvas.width - 2 * margin);
+          y = margin + Math.random() * (canvas.height - 2 * margin);
+          attempts++;
+        } while (!isValidPosition(x, y) && attempts < 100);
+
+        if (attempts < 100) {
+          particles.push(new Particle(x, y));
+        }
+      }
+    }
+
+    function step(dt, canvas) {
+      // Compute dipole-based forces and torques
+      computeDipoleForces();
+
+      // Add Brownian motion (thermal noise)
+      applyBrownianMotion();
+
+      // Apply forces to velocities
+      for (const p of particles) {
+        p.vel.x += (p.force.x / p.mass) * dt;
+        p.vel.y += (p.force.y / p.mass) * dt;
+      }
+
+      // Apply soft aggregation damping
+      applyAggregationDamping();
+
+      // Apply local damping for energy minimization
+      applyLocalDamping();
+
+      // Apply global drift
+      applyGlobalDrift();
+
+      // Update positions and orientations
+      for (const p of particles) {
+        p.update(dt);
+      }
+
+      // Handle boundaries
+      for (const p of particles) {
+        p.handleBoundaries(canvas.width, canvas.height);
+      }
+    }
+
+    /**
+     * Count connected clusters using union-find
+     */
+    function countClusters() {
+      if (particles.length === 0) return 0;
+
+      const parent = particles.map((_, i) => i);
+
+      function find(x) {
+        if (parent[x] !== x) parent[x] = find(parent[x]);
+        return parent[x];
+      }
+
+      function union(a, b) {
+        const pa = find(a);
+        const pb = find(b);
+        if (pa !== pb) parent[pa] = pb;
+      }
+
+      for (const bond of bonds) {
+        union(bond.i, bond.j);
+      }
+
+      const roots = new Set();
+      for (let i = 0; i < particles.length; i++) {
+        roots.add(find(i));
+      }
+
+      return roots.size;
+    }
+
+    const Simulation = {
+      canvas: null,
+      ctx: null,
+      isPaused: true,
+      lastTime: 0,
+      fps: 60,
+      frameCount: 0,
+      fpsTime: 0,
+
+      init(canvasElement, initialParams) {
+        this.canvas = canvasElement;
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        Object.assign(params, initialParams);
+        this.createParticles();
+        this.lastTime = performance.now();
+        this.animate();
+      },
+
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+
+        // Update molecule dimensions on resize
+        const deviceScale = getDeviceScale();
+        for (const p of particles) {
+          p.centerRadius = params.radiusScale * BASE_RADIUS * deviceScale;
+          p.peripheralRadius = p.centerRadius / CENTER_TO_PERIPHERAL_RATIO;
+          p.bondLength = p.centerRadius * 1.2;
+          p.radius = p.centerRadius + p.peripheralRadius;
+        }
+      },
+
+      createParticles() {
+        initParticles(params.particleCount, this.canvas);
+      },
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+
+        this.frameCount++;
+        this.fpsTime += deltaTime;
+        if (this.fpsTime >= 1) {
+          this.fps = Math.round(this.frameCount / this.fpsTime);
+          this.frameCount = 0;
+          this.fpsTime = 0;
+        }
+
+        if (!this.isPaused) {
+          this.update(deltaTime);
+        }
+        this.draw();
+        this.updateStats();
+      },
+
+      update(dt) {
+        dt = Math.min(dt, 0.033);
+
+        // Run multiple substeps for higher speeds (maintains numerical stability)
+        const substeps = Math.ceil(params.simulationSpeed);
+        const substepDt = params.dt * (params.simulationSpeed / substeps);
+
+        for (let i = 0; i < substeps; i++) {
+          step(substepDt, this.canvas);
+        }
+      },
+
+      draw() {
+        this.ctx.fillStyle = 'rgba(10, 10, 10, 1)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw hydrogen bonds
+        if (params.showBonds && bonds.length > 0) {
+          this.ctx.lineWidth = isMobile() ? 1.5 : 2;
+
+          for (const bond of bonds) {
+            const pi = particles[bond.i];
+            const pj = particles[bond.j];
+
+            // Get the specific charge points involved in the H-bond
+            const chargesI = pi.getChargePoints();
+            const chargesJ = pj.getChargePoints();
+
+            let startPos, endPos;
+
+            if (bond.chargeI !== undefined && bond.chargeJ !== undefined) {
+              startPos = chargesI[bond.chargeI].pos;
+              endPos = chargesJ[bond.chargeJ].pos;
+            } else {
+              // Fallback to center-to-center
+              startPos = pi.pos;
+              endPos = pj.pos;
+            }
+
+            // Hydrogen bond style: dashed cyan line
+            const alpha = 0.3 + bond.strength * 0.5;
+            this.ctx.strokeStyle = `hsla(190, 70%, 65%, ${alpha})`;
+
+            this.ctx.setLineDash([3, 3]);
+            this.ctx.beginPath();
+            this.ctx.moveTo(startPos.x, startPos.y);
+            this.ctx.lineTo(endPos.x, endPos.y);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
+          }
+        }
+
+        // Draw molecules
+        for (const p of particles) {
+          p.draw(this.ctx);
+        }
+        this.ctx.shadowBlur = 0;
+      },
+
+      updateStats() {
+        document.getElementById('fpsValue').textContent = this.fps;
+        document.getElementById('particleCountStat').textContent = particles.length;
+        document.getElementById('bondCountStat').textContent = bonds.length;
+        document.getElementById('clusterCountStat').textContent = countClusters();
+      },
+
+      reset() {
+        this.pause();
+        this.createParticles();
+        this.draw();
+      },
+
+      pause() {
+        this.isPaused = true;
+      },
+
+      play() {
+        this.isPaused = false;
+        this.lastTime = performance.now();
+      }
+    };
+
+    // UI Controller
+    const UIController = {
+      sidebar: null,
+      overlay: null,
+      playButton: null,
+      resetButton: null,
+
+      init() {
+        this.sidebar = document.getElementById('simulationSidebar');
+        this.overlay = document.getElementById('simulationOverlay');
+        this.playButton = document.getElementById('playButton');
+        this.resetButton = document.getElementById('resetButton');
+
+        this.setupSidebarToggle();
+        this.setupControls();
+        this.setupOverlay();
+        this.setupCanvas();
+        this.showOverlay();
+      },
+
+      setupSidebarToggle() {
+        const toggle = document.getElementById('sidebarToggle');
+        const controlBtn = document.getElementById('sidebarControlBtn');
+        const mobileExpandBtn = document.getElementById('mobileExpandBtn');
+        const mobileCollapseBtn = document.getElementById('mobileCollapseBtn');
+
+        const updateButtons = () => {
+          const isCollapsed = this.sidebar.classList.contains('collapsed');
+          if (toggle && !isMobile()) {
+            toggle.textContent = isCollapsed ? '☰' : '✕';
+          }
+          if (controlBtn) {
+            controlBtn.textContent = isCollapsed ? '→' : '←';
+          }
+        };
+
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            this.sidebar.classList.toggle('collapsed');
+            updateButtons();
+          });
+        }
+
+        if (controlBtn) {
+          controlBtn.addEventListener('click', () => {
+            this.sidebar.classList.toggle('collapsed');
+            updateButtons();
+          });
+        }
+
+        if (mobileExpandBtn) {
+          mobileExpandBtn.addEventListener('click', () => {
+            this.sidebar.classList.remove('collapsed');
+            updateButtons();
+          });
+        }
+
+        if (mobileCollapseBtn) {
+          mobileCollapseBtn.addEventListener('click', () => {
+            this.sidebar.classList.add('collapsed');
+            updateButtons();
+          });
+        }
+
+        updateButtons();
+        window.addEventListener('resize', updateButtons);
+      },
+
+      setupControls() {
+        // Basic parameters
+        this.bindSlider('particleCount', 'particleCountValue', v => params.particleCount = parseInt(v));
+        this.bindSlider('radiusScale', 'radiusScaleValue', v => {
+          params.radiusScale = parseFloat(v);
+          const deviceScale = getDeviceScale();
+          for (const p of particles) {
+            p.centerRadius = params.radiusScale * BASE_RADIUS * deviceScale;
+            p.peripheralRadius = p.centerRadius / CENTER_TO_PERIPHERAL_RATIO;
+            p.bondLength = p.centerRadius * 1.2;
+            p.radius = p.centerRadius + p.peripheralRadius;
+          }
+        }, 1);
+
+        document.getElementById('wallMode').addEventListener('change', e => {
+          params.wallMode = e.target.value;
+        });
+
+        // Electrostatic parameters
+        this.bindSlider('electrostaticForce', 'electrostaticForceValue', v => params.electrostaticForce = parseFloat(v), 1);
+        this.bindSlider('chargeBias', 'chargeBiasValue', v => params.chargeBias = parseFloat(v), 2);
+        this.bindSlider('aggregationDamping', 'aggregationDampingValue', v => params.aggregationDamping = parseFloat(v), 2);
+
+        // Dynamics
+        this.bindSlider('simulationSpeed', 'simulationSpeedValue', v => {
+          params.simulationSpeed = parseFloat(v);
+          document.getElementById('simulationSpeedValue').textContent = params.simulationSpeed.toFixed(2) + 'x';
+        }, 2);
+        this.bindSlider('temperature', 'temperatureValue', v => params.temperature = parseFloat(v), 1);
+        this.bindSlider('damping', 'dampingValue', v => params.damping = parseFloat(v), 3);
+        this.bindSlider('rotationDamping', 'rotationDampingValue', v => params.rotationDamping = parseFloat(v), 2);
+        this.bindSlider('localDamping', 'localDampingValue', v => params.localDamping = parseFloat(v), 2);
+        this.bindSlider('globalDrift', 'globalDriftValue', v => params.globalDriftStrength = parseFloat(v), 1);
+        this.bindSlider('driftAngle', 'driftAngleValue', v => params.globalDriftAngle = parseFloat(v));
+
+        // Visualization
+        document.getElementById('showDipoles').addEventListener('change', e => {
+          params.showDipoles = e.target.checked;
+        });
+
+        document.getElementById('showBonds').addEventListener('change', e => {
+          params.showBonds = e.target.checked;
+        });
+      },
+
+      bindSlider(inputId, valueId, callback, decimals = 0) {
+        const input = document.getElementById(inputId);
+        const valueEl = document.getElementById(valueId);
+        input.addEventListener('input', e => {
+          const val = e.target.value;
+          valueEl.textContent = decimals > 0 ? parseFloat(val).toFixed(decimals) : val;
+          callback(val);
+        });
+      },
+
+      setupOverlay() {
+        this.playButton.addEventListener('click', () => {
+          Simulation.play();
+          this.hideOverlay();
+        });
+
+        this.resetButton.addEventListener('click', () => {
+          Simulation.reset();
+          this.showOverlay();
+        });
+      },
+
+      setupCanvas() {
+        const canvas = document.getElementById('simulationCanvas');
+
+        const pauseSimulation = () => {
+          Simulation.pause();
+          this.showOverlay();
+        };
+
+        canvas.addEventListener('click', pauseSimulation);
+        canvas.addEventListener('touchstart', e => {
+          e.preventDefault();
+          pauseSimulation();
+        });
+      },
+
+      showOverlay() {
+        this.overlay.classList.add('active');
+      },
+
+      hideOverlay() {
+        this.overlay.classList.remove('active');
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('simulationCanvas');
+      Simulation.init(canvas, params);
+      UIController.init();
+    });
+  </script>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

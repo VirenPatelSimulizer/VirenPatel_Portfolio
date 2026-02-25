@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Layered Aggregates (Three Particle Types) - Learn about spring-based self-organization and differential adhesion.">
+  <title>Layered Aggregates (Three Types) Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">Layered Aggregates Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="sim4_b04.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">Layered Aggregates (Three Types)</h1>
+      <p class="info-subtitle">Spring-based tri-particle self-organization with differential adhesion</p>
+
+      <!-- What is it -->
+      <section class="info-section">
+        <h2 class="section-title">What is Differential Adhesion?</h2>
+        <p>
+          The <span class="highlight">Differential Adhesion Hypothesis</span> (DAH), proposed by
+          <span class="highlight">Malcolm Steinberg</span> in 1963, explains how cells with different
+          adhesion strengths spontaneously sort into layered structures. Cells that stick together more
+          strongly end up in the interior, while less adhesive cells migrate to the surface.
+        </p>
+        <p>
+          This simulation extends the concept to three particle types (A, B, C), each with distinct
+          <span class="highlight">preferred distances</span> and <span class="highlight">spring stiffnesses</span>
+          for every pair combination. The result is emergent shell-like structures where different species
+          occupy distinct spatial layers.
+        </p>
+      </section>
+
+      <!-- Physics -->
+      <section class="info-section">
+        <h2 class="section-title">Physics Behind the Simulation</h2>
+        <p>This simulation uses a spring-based force model:</p>
+        <ul>
+          <li>
+            <strong>Spring Forces:</strong> Each particle pair experiences a spring force that pulls them
+            toward a preferred distance. Too close = repulsion, too far = attraction.
+          </li>
+          <li>
+            <strong>Asymmetric Interactions:</strong> The preferred distance and stiffness are different
+            for each type pair (A-A, A-B, A-C, B-B, B-C, C-C), creating a rich interaction matrix.
+          </li>
+          <li>
+            <strong>Velocity Damping:</strong> A damping factor (0.9-1.0) gradually removes kinetic energy,
+            allowing the system to settle into stable configurations.
+          </li>
+          <li>
+            <strong>Bond Visualization:</strong> Lines connecting particles within the interaction radius
+            reveal the network structure underlying the self-organized patterns.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>The spring force between two particles follows Hooke's Law with preferred distance:</p>
+        <div class="formula">
+          F = stiffness &times; (distance - preferredDistance)
+        </div>
+        <p>
+          When <span class="highlight">distance &gt; preferredDistance</span>, the force is attractive (pulls together).
+          When <span class="highlight">distance &lt; preferredDistance</span>, the force is repulsive (pushes apart).
+          This creates stable equilibrium configurations at the preferred spacing.
+        </p>
+      </section>
+
+      <!-- Controls -->
+      <section class="info-section">
+        <h2 class="section-title">Simulation Controls</h2>
+        <ul>
+          <li>
+            <strong>Particle A/B/C Count:</strong> Number of each species (10-500). Three particle types create richer layering.
+          </li>
+          <li>
+            <strong>Damping:</strong> Velocity damping factor (0.9-1.0). Lower values cause faster settling into equilibrium.
+          </li>
+          <li>
+            <strong>Interaction Radius:</strong> Range of spring forces (20-300). Controls how far particles "feel" each other.
+          </li>
+          <li>
+            <strong>Show Bonds:</strong> Toggle bond line visualization to see the connectivity network.
+          </li>
+          <li>
+            <strong>Preset Configurations:</strong> Layered Shells, Tight Clusters, Loose Lattice, Segregated, Mixed Soup, Core-Shell.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Interesting Behaviors -->
+      <section class="info-section">
+        <h2 class="section-title">Interesting Behaviors to Observe</h2>
+        <ul>
+          <li>
+            <strong>Shell Formation:</strong> With the "Layered Shells" preset, particles organize into
+            concentric layers with one type at the core and others forming successive shells.
+          </li>
+          <li>
+            <strong>Core-Shell Structures:</strong> One particle type forms a dense core while another
+            coats the surface, mimicking core-shell nanoparticles.
+          </li>
+          <li>
+            <strong>Segregation vs. Mixing:</strong> Compare the "Segregated" and "Mixed Soup" presets to
+            see how interaction parameters determine whether species mix or separate.
+          </li>
+          <li>
+            <strong>Lattice Formation:</strong> The "Loose Lattice" preset demonstrates how periodic spatial
+            arrangements can emerge from isotropic interactions.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -276,6 +276,34 @@
       animation: fadeInUp 0.8s ease-out 0.4s both;
     }
 
+    .roadmap-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 50px;
+      color: #a5b4fc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .roadmap-link:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+      border-color: #6366f1;
+      color: #f1f5f9;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .roadmap-link svg {
+      flex-shrink: 0;
+    }
+
     /* Loading State */
     .loading {
       text-align: center;
@@ -532,6 +560,35 @@
       box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
     }
 
+    /* Upcoming simulation cards */
+    .upcoming-card {
+      opacity: 0.6;
+      cursor: default;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .upcoming-card:hover {
+      transform: none;
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+
+    .upcoming-preview {
+      background: linear-gradient(135deg, #1e293b, #262f3d) !important;
+    }
+
+    .upcoming-badge {
+      background: rgba(234, 179, 8, 0.15) !important;
+      color: #facc15 !important;
+      border-color: rgba(234, 179, 8, 0.3) !important;
+    }
+
+    .upcoming-count {
+      color: #facc15;
+      font-size: 0.75rem;
+      margin-left: 0.25rem;
+    }
+
     /* Animations */
     @keyframes fadeInUp {
       from {
@@ -656,6 +713,17 @@
           <h1>Simulations Gallery</h1>
           <p class="subtitle">Interactive Simulations by Viren Patel</p>
           <p class="description">Explore complex systems through interactive demonstrations. Select a category to view simulations.</p>
+          <a href="roadmap.html" class="roadmap-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="5" r="3"/>
+              <line x1="12" y1="8" x2="12" y2="14"/>
+              <circle cx="6" cy="19" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="12" y1="14" x2="6" y2="16"/>
+              <line x1="12" y1="14" x2="18" y2="16"/>
+            </svg>
+            View Emergence Roadmap
+          </a>
         </div>
         <div class="simulation-grid" id="simulationGrid">
           <div class="loading">Loading simulations</div>
@@ -721,7 +789,9 @@
 
     // State management
     let allSimulations = [];
+    let upcomingSimulations = [];
     let categorizedData = {};
+    let categorizedUpcoming = {};
     let currentView = 'gallery';
     let selectedCategory = null;
 
@@ -750,6 +820,7 @@
           skipEmptyLines: true,
           complete: function(results) {
             allSimulations = results.data.filter(sim => sim.status === 'active');
+            upcomingSimulations = results.data.filter(sim => sim.status === 'upcoming');
             processData();
             init();
           },
@@ -767,13 +838,22 @@
     // Process data into categories
     function processData() {
       categorizedData = {};
-      
+      categorizedUpcoming = {};
+
       allSimulations.forEach(sim => {
         const category = sim.category;
         if (!categorizedData[category]) {
           categorizedData[category] = [];
         }
         categorizedData[category].push(sim);
+      });
+
+      upcomingSimulations.forEach(sim => {
+        const category = sim.category;
+        if (!categorizedUpcoming[category]) {
+          categorizedUpcoming[category] = [];
+        }
+        categorizedUpcoming[category].push(sim);
       });
     }
 
@@ -812,22 +892,27 @@
 
     // Render category cards (gallery view)
     function renderCategoryCards() {
-      const categories = Object.keys(categorizedData);
-      
+      // Merge active and upcoming category keys
+      const allCategoryIds = new Set([...Object.keys(categorizedData), ...Object.keys(categorizedUpcoming)]);
+      const categories = [...allCategoryIds];
+
       if (categories.length === 0) {
         simulationGrid.innerHTML = '<div class="loading">No simulations available.</div>';
         return;
       }
 
       simulationGrid.innerHTML = categories.map(categoryId => {
-        const simCount = categorizedData[categoryId].length;
+        const activeCount = (categorizedData[categoryId] || []).length;
+        const upcomingCount = (categorizedUpcoming[categoryId] || []).length;
+        const totalCount = activeCount + upcomingCount;
+        const upcomingLabel = upcomingCount > 0 ? ` <span class="upcoming-count">+${upcomingCount} upcoming</span>` : '';
         return `
           <div class="gallery-card" data-category="${categoryId}">
             <div class="gallery-preview">${getCategoryIcon(categoryId)}</div>
             <div class="gallery-info">
               <h3>${getCategoryName(categoryId)}</h3>
               <p>${getCategoryDesc(categoryId)}</p>
-              <span class="sim-count">${simCount} simulation${simCount !== 1 ? 's' : ''}</span>
+              <span class="sim-count">${activeCount} simulation${activeCount !== 1 ? 's' : ''}${upcomingLabel}</span>
             </div>
           </div>
         `;
@@ -836,20 +921,23 @@
 
     // Render sidebar categories
     function renderSidebar() {
-      const categories = Object.keys(categorizedData);
-      
+      const allCategoryIds = new Set([...Object.keys(categorizedData), ...Object.keys(categorizedUpcoming)]);
+      const categories = [...allCategoryIds];
+
       categoryList.innerHTML = `
         <button class="category-btn active" data-category="all">
           <span class="category-icon">🏠</span>
           <span>All Categories</span>
         </button>
         ${categories.map(categoryId => {
-          const count = categorizedData[categoryId].length;
+          const activeCount = (categorizedData[categoryId] || []).length;
+          const upcomingCount = (categorizedUpcoming[categoryId] || []).length;
+          const totalCount = activeCount + upcomingCount;
           return `
             <button class="category-btn" data-category="${categoryId}">
               <span class="category-icon">${getCategoryIcon(categoryId)}</span>
               <span>${getCategoryName(categoryId)}</span>
-              <span class="category-count">${count}</span>
+              <span class="category-count">${totalCount}</span>
             </button>
           `;
         }).join('')}
@@ -858,14 +946,15 @@
 
     // Render video gallery for a specific category
     function renderVideoGallery(categoryId) {
-      const simulations = categorizedData[categoryId];
-      if (!simulations) return;
+      const activeList = categorizedData[categoryId] || [];
+      const upcomingList = categorizedUpcoming[categoryId] || [];
+      if (activeList.length === 0 && upcomingList.length === 0) return;
 
       categoryTitle.textContent = getCategoryName(categoryId);
       categoryDescription.textContent = getCategoryDesc(categoryId);
 
-      videoGrid.innerHTML = simulations.map(sim => {
-        const previewContent = sim.previewType === 'video' 
+      const activeCards = activeList.map(sim => {
+        const previewContent = sim.previewType === 'video'
           ? `<video autoplay loop muted playsinline>
                <source src="${sim.previewPath}" type="video/mp4">
                <img src="${sim.fallbackImage}" alt="${sim.title}">
@@ -889,6 +978,25 @@
           </div>
         `;
       }).join('');
+
+      const upcomingCards = upcomingList.map(sim => {
+        return `
+          <div class="video-card upcoming-card">
+            <div class="video-preview upcoming-preview">
+              <span class="preview-placeholder">🔜</span>
+            </div>
+            <div class="video-info">
+              <h3>${sim.title}</h3>
+              <div class="sim-meta">
+                <span class="meta-badge upcoming-badge">Coming Soon</span>
+              </div>
+              <p>${sim.shortDescription}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      videoGrid.innerHTML = activeCards + upcomingCards;
     }
 
     // Switch views

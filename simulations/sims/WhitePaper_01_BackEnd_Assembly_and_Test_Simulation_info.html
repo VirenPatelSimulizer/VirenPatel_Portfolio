@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DPAT vs SPAT Simulation - Learn about semiconductor backend testing, Part Average Testing, and quality control.">
+  <title>DPAT vs SPAT Simulation Info - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .info-container {
+      min-height: calc(100vh - 60px);
+      margin-top: 60px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+    }
+
+    .info-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(20, 20, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: fit-content;
+    }
+
+    .nav-btn:hover {
+      background: rgba(30, 30, 50, 0.95);
+      border-color: #4a9eff;
+      color: #4a9eff;
+    }
+
+    .nav-btn.primary {
+      width: 100%;
+      padding: 20px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+    }
+
+    .nav-btn.primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(74, 158, 255, 0.4);
+    }
+
+    .nav-btn.primary span {
+      font-size: 1.4rem;
+    }
+
+    .info-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-subtitle {
+      font-size: 1.1rem;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .info-section {
+      background: rgba(20, 20, 40, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, #4a9eff 0%, #6b5ce7 100%);
+      border-radius: 2px;
+    }
+
+    .info-section p {
+      line-height: 1.8;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-section li {
+      padding: 10px 0;
+      padding-left: 25px;
+      position: relative;
+      color: #b0b0b0;
+      line-height: 1.6;
+    }
+
+    .info-section li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 8px;
+      height: 8px;
+      background: #4a9eff;
+      border-radius: 50%;
+    }
+
+    .info-section li strong {
+      color: #e0e0e0;
+    }
+
+    .highlight {
+      color: #4a9eff;
+      font-weight: 500;
+    }
+
+    .formula {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      color: #4a9eff;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .personal-notes {
+      border: 2px dashed rgba(107, 92, 231, 0.3);
+      background: rgba(107, 92, 231, 0.05);
+    }
+
+    .personal-notes .section-title::before {
+      background: linear-gradient(135deg, #6b5ce7 0%, #a855f7 100%);
+    }
+
+    .empty-note {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    @media (max-width: 768px) {
+      .info-container {
+        padding: 20px 15px;
+      }
+
+      .info-title {
+        font-size: 1.8rem;
+      }
+
+      .info-section {
+        padding: 20px;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+      }
+
+      .nav-btn {
+        justify-content: center;
+      }
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 9999;
+      position: relative;
+    }
+
+    .mobile-menu-toggle span {
+      display: block;
+      width: 28px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+      transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        width: 70%;
+        max-width: 300px;
+        background: rgba(15, 23, 42, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 80px 0 20px 0;
+        transition: right 0.3s ease;
+        z-index: 9998;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 1.2rem 1.5rem;
+        font-size: 1.1rem;
+        color: #cbd5e1;
+      }
+
+      .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">DPAT vs SPAT Info</a>
+      </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../index.html">Simulations</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="info-container">
+    <div class="info-content">
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <a href="WhitePaper_01_BackEnd_Assembly_and_Test_Simulation.html" class="nav-btn primary">
+          <span>&#9654;</span> Launch Simulation
+        </a>
+        <a href="../index.html" class="nav-btn">
+          <span>&#8592;</span> Back to Simulations
+        </a>
+      </div>
+
+      <!-- Title -->
+      <h1 class="info-title">DPAT vs SPAT Simulation</h1>
+      <p class="info-subtitle">Semiconductor backend assembly & test quality control comparison</p>
+
+      <!-- What is it -->
+      <section class="info-section">
+        <h2 class="section-title">What is Part Average Testing (PAT)?</h2>
+        <p>
+          <span class="highlight">Part Average Testing</span> is a statistical quality control method
+          used in semiconductor manufacturing to identify defective units that pass standard specification
+          limits but are statistical outliers relative to their lot. PAT catches
+          <span class="highlight">"marginal" parts</span> that may fail in the field despite passing
+          absolute test limits.
+        </p>
+        <p>
+          There are two main approaches: <span class="highlight">Static PAT (SPAT)</span> calculates
+          control limits from an initial training set and applies them to all subsequent production, while
+          <span class="highlight">Dynamic PAT (DPAT)</span> uses a rolling window of recent lots to
+          continuously update limits. This simulation demonstrates how each approach performs under
+          various process disturbances.
+        </p>
+      </section>
+
+      <!-- How it Works -->
+      <section class="info-section">
+        <h2 class="section-title">How the Simulation Works</h2>
+        <p>The simulation models the complete semiconductor backend flow:</p>
+        <ul>
+          <li>
+            <strong>Lot Generation:</strong> Each lot contains multiple units with normally distributed
+            measurement values (e.g., Iread current), parameterized by baseline mean and sigma.
+          </li>
+          <li>
+            <strong>Process Flow:</strong> Units flow through Material Source &rarr; Assembly &rarr;
+            Transport &rarr; Tester &rarr; Ship or Destruction. Each stage can add variation.
+          </li>
+          <li>
+            <strong>Measurement Model:</strong> The measured value combines the innate part value with
+            calibration error, thermal effects, firmware effects, and random noise.
+          </li>
+          <li>
+            <strong>SPAT Limits:</strong> Calculated once from training lots as mean &plusmn; k&sigma;.
+            Fixed for all subsequent production.
+          </li>
+          <li>
+            <strong>DPAT Limits:</strong> Recalculated using a rolling window of recent lots, adapting
+            to process drift. Can be stratified by test conditions.
+          </li>
+          <li>
+            <strong>Defect Injection:</strong> Intermittent defects are injected with configurable
+            probability, simulating real-world failure modes.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Key Equations -->
+      <section class="info-section">
+        <h2 class="section-title">Key Equations</h2>
+        <p>PAT control limits:</p>
+        <div class="formula">
+          Upper Limit = &mu; + k &times; &sigma;
+          <br>Lower Limit = &mu; - k &times; &sigma;
+        </div>
+        <p>
+          Where <span class="highlight">&mu;</span> is the mean, <span class="highlight">&sigma;</span>
+          is the standard deviation, and <span class="highlight">k</span> is the sigma multiplier
+          (typically 3-5).
+        </p>
+        <p>Measurement model:</p>
+        <div class="formula">
+          MEASURED = INNATE + Cal_Error + Thermal_Effect + FW_Effect + Noise
+        </div>
+        <p>Escape criterion (defective part passes test):</p>
+        <div class="formula">
+          |MEASURED - &mu;| &lt; k&sigma; &nbsp;AND&nbsp; |TRUE - &mu;| &gt; defect_limit &times; &sigma;
+        </div>
+      </section>
+
+      <!-- Controls -->
+      <section class="info-section">
+        <h2 class="section-title">Simulation Controls</h2>
+        <ul>
+          <li>
+            <strong>Preset Scenarios:</strong> Ultra Stable Backend, Mix Change Shock, Tester Degradation
+            Drift, High Variance Chaos, Firmware Mode Switching, Custom Configuration.
+          </li>
+          <li>
+            <strong>Lot Parameters:</strong> Number of lots (20-500), units per lot (50-1000), baseline
+            mean and sigma for the measured parameter.
+          </li>
+          <li>
+            <strong>SPAT Training Lots:</strong> Number of initial lots used to calculate static limits (10-100).
+          </li>
+          <li>
+            <strong>DPAT Window Size:</strong> Rolling window of recent lots for dynamic limit calculation (3-50).
+          </li>
+          <li>
+            <strong>k-factor:</strong> Sigma multiplier for control limits (2-5). Lower = tighter limits, more fallout.
+          </li>
+          <li>
+            <strong>Defect Limit:</strong> Sigma multiplier defining true defects (3-6).
+          </li>
+          <li>
+            <strong>DPAT Mode:</strong> Unstratified (global limits) or Stratified (limits matched by
+            firmware/thermal/tester conditions).
+          </li>
+          <li>
+            <strong>Intermittent Defect Rate:</strong> Probability of units exhibiting intermittent failures (0-0.5).
+          </li>
+        </ul>
+      </section>
+
+      <!-- What to Observe -->
+      <section class="info-section">
+        <h2 class="section-title">What to Observe</h2>
+        <ul>
+          <li>
+            <strong>SPAT vs DPAT Performance:</strong> Compare fallout rates, escape rates, and false
+            reject counts between the two methods. DPAT typically adapts better to drift but can be
+            unstable with small windows.
+          </li>
+          <li>
+            <strong>Mix Change Shock:</strong> Watch how SPAT limits become invalid when the process
+            shifts, while DPAT gradually adapts its limits.
+          </li>
+          <li>
+            <strong>Tester Degradation:</strong> See how gradual calibration drift affects both methods
+            differently. SPAT may miss the drift entirely.
+          </li>
+          <li>
+            <strong>Stratification Benefits:</strong> Compare unstratified vs. stratified DPAT to see how
+            accounting for test conditions reduces false rejects.
+          </li>
+          <li>
+            <strong>Fallout vs. Escape Trade-off:</strong> Tightening k-factor reduces escapes but
+            increases fallout (good parts rejected). Find the optimal balance.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Node Graph -->
+      <section class="info-section">
+        <h2 class="section-title">Supply Chain Graph Editor</h2>
+        <p>
+          The simulation includes a visual node graph editor representing the semiconductor backend
+          supply chain. Each node type models a different process step:
+        </p>
+        <ul>
+          <li>
+            <strong>Material Source:</strong> Baseline variability of incoming wafers/dies.
+          </li>
+          <li>
+            <strong>Assembly Equipment:</strong> Die attach, wire bonding, and packaging variation.
+          </li>
+          <li>
+            <strong>Tester:</strong> Measurement system with calibration, thermal, and firmware effects.
+          </li>
+          <li>
+            <strong>Firmware Mode:</strong> Different test software variants with distinct measurement biases.
+          </li>
+          <li>
+            <strong>Transport:</strong> Physical handling and ESD damage risks.
+          </li>
+          <li>
+            <strong>Ship / Destruction:</strong> Terminal nodes for accepted and rejected units.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Personal Notes -->
+      <section class="info-section personal-notes">
+        <h2 class="section-title">Personal Notes & Findings</h2>
+        <div class="empty-note">
+          <!-- Add your personal comments and findings here -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

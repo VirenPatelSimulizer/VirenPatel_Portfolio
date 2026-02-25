@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Viren Patel - Technology enthusiast, podcast host, and simulation developer. Explore my portfolio of projects and listen to Decoded with Viren.">
+  <title>Turing Reaction-Diffusion - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E', {});
+  </script>
+
+  <style>
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    .simulation-sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 320px;
+      max-width: 320px;
+      height: 100%;
+      max-height: 100vh;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+
+    .simulation-sidebar.collapsed { transform: translateX(-100%); }
+
+    .sidebar-toggle {
+      position: fixed;
+      left: 320px;
+      top: 80px;
+      width: 36px;
+      height: 36px;
+      background: rgba(30, 30, 50, 0.95);
+      border: 2px solid rgba(74, 158, 255, 0.5);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a9eff;
+      font-size: 18px;
+      transition: left 0.3s ease, background 0.2s, transform 0.2s;
+      z-index: 150;
+    }
+    .sidebar-toggle:hover {
+      background: rgba(74, 158, 255, 0.3);
+      color: #fff;
+      transform: scale(1.1);
+    }
+    .sidebar-toggle.collapsed {
+      left: 0;
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .control-group { margin-bottom: 18px; }
+
+    .control-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #b0b0b0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .control-value {
+      float: right;
+      color: #4a9eff;
+      font-weight: 600;
+    }
+
+    .control-input {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .control-input::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #4a9eff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .control-select {
+      width: 100%;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 12px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .control-select option { background: #1a1a2e; color: #e0e0e0; }
+
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .preset-btn {
+      padding: 8px 10px;
+      background: rgba(74, 158, 255, 0.15);
+      border: 1px solid rgba(74, 158, 255, 0.4);
+      border-radius: 6px;
+      color: #4a9eff;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(74, 158, 255, 0.3);
+      border-color: #4a9eff;
+    }
+
+    .playback-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .playback-btn {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+
+    .play-btn { background: rgba(0, 200, 100, 0.2); border-color: rgba(0, 200, 100, 0.5); color: #00c864; }
+    .play-btn:hover { background: rgba(0, 200, 100, 0.35); }
+    .pause-btn { background: rgba(255, 180, 0, 0.2); border-color: rgba(255, 180, 0, 0.5); color: #ffb400; }
+    .pause-btn:hover { background: rgba(255, 180, 0, 0.35); }
+    .reset-btn { background: rgba(255, 74, 74, 0.2); border-color: rgba(255, 74, 74, 0.5); color: #ff4a4a; }
+    .reset-btn:hover { background: rgba(255, 74, 74, 0.35); }
+
+    .simulation-canvas-wrapper { flex: 1; position: relative; }
+    #simulationCanvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(20, 20, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      z-index: 150;
+    }
+
+    .back-button:hover { background: rgba(30, 30, 50, 0.95); border-color: #4a9eff; color: #4a9eff; }
+
+    .simulation-stats {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 40, 0.9);
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      font-size: 12px;
+      z-index: 50;
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item { display: flex; gap: 6px; }
+    .stat-value { color: #4a9eff; font-weight: 600; }
+    .stat-particle-a { color: #1e90ff; font-weight: 600; }
+    .stat-particle-b { color: #dc3c3c; font-weight: 600; }
+
+    .simulation-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .simulation-overlay.active { display: flex; }
+
+    .overlay-text {
+      color: #888;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .overlay-buttons { display: flex; gap: 15px; }
+
+    .overlay-button {
+      padding: 15px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(20, 20, 40, 0.9);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .overlay-button:hover { border-color: #4a9eff; transform: translateY(-2px); }
+    .overlay-button.play { background: rgba(74, 158, 255, 0.2); border-color: #4a9eff; }
+
+    .mobile-expand-btn, .mobile-collapse-btn {
+      position: fixed;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(137, 74, 255, 0.1);
+      border: 1px solid rgba(137, 74, 255, 0.3);
+      border-radius: 50%;
+      color: rgba(137, 74, 255, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 150;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mobile-expand-btn { top: 80px; }
+    .mobile-collapse-btn { top: calc(50vh + 10px); }
+
+    @media (min-width: 769px) { .mobile-expand-btn, .mobile-collapse-btn { display: none !important; } }
+
+    @media (max-width: 768px) {
+      .simulation-sidebar { width: 100%; max-width: 100%; height: auto; max-height: 50vh; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); position: fixed; }
+      .simulation-sidebar.collapsed { transform: translateY(-100%); }
+      .sidebar-toggle { display: none; }
+      .mobile-expand-btn, .mobile-collapse-btn { display: flex; }
+      .simulation-sidebar.collapsed ~ .simulation-canvas-wrapper .mobile-expand-btn { opacity: 1; pointer-events: auto; }
+      .simulation-sidebar:not(.collapsed) ~ .simulation-canvas-wrapper .mobile-collapse-btn { opacity: 1; pointer-events: auto; }
+      .back-button { top: 10px; left: 10px; right: auto; padding: 8px 15px; font-size: 12px; }
+      .back-text { display: none; }
+      .simulation-stats { font-size: 10px; padding: 8px 12px; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <header>
+    <nav>
+      <div class="logo"><a href="index.html">Viren Patel</a></div>
+      <div class="logo"><a>Turing Patterns</a></div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-title">Solid Particle Life</div>
+
+      <div class="control-group">
+        <div class="playback-buttons">
+          <button class="playback-btn play-btn" id="playBtn">&#9658; Play</button>
+          <button class="playback-btn pause-btn" id="pauseBtn">&#10074;&#10074; Pause</button>
+          <button class="playback-btn reset-btn" id="resetBtn">&#8635; Reset</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Behavior Presets</label>
+        <div class="preset-buttons">
+          <button class="preset-btn" data-preset="territory">Territory</button>
+          <button class="preset-btn" data-preset="pulse">Pulse</button>
+          <button class="preset-btn" data-preset="chaos">Chaos</button>
+          <button class="preset-btn" data-preset="blueDom">Blue Dom</button>
+          <button class="preset-btn" data-preset="freeze">Freeze</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Blue Speed (D<sub>A</sub>) <span class="control-value" id="daValue">0.30</span></label>
+        <input type="range" class="control-input" id="diffusionA" min="0.1" max="1.0" step="0.05" value="0.3">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Red Speed (D<sub>B</sub>) <span class="control-value" id="dbValue">0.80</span></label>
+        <input type="range" class="control-input" id="diffusionB" min="0.3" max="1.5" step="0.05" value="0.8">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Particle Radius <span class="control-value" id="radiusValue">8</span></label>
+        <input type="range" class="control-input" id="particleRadius" min="4" max="15" step="1" value="8">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Collision Elasticity <span class="control-value" id="elasticityValue">0.80</span></label>
+        <input type="range" class="control-input" id="elasticity" min="0.5" max="1.0" step="0.05" value="0.8">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Reproduction Interval (ms) <span class="control-value" id="reproIntervalValue">1000</span></label>
+        <input type="range" class="control-input" id="reproductionInterval" min="500" max="3000" step="100" value="1000">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Blue Death Timeout (ms) <span class="control-value" id="blueDeathValue">5000</span></label>
+        <input type="range" class="control-input" id="blueDeathTimeout" min="2000" max="15000" step="500" value="5000">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Red Death Timeout (ms) <span class="control-value" id="redDeathValue">5000</span></label>
+        <input type="range" class="control-input" id="redDeathTimeout" min="2000" max="15000" step="500" value="5000">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Initial Blue Particles <span class="control-value" id="blueCountValue">1</span></label>
+        <input type="range" class="control-input" id="initialBlue" min="1" max="20" step="1" value="1">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Simulation Speed <span class="control-value" id="speedValue">1.0</span></label>
+        <input type="range" class="control-input" id="simSpeed" min="0.2" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Max Particles <span class="control-value" id="maxParticlesValue">1000</span></label>
+        <input type="range" class="control-input" id="maxParticles" min="100" max="5000" step="100" value="1000">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Max Reproducers/Tick <span class="control-value" id="maxReproducersValue">100</span></label>
+        <input type="range" class="control-input" id="maxReproducersPerTick" min="10" max="200" step="10" value="100">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Reproduction Rate <span class="control-value" id="reproRateValue">0.80</span></label>
+        <input type="range" class="control-input" id="baseReproductionRate" min="0.1" max="1.0" step="0.05" value="0.8">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Blue Children/Birth <span class="control-value" id="blueChildValue">1</span></label>
+        <input type="range" class="control-input" id="blueChildCount" min="1" max="5" step="1" value="1">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Red Children/Birth <span class="control-value" id="redChildValue">1</span></label>
+        <input type="range" class="control-input" id="redChildCount" min="1" max="5" step="1" value="1">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" style="cursor: pointer;">
+          <input type="checkbox" id="showGridToggle" style="margin-right: 8px; cursor: pointer;">
+          Show Spatial Grid
+        </label>
+      </div>
+    </div>
+
+    <div class="simulation-canvas-wrapper">
+      <canvas id="simulationCanvas"></canvas>
+
+      <button class="mobile-expand-btn" id="mobileExpandBtn">&#9660;</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">&#9650;</button>
+
+      <a href="../index.html" class="back-button">
+        <span class="back-arrow">&larr;</span>
+        <span class="back-text">Back</span>
+      </a>
+
+      <div class="simulation-stats">
+        <div class="stat-item"><span>FPS:</span><span class="stat-value" id="fpsValue">60</span></div>
+        <div class="stat-item"><span class="stat-particle-a">Blue:</span><span class="stat-particle-a" id="countA">0</span></div>
+        <div class="stat-item"><span class="stat-particle-b">Red:</span><span class="stat-particle-b" id="countB">0</span></div>
+      </div>
+
+      <div class="simulation-overlay active" id="overlay">
+        <div class="overlay-text">Solid particle simulation with elastic collisions. Blue reproduces when surrounded by more blue than red. Red moves faster but cannot reproduce.</div>
+        <div class="overlay-buttons">
+          <button class="overlay-button play" id="overlayPlay">Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * Particle-Based Turing Reaction-Diffusion
+     *
+     * Uses Brownian motion in continuous 2D space with stochastic local reactions.
+     * Implements activator-inhibitor dynamics:
+     * - Activator (A): autocatalytic, promotes itself
+     * - Inhibitor (B): generated by A, suppresses A, diffuses faster (DB >> DA)
+     *
+     * Reaction rules (stochastic, within radius r):
+     * 1. Autocatalysis: A + A → 2A + A' (rate k1) - activator promotes birth of new activator
+     * 2. Inhibitor generation: A → A + B (rate k2) - activator creates inhibitor
+     * 3. Suppression: A + B → B (rate k3) - inhibitor kills activator
+     * 4. Decay: A → ∅ (rate decayA), B → ∅ (rate decayB)
+     *
+     * Turing instability requires: DB >> DA (inhibitor diffuses faster than activator)
+     */
+
+    const CONFIG = {
+      // Canvas and simulation size
+      WIDTH: 600,
+      HEIGHT: 600,
+
+      // Diffusion coefficients - controls random force intensity on velocity
+      // Red (inhibitor) moves FASTER than blue (activator)
+      DA: 0.3,    // Activator (blue) diffusion - slower
+      DB: 0.8,    // Inhibitor (red) diffusion - faster
+
+      // Velocity damping (0-1, higher = more friction, smoother movement)
+      damping: 0.95,
+
+      // Particle radius for collision detection
+      particleRadius: 8,
+
+      // Collision elasticity (0-1, where 1 = perfectly elastic)
+      elasticity: 0.8,
+
+      // Reproduction interval (milliseconds)
+      reproductionInterval: 1000,  // 1 second
+
+      // Death timers (milliseconds)
+      blueDeathTimeout: 5000,  // Blue dies if can't reproduce within this time
+      redDeathTimeout: 5000,   // Red dies after this time from birth
+
+      // Collision grace period - newborn particles can overlap parent for this time (milliseconds)
+      collisionGracePeriod: 500,  // 0.5 seconds
+
+      // Cell division velocity - how fast offspring move away from parent
+      divisionSpeed: 2.5,
+
+      // Initial particle count (for testing, start with 1 blue)
+      initialBlueParticles: 1,
+      initialRedParticles: 0,
+
+      // Simulation speed multiplier
+      speed: 1.0,
+
+      // Rendering
+      renderMode: 'particles',
+      colorScheme: 'dualParticle',
+
+      // === SPATIAL GRID SETTINGS (Particle-Grid Architecture) ===
+      // Grid cell size in pixels (used for neighbor lookup)
+      gridCellSize: 25,  // ~sensing radius, enables O(1) neighbor lookup
+
+      // Sensing radius for reproduction decisions (in pixels)
+      sensingRadius: 40,
+
+      // Base reproduction probability (0-1)
+      baseReproductionRate: 0.8,
+
+      // Max local density before reproduction stops (particles per sensing area)
+      maxLocalDensity: 15,
+
+      // Show grid visualization (debug)
+      showGrid: false,
+
+      // === POPULATION CONTROL ===
+      maxParticles: 1000,        // Hard cap on total particles (blue + red)
+      maxReproducersPerTick: 100, // Max blue particles that can reproduce per interval
+
+      // === CHILD COUNTS PER REPRODUCTION ===
+      blueChildCount: 1,  // Number of blue particles spawned per reproduction
+      redChildCount: 1    // Number of red particles spawned per reproduction
+    };
+
+    // Behavior presets - each creates distinct emergent patterns
+    const PRESETS = {
+      // 1. Stable Territory Clusters - clean dominance pockets with clear boundaries
+      territory: {
+        DA: 0.3, DB: 1.1, initialBlueParticles: 5, particleRadius: 7,
+        reproductionInterval: 1500, baseReproductionRate: 0.4,
+        maxLocalDensity: 12, redDeathTimeout: 10000, blueDeathTimeout: 6000,
+        damping: 0.95
+      },
+      // 2. Pulsating Expansion-Collapse - predator-prey oscillation cycles
+      pulse: {
+        DA: 0.3, DB: 0.5, initialBlueParticles: 3, particleRadius: 8,
+        reproductionInterval: 1000, baseReproductionRate: 0.6,
+        maxLocalDensity: 20, redDeathTimeout: 5500, blueDeathTimeout: 5000,
+        damping: 0.95
+      },
+      // 3. Chaotic Competitive Blobs - energetic, rapidly shifting dominance
+      chaos: {
+        DA: 0.4, DB: 0.9, initialBlueParticles: 8, particleRadius: 6,
+        reproductionInterval: 900, baseReproductionRate: 0.75,
+        maxLocalDensity: 35, redDeathTimeout: 3500, blueDeathTimeout: 4000,
+        damping: 0.92
+      },
+      // 4. Blue Dominance - inhibitor too weak, blue fills canvas
+      blueDom: {
+        DA: 0.3, DB: 0.35, initialBlueParticles: 3, particleRadius: 8,
+        reproductionInterval: 1000, baseReproductionRate: 0.8,
+        maxLocalDensity: 30, redDeathTimeout: 3000, blueDeathTimeout: 6000,
+        damping: 0.95
+      },
+      // 5. Suppressed Freeze - over-inhibited, slow scattered clusters
+      freeze: {
+        DA: 0.25, DB: 1.0, initialBlueParticles: 5, particleRadius: 8,
+        reproductionInterval: 2500, baseReproductionRate: 0.2,
+        maxLocalDensity: 9, redDeathTimeout: 12000, blueDeathTimeout: 8000,
+        damping: 0.96
+      }
+    };
+
+    // Color schemes for density rendering
+    const COLORS = {
+      dualParticle: (a, b) => {
+        // Cyan for activators (A), orange for inhibitors (B) - matching sim3 theme
+        const intensityA = Math.min(1, a * 3);
+        const intensityB = Math.min(1, b * 2);
+        // Blend: cyan activators with orange inhibitor influence
+        const r = Math.floor(intensityA * 0 + intensityB * 255 * 0.3);
+        const g = Math.floor(intensityA * 212);
+        const bl = Math.floor(intensityA * 255 * 0.8);
+        return [r, g, bl];
+      },
+      neonCyan: (a, b) => {
+        const intensity = Math.min(1, a * 3);
+        return [Math.floor(intensity * 20), Math.floor(intensity * 212), Math.floor(intensity * 255)];
+      },
+      fire: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.min(255, Math.floor(v * 400)), Math.floor(v * 150), Math.floor(v * 40)];
+      },
+      ocean: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.floor(v * 40), Math.floor(80 + v * 120), Math.floor(120 + v * 135)];
+      },
+      purple: (a, b) => {
+        const v = Math.min(1, a * 3);
+        return [Math.floor(80 + v * 175), Math.floor(v * 60), Math.floor(120 + v * 135)];
+      },
+      classic: (a, b) => {
+        const v = Math.min(255, Math.floor(a * 3 * 255));
+        return [v, v, v];
+      }
+    };
+
+    /**
+     * PARTICLE-GRID SIMULATION
+     *
+     * Architecture:
+     * - Particles: Handle position, velocity, Brownian motion, collisions, rendering
+     * - Spatial Grid: Fast O(1) neighbor lookup for local density counting
+     *
+     * Reproduction Logic:
+     * - Count blue and red particles within sensing radius using grid
+     * - Blue reproduces if blueCount >= redCount with density-based probability
+     * - No continuous field diffusion - pure agent-based local interactions
+     *
+     * Performance: O(N) with spatial partitioning instead of O(N²)
+     */
+    class TuringParticles {
+      constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.particlesA = [];  // Blue (activators)
+        this.particlesB = [];  // Red (inhibitors)
+
+        // Spatial grid for fast neighbor lookup
+        this.gridCellSize = CONFIG.gridCellSize;
+        this.gridCols = Math.ceil(width / this.gridCellSize);
+        this.gridRows = Math.ceil(height / this.gridCellSize);
+        this.grid = [];
+
+        this.init();
+      }
+
+      init() {
+        this.particlesA = [];
+        this.particlesB = [];
+        this.nextParticleId = 1;
+        const now = performance.now();
+
+        // Initialize empty grid
+        this.clearGrid();
+
+        // Create blue (activator) particles - start in center
+        for (let i = 0; i < CONFIG.initialBlueParticles; i++) {
+          const x = this.width / 2 + (Math.random() - 0.5) * 50;
+          const y = this.height / 2 + (Math.random() - 0.5) * 50;
+          this.particlesA.push({
+            id: this.nextParticleId++,
+            x: x,
+            y: y,
+            vx: 0,
+            vy: 0,
+            lastReproduced: now,
+            birthTime: 0,
+            parentId: null,
+            type: 'A'
+          });
+        }
+
+        // Create red (inhibitor) particles if any
+        for (let i = 0; i < CONFIG.initialRedParticles; i++) {
+          this.particlesB.push({
+            id: this.nextParticleId++,
+            x: Math.random() * this.width,
+            y: Math.random() * this.height,
+            vx: 0,
+            vy: 0,
+            birthTime: 0,
+            parentId: null,
+            type: 'B'
+          });
+        }
+
+        this.rebuildGrid();
+      }
+
+      // === SPATIAL GRID METHODS ===
+
+      // Clear grid - O(gridCells)
+      clearGrid() {
+        this.grid = [];
+        for (let i = 0; i < this.gridCols * this.gridRows; i++) {
+          this.grid.push([]);
+        }
+      }
+
+      // Get grid cell index for a position
+      getGridIndex(x, y) {
+        const col = Math.floor(x / this.gridCellSize);
+        const row = Math.floor(y / this.gridCellSize);
+        // Clamp to grid bounds
+        const clampedCol = Math.max(0, Math.min(col, this.gridCols - 1));
+        const clampedRow = Math.max(0, Math.min(row, this.gridRows - 1));
+        return clampedRow * this.gridCols + clampedCol;
+      }
+
+      // Rebuild spatial grid - O(N)
+      rebuildGrid() {
+        this.clearGrid();
+        // Insert all particles into grid
+        for (const p of this.particlesA) {
+          const idx = this.getGridIndex(p.x, p.y);
+          this.grid[idx].push(p);
+        }
+        for (const p of this.particlesB) {
+          const idx = this.getGridIndex(p.x, p.y);
+          this.grid[idx].push(p);
+        }
+      }
+
+      // Get particles in neighboring cells (current + 8 surrounding)
+      getNeighborParticles(x, y) {
+        const neighbors = [];
+        const col = Math.floor(x / this.gridCellSize);
+        const row = Math.floor(y / this.gridCellSize);
+
+        // Check 3x3 grid of cells centered on particle's cell
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const c = col + dx;
+            const r = row + dy;
+            // Skip out-of-bounds cells
+            if (c < 0 || c >= this.gridCols || r < 0 || r >= this.gridRows) continue;
+            const idx = r * this.gridCols + c;
+            for (const p of this.grid[idx]) {
+              neighbors.push(p);
+            }
+          }
+        }
+        return neighbors;
+      }
+
+      // Count blue and red particles within sensing radius - O(1) average with grid
+      countLocalParticles(particle) {
+        const sensingRadius = CONFIG.sensingRadius;
+        const sensingRadiusSq = sensingRadius * sensingRadius;
+        const neighbors = this.getNeighborParticles(particle.x, particle.y);
+
+        let blueCount = 0;
+        let redCount = 0;
+
+        for (const p of neighbors) {
+          if (p === particle) continue; // Don't count self
+          const dx = p.x - particle.x;
+          const dy = p.y - particle.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq <= sensingRadiusSq) {
+            if (p.type === 'A') {
+              blueCount++;
+            } else {
+              redCount++;
+            }
+          }
+        }
+
+        return { blueCount, redCount, totalCount: blueCount + redCount };
+      }
+
+      // === PARTICLE METHODS ===
+
+      gaussianRandom() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+      }
+
+      inGracePeriod(p1, p2, now) {
+        const grace = CONFIG.collisionGracePeriod;
+        if (p2.parentId === p1.id && (now - p2.birthTime) < grace) return true;
+        if (p1.parentId === p2.id && (now - p1.birthTime) < grace) return true;
+        return false;
+      }
+
+      resolveCollision(p1, p2, now) {
+        if (this.inGracePeriod(p1, p2, now)) return;
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = CONFIG.particleRadius * 2;
+
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const dvx = p1.vx - p2.vx;
+          const dvy = p1.vy - p2.vy;
+          const dvn = dvx * nx + dvy * ny;
+
+          if (dvn > 0) {
+            const restitution = CONFIG.elasticity;
+            const impulse = (1 + restitution) * dvn / 2;
+            p1.vx -= impulse * nx;
+            p1.vy -= impulse * ny;
+            p2.vx += impulse * nx;
+            p2.vy += impulse * ny;
+          }
+
+          const overlap = minDist - dist;
+          const separationX = (overlap / 2 + 0.5) * nx;
+          const separationY = (overlap / 2 + 0.5) * ny;
+          p1.x -= separationX;
+          p1.y -= separationY;
+          p2.x += separationX;
+          p2.y += separationY;
+        }
+      }
+
+      // === MAIN STEP FUNCTION ===
+      step(dt = 1) {
+        const { DA, DB, damping, particleRadius, divisionSpeed, reproductionInterval,
+                blueDeathTimeout, redDeathTimeout, baseReproductionRate, maxLocalDensity } = CONFIG;
+        const now = performance.now();
+
+        const newA = [];
+        const newB = [];
+        const removeA = new Set();
+        const removeB = new Set();
+
+        // 1. Apply Brownian motion to particles
+        for (const p of this.particlesA) {
+          p.vx += Math.sqrt(2 * DA * dt) * this.gaussianRandom();
+          p.vy += Math.sqrt(2 * DA * dt) * this.gaussianRandom();
+          p.vx *= damping;
+          p.vy *= damping;
+        }
+
+        for (const p of this.particlesB) {
+          p.vx += Math.sqrt(2 * DB * dt) * this.gaussianRandom();
+          p.vy += Math.sqrt(2 * DB * dt) * this.gaussianRandom();
+          p.vx *= damping;
+          p.vy *= damping;
+        }
+
+        // 2. Move particles with wall bounce
+        const allParticles = [...this.particlesA, ...this.particlesB];
+
+        for (const p of allParticles) {
+          let newX = p.x + p.vx * dt;
+          let newY = p.y + p.vy * dt;
+
+          if (newX < particleRadius) {
+            newX = particleRadius;
+            p.vx = Math.abs(p.vx) * CONFIG.elasticity;
+          } else if (newX > this.width - particleRadius) {
+            newX = this.width - particleRadius;
+            p.vx = -Math.abs(p.vx) * CONFIG.elasticity;
+          }
+
+          if (newY < particleRadius) {
+            newY = particleRadius;
+            p.vy = Math.abs(p.vy) * CONFIG.elasticity;
+          } else if (newY > this.height - particleRadius) {
+            newY = this.height - particleRadius;
+            p.vy = -Math.abs(p.vy) * CONFIG.elasticity;
+          }
+
+          p.x = newX;
+          p.y = newY;
+        }
+
+        // 3. Rebuild spatial grid after movement - O(N)
+        this.rebuildGrid();
+
+        // 4. Resolve collisions using grid for neighbor lookup
+        for (let i = 0; i < allParticles.length; i++) {
+          const p1 = allParticles[i];
+          const neighbors = this.getNeighborParticles(p1.x, p1.y);
+
+          for (const p2 of neighbors) {
+            if (p1 === p2) continue;
+            if (allParticles.indexOf(p2) <= i) continue;
+            this.resolveCollision(p1, p2, now);
+          }
+        }
+
+        // 5. Blue reproduction - Grid-based local particle counting
+        // Population control: limit reproduction rate and total particles
+        const currentTotal = this.particlesA.length + this.particlesB.length;
+        const maxParticles = CONFIG.maxParticles;
+        const maxReproducers = CONFIG.maxReproducersPerTick;
+        let reproductionCount = 0;
+
+        for (let i = 0; i < this.particlesA.length; i++) {
+          const blue = this.particlesA[i];
+          const timeSinceLastRepro = now - blue.lastReproduced;
+
+          if (timeSinceLastRepro >= reproductionInterval) {
+            // Check population limits BEFORE reproducing
+            const projectedTotal = currentTotal + newA.length + newB.length;
+            const childrenPerBirth = CONFIG.blueChildCount + CONFIG.redChildCount;
+            const canReproduce = projectedTotal + childrenPerBirth <= maxParticles && reproductionCount < maxReproducers;
+
+            if (canReproduce) {
+              // Count actual particles in sensing radius using grid
+              const { blueCount, redCount, totalCount } = this.countLocalParticles(blue);
+
+              // Blue reproduces if blueCount >= redCount (more friends than enemies nearby)
+              if (blueCount >= redCount) {
+                // Density-based reproduction probability
+                // reproductionChance = baseRate * (1 - localDensity / maxDensity)
+                const densityFactor = Math.max(0, 1 - totalCount / maxLocalDensity);
+                const reproductionChance = baseReproductionRate * densityFactor;
+
+                if (Math.random() < reproductionChance) {
+                  // Spawn blue children
+                  for (let c = 0; c < CONFIG.blueChildCount; c++) {
+                    const blueAngle = Math.random() * Math.PI * 2;
+                    newA.push({
+                      id: this.nextParticleId++,
+                      x: blue.x,
+                      y: blue.y,
+                      vx: Math.cos(blueAngle) * divisionSpeed,
+                      vy: Math.sin(blueAngle) * divisionSpeed,
+                      lastReproduced: now,
+                      birthTime: now,
+                      parentId: blue.id,
+                      type: 'A'
+                    });
+
+                    // Push parent opposite direction (smaller push per child)
+                    blue.vx -= Math.cos(blueAngle) * divisionSpeed * 0.3;
+                    blue.vy -= Math.sin(blueAngle) * divisionSpeed * 0.3;
+                  }
+
+                  // Spawn red children
+                  for (let c = 0; c < CONFIG.redChildCount; c++) {
+                    const redAngle = Math.random() * Math.PI * 2;
+                    newB.push({
+                      id: this.nextParticleId++,
+                      x: blue.x,
+                      y: blue.y,
+                      vx: Math.cos(redAngle) * divisionSpeed * 1.3,
+                      vy: Math.sin(redAngle) * divisionSpeed * 1.3,
+                      birthTime: now,
+                      parentId: blue.id,
+                      type: 'B'
+                    });
+                  }
+
+                  blue.lastReproduced = now;
+                  reproductionCount++;
+                } else {
+                  // Conditions met but probability check failed - reset timer
+                  blue.lastReproduced = now;
+                }
+              }
+            } else {
+              // Can't reproduce due to population cap - reset timer if conditions were met
+              const { blueCount, redCount } = this.countLocalParticles(blue);
+              if (blueCount >= redCount) {
+                blue.lastReproduced = now; // "Tried" to reproduce, reset death timer
+              }
+            }
+          }
+
+          // Death check - blue dies if can't reproduce within timeout
+          if (timeSinceLastRepro >= blueDeathTimeout) {
+            removeA.add(i);
+          }
+        }
+
+        // Red death check - red dies after redDeathTimeout from birth
+        for (let i = 0; i < this.particlesB.length; i++) {
+          const red = this.particlesB[i];
+          const age = now - red.birthTime;
+          if (age >= redDeathTimeout) {
+            removeB.add(i);
+          }
+        }
+
+        // 6. Apply changes
+        this.particlesA = this.particlesA.filter((_, i) => !removeA.has(i));
+        this.particlesB = this.particlesB.filter((_, i) => !removeB.has(i));
+        for (const p of newA) this.particlesA.push(p);
+        for (const p of newB) this.particlesB.push(p);
+
+        // Rebuild grid with new particles
+        this.rebuildGrid();
+      }
+
+      // === RENDERING ===
+
+      // Render grid visualization (debug) - shows particle density per cell
+      renderGrid(ctx) {
+        const cs = this.gridCellSize;
+
+        for (let row = 0; row < this.gridRows; row++) {
+          for (let col = 0; col < this.gridCols; col++) {
+            const idx = row * this.gridCols + col;
+            const particles = this.grid[idx];
+
+            if (particles.length > 0) {
+              // Count blue and red in this cell
+              let blueCount = 0;
+              let redCount = 0;
+              for (const p of particles) {
+                if (p.type === 'A') blueCount++;
+                else redCount++;
+              }
+
+              // Color based on particle type ratio
+              const total = blueCount + redCount;
+              const intensity = Math.min(1, total / 5);
+              const blueRatio = blueCount / total;
+
+              const r = Math.floor((1 - blueRatio) * 150 * intensity);
+              const b = Math.floor(blueRatio * 150 * intensity);
+
+              ctx.fillStyle = `rgba(${r}, 50, ${b}, 0.3)`;
+              ctx.fillRect(col * cs, row * cs, cs, cs);
+            }
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.strokeRect(col * cs, row * cs, cs, cs);
+          }
+        }
+      }
+
+      renderParticles(ctx) {
+        // Clear with gradient background
+        const gradient = ctx.createLinearGradient(0, 0, this.width, this.height);
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(1, '#1a1a2e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // Optionally render spatial grid (debug visualization)
+        if (CONFIG.showGrid) {
+          this.renderGrid(ctx);
+        }
+
+        const radius = CONFIG.particleRadius;
+        const totalParticles = this.particlesA.length + this.particlesB.length;
+        let shadowBlur = totalParticles > 200 ? 5 : 12;
+
+        const now = performance.now();
+        const grace = CONFIG.collisionGracePeriod;
+
+        // Draw blue activators
+        ctx.shadowBlur = shadowBlur;
+        for (const p of this.particlesA) {
+          const age = now - p.birthTime;
+          const isNewborn = age < grace && p.birthTime > 0;
+
+          if (isNewborn) {
+            const t = age / grace;
+            const glowIntensity = 1 - t;
+            ctx.shadowColor = `rgba(100, 200, 255, ${0.8 + glowIntensity * 0.4})`;
+            ctx.fillStyle = `rgb(${80 + 100 * glowIntensity}, ${180 + 50 * glowIntensity}, 255)`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius * (1 + 0.3 * glowIntensity), 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.shadowColor = 'rgba(30, 144, 255, 0.8)';
+            ctx.fillStyle = 'rgb(30, 144, 255)';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // Draw red inhibitors
+        for (const p of this.particlesB) {
+          const age = now - p.birthTime;
+          const isNewborn = age < grace && p.birthTime > 0;
+
+          if (isNewborn) {
+            const t = age / grace;
+            const glowIntensity = 1 - t;
+            ctx.shadowColor = `rgba(255, 100, 100, ${0.8 + glowIntensity * 0.4})`;
+            ctx.fillStyle = `rgb(255, ${80 + 80 * glowIntensity}, ${80 + 80 * glowIntensity})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius * (1 + 0.3 * glowIntensity), 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.shadowColor = 'rgba(220, 60, 60, 0.8)';
+            ctx.fillStyle = 'rgb(220, 60, 60)';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // Mobile detection
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    }
+
+    // Main simulation controller
+    const Sim = {
+      canvas: null,
+      ctx: null,
+      sim: null,
+      running: false,
+      fps: 0,
+      frameCount: 0,
+      lastFpsTime: 0,
+
+      init() {
+        this.canvas = document.getElementById('simulationCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        // Size canvas to fill container
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+
+        CONFIG.WIDTH = this.canvas.width;
+        CONFIG.HEIGHT = this.canvas.height;
+
+        this.sim = new TuringParticles(CONFIG.WIDTH, CONFIG.HEIGHT);
+        this.render();
+        this.loop();
+
+        // Handle resize
+        window.addEventListener('resize', () => this.resize());
+      },
+
+      resize() {
+        const wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+        CONFIG.WIDTH = this.canvas.width;
+        CONFIG.HEIGHT = this.canvas.height;
+      },
+
+      loop() {
+        requestAnimationFrame(() => this.loop());
+
+        // FPS calculation
+        this.frameCount++;
+        const now = performance.now();
+        if (now - this.lastFpsTime >= 1000) {
+          this.fps = this.frameCount;
+          this.frameCount = 0;
+          this.lastFpsTime = now;
+          document.getElementById('fpsValue').textContent = this.fps;
+          document.getElementById('countA').textContent = this.sim.particlesA.length;
+          document.getElementById('countB').textContent = this.sim.particlesB.length;
+        }
+
+        if (this.running) {
+          // Slower step for visible movement, scaled by speed
+          this.sim.step(0.3 * CONFIG.speed);
+        }
+
+        this.render();
+      },
+
+      render() {
+        this.sim.renderParticles(this.ctx);
+      },
+
+      play() { this.running = true; },
+      pause() { this.running = false; },
+      reset() {
+        this.sim = new TuringParticles(CONFIG.WIDTH, CONFIG.HEIGHT);
+        this.render();
+      }
+    };
+
+    // UI Setup
+    document.addEventListener('DOMContentLoaded', () => {
+      Sim.init();
+
+      const overlay = document.getElementById('overlay');
+      const hideOverlay = () => overlay.classList.remove('active');
+      const showOverlay = () => overlay.classList.add('active');
+
+      // Playback buttons
+      document.getElementById('playBtn').onclick = () => { Sim.play(); hideOverlay(); };
+      document.getElementById('pauseBtn').onclick = () => { Sim.pause(); showOverlay(); };
+      document.getElementById('resetBtn').onclick = () => { Sim.pause(); Sim.reset(); showOverlay(); };
+      document.getElementById('overlayPlay').onclick = () => { Sim.play(); hideOverlay(); };
+
+      // Parameter sliders
+      const sliders = [
+        { id: 'diffusionA', key: 'DA', display: 'daValue', decimals: 2 },
+        { id: 'diffusionB', key: 'DB', display: 'dbValue', decimals: 2 },
+        { id: 'particleRadius', key: 'particleRadius', display: 'radiusValue', decimals: 0 },
+        { id: 'elasticity', key: 'elasticity', display: 'elasticityValue', decimals: 2 },
+        { id: 'reproductionInterval', key: 'reproductionInterval', display: 'reproIntervalValue', decimals: 0 },
+        { id: 'blueDeathTimeout', key: 'blueDeathTimeout', display: 'blueDeathValue', decimals: 0 },
+        { id: 'redDeathTimeout', key: 'redDeathTimeout', display: 'redDeathValue', decimals: 0 },
+        { id: 'initialBlue', key: 'initialBlueParticles', display: 'blueCountValue', decimals: 0 },
+        { id: 'simSpeed', key: 'speed', display: 'speedValue', decimals: 1 },
+        { id: 'baseReproductionRate', key: 'baseReproductionRate', display: 'reproRateValue', decimals: 2 },
+        { id: 'maxParticles', key: 'maxParticles', display: 'maxParticlesValue', decimals: 0 },
+        { id: 'maxReproducersPerTick', key: 'maxReproducersPerTick', display: 'maxReproducersValue', decimals: 0 },
+        { id: 'blueChildCount', key: 'blueChildCount', display: 'blueChildValue', decimals: 0 },
+        { id: 'redChildCount', key: 'redChildCount', display: 'redChildValue', decimals: 0 }
+      ];
+
+      // Grid visualization toggle
+      document.getElementById('showGridToggle').onchange = (e) => {
+        CONFIG.showGrid = e.target.checked;
+      };
+
+      sliders.forEach(({ id, key, display, decimals }) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.oninput = (e) => {
+            CONFIG[key] = parseFloat(e.target.value);
+            document.getElementById(display).textContent = decimals > 0 ? CONFIG[key].toFixed(decimals) : CONFIG[key];
+          };
+        }
+      });
+
+      // Preset buttons - sync all parameters to UI
+      document.querySelectorAll('.preset-btn[data-preset]').forEach(btn => {
+        btn.onclick = () => {
+          const preset = PRESETS[btn.dataset.preset];
+          if (preset) {
+            Object.assign(CONFIG, preset);
+            // Update all UI sliders
+            const syncSlider = (id, value, displayId, decimals) => {
+              const el = document.getElementById(id);
+              const disp = document.getElementById(displayId);
+              if (el) el.value = value;
+              if (disp) disp.textContent = decimals > 0 ? value.toFixed(decimals) : value;
+            };
+            syncSlider('diffusionA', CONFIG.DA, 'daValue', 2);
+            syncSlider('diffusionB', CONFIG.DB, 'dbValue', 2);
+            syncSlider('particleRadius', CONFIG.particleRadius, 'radiusValue', 0);
+            syncSlider('initialBlue', CONFIG.initialBlueParticles, 'blueCountValue', 0);
+            syncSlider('reproductionInterval', CONFIG.reproductionInterval, 'reproIntervalValue', 0);
+            syncSlider('blueDeathTimeout', CONFIG.blueDeathTimeout, 'blueDeathValue', 0);
+            syncSlider('redDeathTimeout', CONFIG.redDeathTimeout, 'redDeathValue', 0);
+            syncSlider('baseReproductionRate', CONFIG.baseReproductionRate, 'reproRateValue', 2);
+            Sim.reset();
+          }
+        };
+      });
+
+      // Sidebar toggle
+      const sidebar = document.getElementById('simulationSidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      toggle.onclick = () => {
+        sidebar.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
+        toggle.textContent = sidebar.classList.contains('collapsed') ? '\u2630' : '\u2715';
+      };
+
+      // Mobile buttons
+      document.getElementById('mobileExpandBtn').onclick = () => {
+        sidebar.classList.remove('collapsed');
+        toggle.classList.remove('collapsed');
+      };
+      document.getElementById('mobileCollapseBtn').onclick = () => {
+        sidebar.classList.add('collapsed');
+        toggle.classList.add('collapsed');
+      };
+    });
+  </script>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
