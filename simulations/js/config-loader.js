@@ -95,7 +95,7 @@ class SimulationConfigLoader {
       simulations.push(simulation);
     }
 
-    return simulations;
+    return simulations.reverse();
   }
 
   parseCSVLine(line) {

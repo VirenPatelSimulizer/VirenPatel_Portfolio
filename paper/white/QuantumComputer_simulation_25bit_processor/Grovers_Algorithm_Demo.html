@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Grover's Algorithm interactive visualization - quantum amplitude amplification on 4 qubits.">
+  <title>Grover's Algorithm Demo - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/css/styles.css">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E');
+  </script>
+
+  <style>
+    /* ── Layout ── */
+    .simulation-container {
+      position: relative; width: 100%;
+      height: calc(100vh - 60px); margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .simulation-sidebar {
+      position: absolute; left: 0; top: 0;
+      width: 290px; max-width: 290px; height: 100%;
+      background: rgba(20,20,40,0.95); backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 14px; box-sizing: border-box;
+      overflow-y: auto;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      z-index: 100; color: #e0e0e0;
+    }
+    .simulation-sidebar.collapsed { transform: translateX(-100%); }
+
+    .sidebar-toggle {
+      position: absolute; right: -32px; top: 50%;
+      transform: translateY(-50%);
+      width: 32px; height: 48px;
+      background: rgba(20,20,40,0.95);
+      border: 1px solid rgba(255,255,255,0.1); border-left: none;
+      border-radius: 0 6px 6px 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #e0e0e0; font-size: 14px; transition: background 0.2s;
+    }
+    .sidebar-toggle:hover { background: rgba(74,158,255,0.2); }
+
+    .sidebar-title {
+      font-size: 14px; font-weight: 700; color: #4a9eff;
+      margin-bottom: 12px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Stats panel ── */
+    .stats-panel {
+      background: rgba(10,10,25,0.6);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;
+    }
+    .stat-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 5px;
+      font-size: 12px;
+    }
+    .stat-row:last-child { margin-bottom: 0; }
+    .stat-label { color: #8090b0; }
+    .stat-value { color: #4a9eff; font-weight: 600; }
+    .stat-value.gold { color: #fbbf24; }
+    .stat-value.green { color: #4ade80; }
+
+    /* ── Phase badge ── */
+    .phase-badge {
+      padding: 5px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      text-align: center; margin: 8px 0;
+    }
+    .phase-badge.initial  { background: rgba(74,158,255,0.15); color: #4a9eff;  border: 1px solid rgba(74,158,255,0.3); }
+    .phase-badge.oracle   { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
+    .phase-badge.diffusion{ background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+    .phase-badge.complete { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+
+    /* ── Quantum advantage box ── */
+    .advantage-box {
+      background: rgba(10,10,30,0.5);
+      border: 1px solid rgba(74,158,255,0.15);
+      border-radius: 6px; padding: 8px 10px; margin-bottom: 12px;
+    }
+    .adv-row {
+      display: flex; justify-content: space-between;
+      font-size: 11px; margin-bottom: 4px;
+    }
+    .adv-label { color: #6070a0; }
+    .adv-val   { color: #e0e0e0; font-weight: 600; }
+    .adv-val.quantum { color: #4ade80; }
+    .adv-speedup {
+      font-size: 12px; font-weight: 700; color: #fbbf24;
+      text-align: center; margin-top: 5px;
+      padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ── Section labels / dividers ── */
+    .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 10px 0; }
+    .section-label {
+      font-size: 10px; font-weight: 600; color: #6080a0;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+    }
+
+    /* ── Bit selector ── */
+    .bit-selector { display: flex; gap: 4px; justify-content: center; margin: 6px 0 4px; flex-wrap: wrap; }
+    .bit-btn {
+      width: 26px; height: 26px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+      color: #6070a0; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.18s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bit-btn.one {
+      background: rgba(74,158,255,0.2); border-color: #4a9eff; color: #4a9eff;
+    }
+    .bit-btn:hover { background: rgba(74,158,255,0.25); border-color: rgba(74,158,255,0.5); color: #9ec8ff; }
+    .target-display {
+      text-align: center; font-size: 12px; color: #fbbf24;
+      font-weight: 600; margin-bottom: 6px; letter-spacing: 0.5px;
+    }
+
+    /* ── Controls ── */
+    .control-group { margin-bottom: 12px; }
+    .control-label {
+      display: block; font-size: 11px; font-weight: 500;
+      margin-bottom: 5px; color: #b0b0b0;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .control-value { float: right; color: #4a9eff; font-weight: 600; }
+    .control-input {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 5px;
+      background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; cursor: pointer;
+    }
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; background: #4a9eff; border-radius: 50%; cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .control-input::-webkit-slider-thumb:hover { transform: scale(1.25); }
+    .control-input::-moz-range-thumb {
+      width: 14px; height: 14px; background: #4a9eff; border-radius: 50%; cursor: pointer; border: none;
+    }
+
+    /* ── Toggle switch ── */
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .toggle-label { font-size: 11px; color: #b0b0b0; text-transform: uppercase; letter-spacing: 0.4px; }
+    .toggle-switch {
+      position: relative; width: 34px; height: 18px; cursor: pointer;
+    }
+    .toggle-switch input { display: none; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 9px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 12px; height: 12px; background: #6080a0; border-radius: 50%;
+      transition: left 0.2s, background 0.2s;
+    }
+    .toggle-switch.on .toggle-track { background: rgba(74,158,255,0.25); border-color: #4a9eff; }
+    .toggle-switch.on .toggle-thumb  { left: 18px; background: #4a9eff; }
+
+    /* ── Action buttons ── */
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .action-btn {
+      padding: 9px 4px; font-size: 11px; font-weight: 600;
+      border-radius: 6px; cursor: pointer; text-align: center;
+      transition: all 0.2s; line-height: 1.3;
+    }
+    .action-btn.step {
+      background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); color: #4ade80;
+    }
+    .action-btn.step:hover { background: rgba(74,222,128,0.25); border-color: #4ade80; }
+    .action-btn.step:disabled { opacity: 0.35; cursor: not-allowed; }
+    .action-btn.auto {
+      background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); color: #a855f7;
+    }
+    .action-btn.auto:hover  { background: rgba(168,85,247,0.25); border-color: #a855f7; }
+    .action-btn.auto.active { background: rgba(168,85,247,0.3);  border-color: #a855f7; }
+    .action-btn.reset {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #ef4444;
+    }
+    .action-btn.reset:hover { background: rgba(239,68,68,0.25); border-color: #ef4444; }
+
+    /* ── Info text ── */
+    .info-text {
+      font-size: 10px; color: #5060a0; line-height: 1.5;
+      margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;
+    }
+
+    /* ── Canvas wrapper ── */
+    .simulation-canvas-wrapper {
+      flex: 1; position: relative;
+      margin-left: 290px;
+      transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .simulation-canvas-wrapper.sidebar-collapsed { margin-left: 0; }
+    #simulationCanvas { display: block; width: 100%; height: 100%; cursor: default; }
+
+    /* ── Sidebar control btn ── */
+    .sidebar-control-btn {
+      position: absolute; left: 10px; top: 10px;
+      width: 34px; height: 34px;
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; color: #e0e0e0; font-size: 16px; z-index: 150; transition: all 0.2s;
+    }
+    .sidebar-control-btn:hover { background: rgba(74,158,255,0.2); border-color: #4a9eff; }
+
+    /* ── Back button ── */
+    .back-button {
+      position: absolute; top: 12px; right: 12px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #e0e0e0; text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: all 0.3s; z-index: 150;
+    }
+    .back-button:hover { background: rgba(30,30,50,0.95); border-color: #4a9eff; color: #4a9eff; transform: translateX(-2px); }
+
+    /* ── Canvas stats overlay ── */
+    .simulation-stats {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e0e0e0; font-size: 11px;
+      z-index: 50; display: flex; gap: 16px;
+    }
+    .stat-item { display: flex; gap: 6px; align-items: center; }
+    .stat-item .stat-v { color: #4a9eff; font-weight: 600; }
+
+    /* ── Overlay ── */
+    .simulation-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(5,5,15,0.75); backdrop-filter: blur(4px);
+      z-index: 200; transition: opacity 0.3s;
+    }
+    .simulation-overlay.hidden { opacity: 0; pointer-events: none; }
+    .overlay-content { text-align: center; max-width: 480px; padding: 20px; }
+    .overlay-title { font-size: 22px; font-weight: 700; color: #e0e0e0; margin-bottom: 6px; }
+    .overlay-desc { font-size: 13px; color: #7080a0; margin-bottom: 20px; line-height: 1.6; }
+    .overlay-buttons { display: flex; gap: 12px; justify-content: center; }
+    .overlay-button {
+      padding: 11px 28px; font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;
+    }
+    .overlay-button.play { background: rgba(74,158,255,0.2); border-color: #4a9eff; }
+    .overlay-button.play:hover { background: rgba(74,158,255,0.4); box-shadow: 0 0 20px rgba(74,158,255,0.3); }
+    .overlay-button.reset2 { background: rgba(239,68,68,0.15); border-color: #ef4444; }
+    .overlay-button.reset2:hover { background: rgba(239,68,68,0.3); }
+
+    /* ── Mobile ── */
+    .mobile-expand-btn, .mobile-collapse-btn {
+      display: none; position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      padding: 8px 20px; font-size: 12px; font-weight: 600;
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+      color: #e0e0e0; cursor: pointer; z-index: 200;
+    }
+
+    @media (max-width: 768px) {
+      .simulation-sidebar {
+        left: 0; top: auto; bottom: 0; width: 100%; max-width: 100%; height: 50%;
+        border-right: none; border-top: 1px solid rgba(255,255,255,0.1);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .simulation-sidebar.collapsed { transform: translateY(100%); }
+      .simulation-sidebar.expanded  { transform: translateY(0); }
+      .sidebar-toggle { display: none; }
+      .simulation-canvas-wrapper { margin-left: 0 !important; }
+      .sidebar-control-btn { display: none !important; }
+      .mobile-expand-btn, .mobile-collapse-btn { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <header>
+    <nav>
+      <div class="logo"><a href="index.html">Viren Patel</a></div>
+      <div class="logo"><a>Grover's Algorithm Demo</a></div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+      <div class="sidebar-title">Grover's Algorithm</div>
+
+      <!-- Stats -->
+      <div class="stats-panel">
+        <div class="stat-row">
+          <span class="stat-label">Iteration</span>
+          <span class="stat-value" id="sbIter">0 / 3</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">P(target)</span>
+          <span class="stat-value gold" id="sbProb">6.25%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Phase</span>
+          <span class="stat-value" id="sbPhase">Initial</span>
+        </div>
+      </div>
+      <div class="phase-badge initial" id="phaseBadge">Initial Superposition</div>
+
+      <!-- Quantum Advantage -->
+      <div class="advantage-box">
+        <div class="adv-row"><span class="adv-label">Classical queries</span><span class="adv-val" id="advClassical">O(16)</span></div>
+        <div class="adv-row"><span class="adv-label">Grover queries</span><span class="adv-val quantum" id="advQuantum">O(3)</span></div>
+        <div class="adv-speedup" id="advSpeedup">≈ 5.3× faster</div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Target State</div>
+
+      <div class="bit-selector" id="bitSelector"></div>
+      <div class="target-display" id="targetDisplay">|0111⟩ = 7</div>
+
+      <hr class="section-divider">
+      <div class="section-label">Parameters</div>
+
+      <div class="control-group">
+        <label class="control-label">Qubits (N = 2^n) <span class="control-value" id="qubitsVal">4 → 16 states</span></label>
+        <input type="range" class="control-input" id="qubitsRange" min="2" max="5" step="1" value="4">
+      </div>
+      <div class="control-group">
+        <label class="control-label">Animation Speed <span class="control-value" id="speedVal">1.0×</span></label>
+        <input type="range" class="control-input" id="speedRange" min="0.3" max="4" step="0.1" value="1">
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Math</span>
+        <div class="toggle-switch" id="mathToggle">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Controls</div>
+
+      <div class="action-grid">
+        <button class="action-btn step" id="stepBtn">&#9654; Step</button>
+        <button class="action-btn auto" id="autoBtn">&#8635; Auto</button>
+        <button class="action-btn reset" id="resetBtn">&#8617; Reset</button>
+      </div>
+
+      <div class="info-text">
+        Grover's algorithm amplifies the probability of a marked state through
+        oracle (phase-flip) and diffusion (inversion about mean) operations.
+        Each iteration rotates the state vector by 2θ₀ = 2·arcsin(1/√N) toward
+        the target, reaching ~100% after ⌊π√N/4⌋ iterations.
+      </div>
+    </div>
+
+    <!-- Canvas Wrapper -->
+    <div class="simulation-canvas-wrapper" id="canvasWrapper">
+      <canvas id="simulationCanvas"></canvas>
+      <button class="mobile-expand-btn" id="mobileExpandBtn">Controls &#9650;</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">&#9660;</button>
+      <div class="sidebar-control-btn" id="sidebarControlBtn">&#9776;</div>
+      <a href="../../../simulations/index.html" class="back-button"><span>&larr;</span><span>Back</span></a>
+
+      <div class="simulation-stats" id="statsDisplay">
+        <div class="stat-item"><span>ITER</span><span class="stat-v" id="cvIter">0/3</span></div>
+        <div class="stat-item"><span>P(TARGET)</span><span class="stat-v" id="cvProb">6.25%</span></div>
+        <div class="stat-item"><span>FPS</span><span class="stat-v" id="cvFPS">60</span></div>
+      </div>
+
+      <div class="simulation-overlay" id="simulationOverlay">
+        <div class="overlay-content">
+          <div class="overlay-title">Grover's Algorithm</div>
+          <div class="overlay-desc">
+            Interactive visualization of quantum amplitude amplification.<br>
+            Watch how interference steers probability toward the target state<br>
+            through oracle phase-flips and diffusion inversions.
+          </div>
+          <div class="overlay-buttons">
+            <button class="overlay-button play" id="playButton">&#9654; Start</button>
+            <button class="overlay-button reset2" id="resetButton">&#8635; Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  'use strict';
+
+  /* ═══════════════════════════════════════════════
+     HELPERS
+  ═══════════════════════════════════════════════ */
+  function easeInOut(t) { return t < 0.5 ? 2*t*t : -1 + (4-2*t)*t; }
+  function lerp(a, b, t) { return a + (b-a)*t; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function fillPanelBg(ctx, p, c1, c2) {
+    const gr = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+    gr.addColorStop(0, c1); gr.addColorStop(1, c2);
+    ctx.fillStyle = gr;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+  }
+
+  function drawArrowHead(ctx, x0, y0, x1, y1, color, sz = 8) {
+    const a = Math.atan2(y1-y0, x1-x0);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - sz*Math.cos(a - Math.PI/6), y1 - sz*Math.sin(a - Math.PI/6));
+    ctx.lineTo(x1 - sz*Math.cos(a + Math.PI/6), y1 - sz*Math.sin(a + Math.PI/6));
+    ctx.closePath(); ctx.fill();
+  }
+
+  /* ═══════════════════════════════════════════════
+     PARAMETERS
+  ═══════════════════════════════════════════════ */
+  const params = {
+    qubits: 4,
+    speed: 1.0,
+    showMath: false,
+  };
+
+  /* ═══════════════════════════════════════════════
+     QUANTUM STATE
+  ═══════════════════════════════════════════════ */
+  const Q = {
+    qubits: 4,
+    get N()       { return 1 << this.qubits; },
+    get maxIter() { return Math.max(1, Math.floor(Math.PI / 4 * Math.sqrt(this.N))); },
+    get theta0()  { return Math.asin(1 / Math.sqrt(this.N)); },
+    target: 7,
+    amplitudes: [],   // true current amplitudes
+    dispAmps:   [],   // interpolated for display
+    iteration: 0,
+    phase: 'initial', // 'initial'|'oracle'|'diffusion'|'complete'
+  };
+
+  function groverInit() {
+    const amp = 1 / Math.sqrt(Q.N);
+    Q.amplitudes = Array(Q.N).fill(amp);
+    Q.dispAmps   = [...Q.amplitudes];
+    Q.iteration  = 0;
+    Q.phase      = 'initial';
+    Anim.t       = 1;
+    Anim.type    = 'idle';
+    AutoRun.active  = false;
+    AutoRun.elapsed = 0;
+  }
+
+  function applyOracle(amps) {
+    const a = [...amps];
+    a[Q.target] = -a[Q.target];
+    return a;
+  }
+
+  function applyDiffusion(amps) {
+    const mean = amps.reduce((s,a) => s+a, 0) / amps.length;
+    return amps.map(a => 2*mean - a);
+  }
+
+  function stepGrover() {
+    if (!Anim.isDone) return;
+    if (Q.phase === 'complete') return;
+
+    let next; let animType; const baseDur = 0.55 / params.speed;
+
+    if (Q.phase === 'initial' || Q.phase === 'diffusion') {
+      next     = applyOracle(Q.amplitudes);
+      animType = 'oracle';
+      Q.phase  = 'oracle';
+    } else {
+      next      = applyDiffusion(Q.amplitudes);
+      animType  = 'diffusion';
+      Q.iteration++;
+      Q.phase   = Q.iteration >= Q.maxIter ? 'complete' : 'diffusion';
+    }
+
+    Anim.start([...Q.dispAmps], next, animType, baseDur);
+    Q.amplitudes = next;
+  }
+
+  /* ═══════════════════════════════════════════════
+     ANIMATION
+  ═══════════════════════════════════════════════ */
+  const Anim = {
+    t: 1, duration: 0.55, type: 'idle',
+    from: [], to: [],
+
+    start(from, to, type, dur) {
+      this.from = from; this.to = to;
+      this.type = type; this.duration = dur;
+      this.t = 0;
+    },
+
+    update(dt) {
+      if (this.t >= 1) return;
+      this.t = Math.min(1, this.t + dt / this.duration);
+      const e = easeInOut(this.t);
+      for (let i = 0; i < Q.N; i++) {
+        Q.dispAmps[i] = lerp(this.from[i], this.to[i], e);
+      }
+      if (this.t >= 1) { Q.dispAmps = [...this.to]; this.type = 'idle'; }
+    },
+
+    get isDone() { return this.t >= 1; },
+  };
+
+  /* ═══════════════════════════════════════════════
+     AUTO-RUN
+  ═══════════════════════════════════════════════ */
+  const AutoRun = {
+    active: false, elapsed: 0, waitTime: 0.5,
+
+    update(dt) {
+      if (!this.active) return;
+      if (!Anim.isDone) { this.elapsed = 0; return; }
+      if (Q.phase === 'complete') { this.active = false; UI.syncAutoBtn(); return; }
+      this.elapsed += dt;
+      if (this.elapsed >= this.waitTime / params.speed) {
+        this.elapsed = 0;
+        stepGrover();
+      }
+    },
+
+    toggle() {
+      this.active = !this.active;
+      this.elapsed = 0;
+      UI.syncAutoBtn();
+    },
+  };
+
+  /* ═══════════════════════════════════════════════
+     LAYOUT
+  ═══════════════════════════════════════════════ */
+  let L = { cw: 0, ch: 0, panels: [] };
+
+  function updateLayout(cw, ch) {
+    L.cw = cw; L.ch = ch;
+    if (cw >= ch) {
+      const pw = Math.floor(cw / 3);
+      L.panels = [
+        { x: 0,    y: 0, w: pw,      h: ch, id: 'amp'  },
+        { x: pw,   y: 0, w: pw,      h: ch, id: 'rot'  },
+        { x: pw*2, y: 0, w: cw-pw*2, h: ch, id: 'prob' },
+      ];
+    } else {
+      const ph = Math.floor(ch / 3);
+      L.panels = [
+        { x: 0, y: 0,    w: cw, h: ph,       id: 'amp'  },
+        { x: 0, y: ph,   w: cw, h: ph,       id: 'rot'  },
+        { x: 0, y: ph*2, w: cw, h: ch-ph*2,  id: 'prob' },
+      ];
+    }
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDER — AMPLITUDE PANEL
+  ═══════════════════════════════════════════════ */
+  function drawAmplitudePanel(ctx, p) {
+    const N = Q.N;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(p.x, p.y, p.w, p.h); ctx.clip();
+    fillPanelBg(ctx, p, '#070712', '#0c0c1e');
+
+    const PL = 14, PR = 10, PT = 38, PB = 30;
+    const iw = p.w - PL - PR;
+    const ih = p.h - PT - PB;
+    const mid = p.y + PT + ih * 0.5;
+    const bw  = iw / N;
+    const normAmp = 1 / Math.sqrt(N);
+    const maxH = ih * 0.43;
+
+    // ── Zero line ──
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(p.x + PL, mid); ctx.lineTo(p.x + PL + iw, mid);
+    ctx.stroke();
+
+    // ── Mean line during diffusion ──
+    if (Anim.type === 'diffusion') {
+      const mean = Q.dispAmps.reduce((s,a) => s+a, 0) / N;
+      const meanPx = clamp(mean / normAmp * maxH * 0.85, -ih*0.44, ih*0.44);
+      const meanY  = mid - meanPx;
+      ctx.strokeStyle = 'rgba(255,215,50,0.55)';
+      ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(p.x + PL, meanY); ctx.lineTo(p.x + PL + iw, meanY);
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(255,215,50,0.7)'; ctx.font = '9px Inter';
+      ctx.textAlign = 'right';
+      ctx.fillText('⟨α⟩', p.x + PL - 2, meanY + 3);
+    }
+
+    // ── Ripple during diffusion ──
+    if (Anim.type === 'diffusion' && Anim.t < 1) {
+      const r1 = Anim.t * iw * 0.55;
+      ctx.strokeStyle = `rgba(168,85,247,${(1-Anim.t)*0.18})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(p.x + PL + iw/2, mid, r1, 0, Math.PI*2); ctx.stroke();
+      if (Anim.t > 0.25) {
+        const r2 = (Anim.t - 0.25) * iw * 0.55;
+        ctx.strokeStyle = `rgba(168,85,247,${(1-(Anim.t-0.25))*0.12})`;
+        ctx.beginPath(); ctx.arc(p.x + PL + iw/2, mid, r2, 0, Math.PI*2); ctx.stroke();
+      }
+    }
+
+    // ── Bars ──
+    for (let i = 0; i < N; i++) {
+      const amp     = Q.dispAmps[i];
+      const isTarget = i === Q.target;
+      const bx      = p.x + PL + i * bw;
+      const gap     = Math.max(1, bw * 0.12);
+      const bxIn    = bx + gap;
+      const bwIn    = bw - gap * 2;
+      const rawH    = Math.abs(amp) / normAmp * maxH * 0.88;
+      const barH    = clamp(rawH, 0, ih * 0.44);
+      const isPos   = amp >= 0;
+      const barY    = isPos ? mid - barH : mid;
+
+      if (barH > 0.8) {
+        const gr = ctx.createLinearGradient(bxIn, barY, bxIn, barY + barH);
+        if (isTarget) {
+          gr.addColorStop(0, isPos ? '#fde68a' : '#fed7aa');
+          gr.addColorStop(1, isPos ? '#d97706' : '#c2410c');
+        } else {
+          gr.addColorStop(0, isPos ? '#93c5fd' : '#fca5a5');
+          gr.addColorStop(1, isPos ? '#1d4ed8' : '#b91c1c');
+        }
+        ctx.fillStyle = gr;
+        ctx.globalAlpha = 0.88;
+        ctx.fillRect(bxIn, barY, bwIn, barH);
+        ctx.globalAlpha = 1;
+      }
+
+      // Arrow on bar
+      if (barH > 4) {
+        const ax  = bxIn + bwIn / 2;
+        const asz = Math.min(bwIn * 0.6, 7);
+        const ay  = isPos ? barY - 1 : barY + barH + 1;
+        const dir = isPos ? -1 : 1;
+        const clr = isTarget ? (isPos ? '#fbbf24' : '#f97316') : (isPos ? '#60a5fa' : '#f87171');
+        ctx.fillStyle = clr;
+        ctx.beginPath();
+        ctx.moveTo(ax, ay + dir * asz * 0.85);
+        ctx.lineTo(ax - asz/2, ay); ctx.lineTo(ax + asz/2, ay);
+        ctx.closePath(); ctx.fill();
+      }
+
+      // Value label for target or large bars
+      if ((isTarget || Math.abs(amp) > normAmp * 1.8) && barH > 8) {
+        const clr = isTarget ? '#fbbf24' : (isPos ? '#93c5fd' : '#fca5a5');
+        ctx.fillStyle = clr;
+        ctx.font = `bold ${Math.max(7, Math.min(9, bwIn*0.6))}px Inter`;
+        ctx.textAlign = 'center';
+        ctx.fillText(amp.toFixed(2), bxIn + bwIn/2, isPos ? barY - 9 : barY + barH + 11);
+      }
+
+      // State label
+      ctx.fillStyle = isTarget ? '#fbbf24' : 'rgba(120,140,190,0.6)';
+      ctx.font = `${Math.max(6, Math.min(9, bwIn*0.55))}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(i.toString(16).toUpperCase(), bxIn + bwIn/2, p.y + p.h - PB + 14);
+    }
+
+    // ── Panel label ──
+    ctx.fillStyle = '#4a9eff'; ctx.font = 'bold 11px Inter'; ctx.textAlign = 'left';
+    ctx.fillText('AMPLITUDES', p.x + 8, p.y + 16);
+
+    // ── Math annotation ──
+    if (params.showMath) {
+      ctx.fillStyle = 'rgba(120,140,200,0.65)'; ctx.font = '9px Inter';
+      ctx.textAlign = 'right';
+      ctx.fillText('α = amplitude  |α| = magnitude  sign = phase', p.x + p.w - 8, p.y + 16);
+    }
+
+    // ── Phase hint ──
+    if (Anim.type === 'oracle') {
+      ctx.fillStyle = '#f97316'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('Oracle: |target⟩ → −|target⟩', p.x + p.w/2, p.y + p.h - 8);
+    } else if (Anim.type === 'diffusion') {
+      ctx.fillStyle = '#a855f7'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('Diffusion: αᵢ → 2⟨α⟩ − αᵢ', p.x + p.w/2, p.y + p.h - 8);
+    } else if (Q.phase === 'complete') {
+      ctx.fillStyle = '#4ade80'; ctx.font = 'bold 10px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('✓ Amplitude amplification complete', p.x + p.w/2, p.y + p.h - 8);
+    }
+
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDER — ROTATION PANEL
+  ═══════════════════════════════════════════════ */
+  function drawRotationPanel(ctx, p) {
+    const N      = Q.N;
+    const th0    = Q.theta0;
+    const maxK   = Q.maxIter;
+
+    ctx.save();
+    ctx.beginPath(); ctx.rect(p.x, p.y, p.w, p.h); ctx.clip();
+    fillPanelBg(ctx, p, '#050510', '#090918');
+
+    // Circle center
+    const cx = p.x + p.w * 0.5;
+    const cy = p.y + p.h * 0.54;
+    const R  = Math.min(p.w * 0.36, p.h * 0.35);
+
+    // ── Oracle reflection axis (x-axis highlight during oracle) ──
+    if (Anim.type === 'oracle') {
+      ctx.strokeStyle = `rgba(249,115,22,${0.3 + 0.2*(1-Anim.t)})`;
+      ctx.lineWidth = 1.5; ctx.setLineDash([3,2]);
+      ctx.beginPath(); ctx.moveTo(cx - R*1.3, cy); ctx.lineTo(cx + R*1.3, cy);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // ── Diffusion axis (initial superposition direction) ──
+    if (Anim.type === 'diffusion') {
+      const ax = Math.cos(th0), ay = Math.sin(th0);
+      ctx.strokeStyle = `rgba(168,85,247,${0.3 + 0.2*(1-Anim.t)})`;
+      ctx.lineWidth = 1.5; ctx.setLineDash([3,2]);
+      ctx.beginPath();
+      ctx.moveTo(cx - R*1.3*ax, cy + R*1.3*ay);
+      ctx.lineTo(cx + R*1.3*ax, cy - R*1.3*ay);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // ── Unit circle ──
+    ctx.strokeStyle = 'rgba(74,158,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
+
+    // ── Grid circles ──
+    for (const fr of [0.5]) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.beginPath(); ctx.arc(cx, cy, R*fr, 0, Math.PI*2); ctx.stroke();
+    }
+
+    // ── Axes ──
+    const axL = R * 1.28;
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - axL, cy); ctx.lineTo(cx + axL, cy);
+    ctx.moveTo(cx, cy - axL); ctx.lineTo(cx, cy + axL);
+    ctx.stroke();
+
+    // ── Axis labels ──
+    ctx.fillStyle = 'rgba(150,170,220,0.65)'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
+    ctx.fillText("|s'⟩", cx + axL + 12, cy + 4);
+    ctx.fillText("|t⟩",  cx + 4,         cy - axL - 6);
+    ctx.fillText("−|t⟩", cx + 6,         cy + axL + 11);
+
+    // ── θ₀ arc ──
+    const arcR = R * 0.24;
+    ctx.strokeStyle = 'rgba(74,158,255,0.45)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, arcR, -th0, 0); // from initial angle to x-axis (angles flipped for canvas)
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(74,158,255,0.8)'; ctx.font = '9px Inter';
+    ctx.textAlign = 'left';
+    ctx.fillText('θ₀', cx + arcR + 3, cy - arcR * 0.35);
+
+    // ── Optimal point marker (y-axis) ──
+    ctx.fillStyle = 'rgba(251,191,36,0.15)';
+    ctx.beginPath();
+    ctx.arc(cx, cy - R, 10, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(251,191,36,0.35)'; ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(251,191,36,0.55)'; ctx.font = '9px Inter'; ctx.textAlign = 'left';
+    ctx.fillText('ideal', cx + 6, cy - R - 2);
+
+    // ── History trajectory arc (arc through iteration positions) ──
+    ctx.strokeStyle = 'rgba(100,130,200,0.3)'; ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+    ctx.beginPath();
+    for (let k = 0; k <= maxK; k++) {
+      const angle = (2*k+1) * th0;
+      const px = cx + R * Math.cos(angle);
+      const py = cy - R * Math.sin(angle);
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // ── Iteration dots ──
+    for (let k = 0; k <= maxK; k++) {
+      const angle = (2*k+1) * th0;
+      const px = cx + R * Math.cos(angle);
+      const py = cy - R * Math.sin(angle);
+      const isOpt = k === maxK;
+      const isReached = k <= Q.iteration;
+
+      ctx.beginPath(); ctx.arc(px, py, isOpt ? 6 : 4, 0, Math.PI*2);
+      ctx.fillStyle = k === 0
+        ? (isReached ? '#4a9eff' : 'rgba(74,158,255,0.25)')
+        : (isOpt
+          ? (isReached ? '#fbbf24' : 'rgba(251,191,36,0.25)')
+          : (isReached ? '#a855f7' : 'rgba(168,85,247,0.25)'));
+      ctx.fill();
+      if (isReached) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
+      }
+
+      // Label
+      const lx = cx + (R + 15) * Math.cos(angle);
+      const ly = cy - (R + 15) * Math.sin(angle);
+      ctx.fillStyle = isReached ? (isOpt ? '#fbbf24' : 'rgba(180,190,230,0.85)') : 'rgba(100,110,150,0.5)';
+      ctx.font = `${isOpt ? 'bold ' : ''}9px Inter`; ctx.textAlign = 'center';
+      ctx.fillText(`k=${k}`, lx, ly + 3);
+    }
+
+    // ── Current state vector (from dispAmps) ──
+    const nonSum = Q.dispAmps.reduce((s,a,i) => i !== Q.target ? s+a : s, 0);
+    const avgNon = Q.N > 1 ? nonSum / (Q.N - 1) : 0;
+    const xComp  = Math.sqrt(Q.N - 1) * avgNon;
+    const yComp  = Q.dispAmps[Q.target];
+    const vMag   = Math.sqrt(xComp*xComp + yComp*yComp);
+
+    if (vMag > 0.001) {
+      const vx = cx + R * (xComp / vMag);
+      const vy = cy - R * (yComp / vMag);
+      // Shadow glow
+      ctx.shadowColor = '#4ade80'; ctx.shadowBlur = 8;
+      ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(vx, vy); ctx.stroke();
+      ctx.shadowBlur = 0;
+      drawArrowHead(ctx, cx, cy, vx, vy, '#4ade80', 9);
+      // Tip dot
+      ctx.beginPath(); ctx.arc(vx, vy, 4.5, 0, Math.PI*2);
+      ctx.fillStyle = '#4ade80'; ctx.fill();
+
+      // Angle annotation
+      const curAngle = Math.atan2(yComp, xComp);
+      const deg = (curAngle * 180 / Math.PI).toFixed(1);
+      ctx.fillStyle = 'rgba(74,222,128,0.7)'; ctx.font = '9px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText(`θ = ${deg}°`, p.x + 8, p.y + p.h - 8);
+    }
+
+    // ── Panel label ──
+    ctx.fillStyle = '#4a9eff'; ctx.font = 'bold 11px Inter'; ctx.textAlign = 'left';
+    ctx.fillText('GROVER ROTATION', p.x + 8, p.y + 16);
+
+    // ── Math annotations ──
+    if (params.showMath) {
+      ctx.fillStyle = 'rgba(120,140,200,0.6)'; ctx.font = '9px Inter'; ctx.textAlign = 'right';
+      ctx.fillText(`θ₀ = arcsin(1/√${N}) = ${(th0*180/Math.PI).toFixed(1)}°`, p.x + p.w - 8, p.y + p.h - 18);
+      ctx.fillText(`2θ₀ = ${(2*th0*180/Math.PI).toFixed(1)}° per iteration`, p.x + p.w - 8, p.y + p.h - 6);
+    }
+
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDER — PROBABILITY PANEL
+  ═══════════════════════════════════════════════ */
+  function drawProbabilityPanel(ctx, p) {
+    const N = Q.N;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(p.x, p.y, p.w, p.h); ctx.clip();
+    fillPanelBg(ctx, p, '#070714', '#0c0c20');
+
+    const PL = 28, PR = 10, PT = 38, PB = 30;
+    const iw  = p.w - PL - PR;
+    const ih  = p.h - PT - PB;
+    const bw  = iw / N;
+    const base = p.y + PT + ih;
+
+    // ── Y-axis ──
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(p.x+PL, p.y+PT); ctx.lineTo(p.x+PL, base);
+    ctx.moveTo(p.x+PL, base);   ctx.lineTo(p.x+PL+iw, base);
+    ctx.stroke();
+
+    // ── Grid ticks ──
+    for (const tick of [0.25, 0.5, 0.75, 1.0]) {
+      const ty = base - tick * ih;
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(p.x+PL, ty); ctx.lineTo(p.x+PL+iw, ty); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(120,140,190,0.5)'; ctx.font = '8px Inter'; ctx.textAlign = 'right';
+      ctx.fillText(tick.toFixed(2), p.x+PL-2, ty+3);
+    }
+
+    // ── Bars ──
+    const probs = Q.dispAmps.map(a => a*a);
+
+    for (let i = 0; i < N; i++) {
+      const prob = probs[i];
+      const isTarget = i === Q.target;
+      const bx  = p.x + PL + i * bw;
+      const gap = Math.max(1, bw * 0.12);
+      const bxIn = bx + gap;
+      const bwIn = bw - gap * 2;
+      const barH = clamp(prob * ih, 0, ih);
+      const barY = base - barH;
+
+      if (barH > 0.5) {
+        const gr = ctx.createLinearGradient(bxIn, barY, bxIn, base);
+        if (isTarget) {
+          gr.addColorStop(0, '#fde68a'); gr.addColorStop(1, '#b45309');
+        } else {
+          const h = 200 + prob * 60;
+          gr.addColorStop(0, `hsl(${h},75%,65%)`);
+          gr.addColorStop(1, `hsl(${h},75%,28%)`);
+        }
+        ctx.fillStyle = gr;
+        ctx.globalAlpha = isTarget ? 0.95 : 0.80;
+        ctx.fillRect(bxIn, barY, bwIn, barH);
+        ctx.globalAlpha = 1;
+      }
+
+      // Percentage on significant bars
+      if (prob > 0.04 && barH > 11) {
+        ctx.fillStyle = isTarget ? '#fbbf24' : 'rgba(200,215,250,0.85)';
+        ctx.font = `bold ${Math.max(7, Math.min(9, bwIn*0.65))}px Inter`;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${(prob*100).toFixed(0)}%`, bxIn + bwIn/2, barY - 3);
+      }
+
+      // State label
+      ctx.fillStyle = isTarget ? '#fbbf24' : 'rgba(110,130,180,0.55)';
+      ctx.font = `${Math.max(6, Math.min(9, bwIn*0.55))}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(i.toString(16).toUpperCase(), bxIn + bwIn/2, p.y + p.h - PB + 14);
+    }
+
+    // ── Target probability callout ──
+    const tProb = probs[Q.target];
+    const binStr = Q.target.toString(2).padStart(Q.qubits, '0');
+    ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 11px Inter'; ctx.textAlign = 'right';
+    ctx.fillText(`P(|${binStr}⟩) = ${(tProb*100).toFixed(1)}%`, p.x + p.w - 8, p.y + 28);
+
+    // ── Panel label ──
+    ctx.fillStyle = '#4a9eff'; ctx.font = 'bold 11px Inter'; ctx.textAlign = 'left';
+    ctx.fillText('PROBABILITY', p.x + 8, p.y + 16);
+
+    // ── Math annotation ──
+    if (params.showMath) {
+      ctx.fillStyle = 'rgba(120,140,200,0.6)'; ctx.font = '9px Inter'; ctx.textAlign = 'right';
+      ctx.fillText('P(i) = |αᵢ|²', p.x + p.w - 8, p.y + p.h - 6);
+    }
+
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDER — MAIN
+  ═══════════════════════════════════════════════ */
+  function render(ctx) {
+    ctx.clearRect(0, 0, L.cw, L.ch);
+    drawAmplitudePanel(ctx, L.panels[0]);
+    drawRotationPanel (ctx, L.panels[1]);
+    drawProbabilityPanel(ctx, L.panels[2]);
+
+    // Panel dividers
+    ctx.strokeStyle = 'rgba(74,158,255,0.18)'; ctx.lineWidth = 1;
+    L.panels.forEach((p, i) => {
+      if (i === 0) return;
+      ctx.beginPath();
+      if (L.cw >= L.ch) { ctx.moveTo(p.x, 0); ctx.lineTo(p.x, L.ch); }
+      else               { ctx.moveTo(0, p.y); ctx.lineTo(L.cw, p.y); }
+      ctx.stroke();
+    });
+  }
+
+  /* ═══════════════════════════════════════════════
+     SIM CONTROLLER
+  ═══════════════════════════════════════════════ */
+  const Sim = {
+    canvas: null, ctx: null,
+    fps: 60, frameCount: 0, fpsTime: 0, lastTime: 0,
+
+    init(canvas) {
+      this.canvas = canvas;
+      this.ctx    = canvas.getContext('2d');
+      this.resize();
+      Q.qubits = params.qubits;
+      groverInit();
+      this.lastTime = performance.now();
+      this.fpsTime  = performance.now();
+      this.loop();
+    },
+
+    resize() {
+      const wrapper = this.canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      const w = wrapper.clientWidth, h = wrapper.clientHeight;
+      this.canvas.width  = w * dpr; this.canvas.height = h * dpr;
+      this.canvas.style.width  = w + 'px';
+      this.canvas.style.height = h + 'px';
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      updateLayout(w, h);
+    },
+
+    loop() {
+      requestAnimationFrame(now => {
+        const dt = Math.min(0.05, (now - this.lastTime) / 1000);
+        this.lastTime = now;
+        this.frameCount++;
+        if (now - this.fpsTime >= 1000) {
+          this.fps = this.frameCount; this.frameCount = 0; this.fpsTime = now;
+        }
+        Anim.update(dt);
+        AutoRun.update(dt);
+        render(this.ctx);
+        updateHUD();
+        this.loop();
+      });
+    },
+  };
+
+  /* ═══════════════════════════════════════════════
+     HUD
+  ═══════════════════════════════════════════════ */
+  function updateHUD() {
+    const tProb    = Q.amplitudes[Q.target] ** 2;
+    const iterStr  = `${Q.iteration} / ${Q.maxIter}`;
+    const probStr  = `${(tProb*100).toFixed(1)}%`;
+    const phaseMap = {
+      initial: 'Initial', oracle: 'Oracle', diffusion: 'Diffusion', complete: 'Complete'
+    };
+    const phaseStr = phaseMap[Q.phase] || Q.phase;
+
+    // Sidebar
+    setEl('sbIter',  iterStr);
+    setEl('sbProb',  probStr);
+    setEl('sbPhase', phaseStr);
+
+    // Canvas overlay
+    setEl('cvIter', iterStr);
+    setEl('cvProb', probStr);
+    setEl('cvFPS',  Sim.fps);
+
+    // Phase badge
+    const badge = document.getElementById('phaseBadge');
+    if (badge) {
+      badge.className = `phase-badge ${Q.phase}`;
+      const labels = {
+        initial: 'Initial Superposition', oracle: '⚡ Oracle Applied',
+        diffusion: '〰 Diffusion Applied', complete: '✓ Sorting Complete'
+      };
+      badge.textContent = labels[Q.phase] || Q.phase;
+    }
+
+    // Step button label
+    const stepBtn = document.getElementById('stepBtn');
+    if (stepBtn) {
+      if (Q.phase === 'complete') {
+        stepBtn.textContent = '✓ Done'; stepBtn.disabled = true;
+      } else if (Q.phase === 'oracle') {
+        stepBtn.textContent = '〰 Diffusion'; stepBtn.disabled = !Anim.isDone;
+      } else {
+        stepBtn.textContent = '⚡ Oracle'; stepBtn.disabled = !Anim.isDone;
+      }
+    }
+
+    // Quantum advantage
+    const N  = Q.N;
+    const sq = Q.maxIter;
+    setEl('advClassical', `O(${N})`);
+    setEl('advQuantum',   `O(${sq})`);
+    setEl('advSpeedup',   `≈ ${(N/sq).toFixed(1)}× fewer queries`);
+  }
+
+  function setEl(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  /* ═══════════════════════════════════════════════
+     UI CONTROLLER
+  ═══════════════════════════════════════════════ */
+  const UI = {
+    sidebar: null, overlay: null, sidebarOpen: true,
+
+    init() {
+      this.sidebar = document.getElementById('simulationSidebar');
+      this.overlay = document.getElementById('simulationOverlay');
+      this.setupSidebar();
+      this.setupBitSelector();
+      this.setupControls();
+      this.setupButtons();
+      this.setupOverlay();
+      this.setupResize();
+    },
+
+    setupSidebar() {
+      const toggle  = document.getElementById('sidebarToggle');
+      const ctrlBtn = document.getElementById('sidebarControlBtn');
+      const wrapper = document.getElementById('canvasWrapper');
+      const doToggle = () => {
+        this.sidebarOpen = !this.sidebarOpen;
+        this.sidebar.classList.toggle('collapsed', !this.sidebarOpen);
+        wrapper.classList.toggle('sidebar-collapsed', !this.sidebarOpen);
+        ctrlBtn.style.display = this.sidebarOpen ? 'none' : 'flex';
+        setTimeout(() => Sim.resize(), 320);
+      };
+      if (toggle)  toggle.addEventListener('click',  doToggle);
+      if (ctrlBtn) ctrlBtn.addEventListener('click', doToggle);
+
+      const exp = document.getElementById('mobileExpandBtn');
+      const col = document.getElementById('mobileCollapseBtn');
+      if (exp) exp.addEventListener('click', () => {
+        this.sidebar.classList.add('expanded');
+        exp.style.display = 'none'; if (col) col.style.display = 'block';
+      });
+      if (col) col.addEventListener('click', () => {
+        this.sidebar.classList.remove('expanded');
+        col.style.display = 'none'; if (exp) exp.style.display = 'block';
+      });
+    },
+
+    setupBitSelector() {
+      this.rebuildBitSelector();
+    },
+
+    rebuildBitSelector() {
+      const container = document.getElementById('bitSelector');
+      if (!container) return;
+      container.innerHTML = '';
+      const n = Q.qubits;
+      for (let b = n - 1; b >= 0; b--) {
+        const btn = document.createElement('div');
+        const bitVal = (Q.target >> b) & 1;
+        btn.className = `bit-btn${bitVal ? ' one' : ''}`;
+        btn.textContent = bitVal;
+        btn.title = `Bit ${b}`;
+        btn.dataset.bit = b;
+        btn.addEventListener('click', () => {
+          Q.target ^= (1 << parseInt(btn.dataset.bit));
+          Q.target = clamp(Q.target, 0, Q.N - 1);
+          groverInit();
+          this.rebuildBitSelector();
+          this.updateTargetDisplay();
+        });
+        container.appendChild(btn);
+      }
+      this.updateTargetDisplay();
+    },
+
+    updateTargetDisplay() {
+      const binStr = Q.target.toString(2).padStart(Q.qubits, '0');
+      setEl('targetDisplay', `|${binStr}⟩ = ${Q.target}`);
+    },
+
+    setupControls() {
+      const qRange = document.getElementById('qubitsRange');
+      if (qRange) qRange.addEventListener('input', () => {
+        params.qubits = parseInt(qRange.value);
+        Q.qubits  = params.qubits;
+        Q.target  = clamp(Q.target, 0, Q.N - 1);
+        setEl('qubitsVal', `${params.qubits} → ${Q.N} states`);
+        groverInit();
+        this.rebuildBitSelector();
+        updateLayout(L.cw, L.ch);
+      });
+      setEl('qubitsVal', `4 → 16 states`);
+
+      const spRange = document.getElementById('speedRange');
+      if (spRange) spRange.addEventListener('input', () => {
+        params.speed = parseFloat(spRange.value);
+        setEl('speedVal', `${params.speed.toFixed(1)}×`);
+      });
+
+      const mathTgl = document.getElementById('mathToggle');
+      if (mathTgl) mathTgl.addEventListener('click', () => {
+        params.showMath = !params.showMath;
+        mathTgl.classList.toggle('on', params.showMath);
+      });
+    },
+
+    setupButtons() {
+      document.getElementById('stepBtn')?.addEventListener('click', () => {
+        stepGrover();
+        AutoRun.active = false; this.syncAutoBtn();
+      });
+      document.getElementById('autoBtn')?.addEventListener('click', () => {
+        AutoRun.toggle();
+      });
+      document.getElementById('resetBtn')?.addEventListener('click', () => {
+        AutoRun.active = false; this.syncAutoBtn();
+        groverInit();
+        this.syncAutoBtn();
+      });
+    },
+
+    syncAutoBtn() {
+      const btn = document.getElementById('autoBtn');
+      if (!btn) return;
+      btn.classList.toggle('active', AutoRun.active);
+      btn.textContent = AutoRun.active ? '⏹ Stop' : '↻ Auto';
+    },
+
+    setupOverlay() {
+      document.getElementById('playButton')?.addEventListener('click', () => {
+        this.hideOverlay();
+      });
+      document.getElementById('resetButton')?.addEventListener('click', () => {
+        groverInit();
+      });
+    },
+
+    showOverlay() { this.overlay?.classList.remove('hidden'); },
+    hideOverlay() { this.overlay?.classList.add('hidden'); },
+
+    setupResize() {
+      let t;
+      window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => Sim.resize(), 80);
+      });
+    },
+  };
+
+  /* ═══════════════════════════════════════════════
+     BOOT
+  ═══════════════════════════════════════════════ */
+  window.addEventListener('DOMContentLoaded', () => {
+    Sim.init(document.getElementById('simulationCanvas'));
+    UI.init();
+  });
+  </script>
+  <script src="../../../assets/js/main.js"></script>
+</body>
+</html>

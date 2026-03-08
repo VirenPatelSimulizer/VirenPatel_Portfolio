@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Physical Marble Sorter simulation - two parallel rods that slowly separate, sorting marbles by size.">
+  <title>Physical Marble Sorter - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/css/styles.css">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E');
+  </script>
+
+  <style>
+    .simulation-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+      display: flex;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .simulation-sidebar {
+      position: absolute;
+      left: 0; top: 0;
+      width: 300px;
+      max-width: 300px;
+      height: 100%;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 16px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      z-index: 100;
+      color: #e0e0e0;
+    }
+    .simulation-sidebar.collapsed { transform: translateX(-100%); }
+
+    .sidebar-toggle {
+      position: absolute;
+      right: -32px; top: 50%;
+      transform: translateY(-50%);
+      width: 32px; height: 48px;
+      background: rgba(20,20,40,0.95);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-left: none;
+      border-radius: 0 6px 6px 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #e0e0e0; font-size: 14px;
+      transition: background 0.2s;
+    }
+    .sidebar-toggle:hover { background: rgba(74,158,255,0.2); }
+
+    .sidebar-title {
+      font-size: 15px; font-weight: 700;
+      color: #4a9eff; margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Stats Panel ── */
+    .stats-panel {
+      background: rgba(10,10,25,0.6);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .stat-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 5px;
+      font-size: 12px;
+    }
+    .stat-row:last-child { margin-bottom: 0; }
+    .stat-label { color: #8090b0; }
+    .stat-value { color: #4a9eff; font-weight: 600; }
+
+    .gap-bar-container { margin-top: 8px; }
+    .gap-bar-label { font-size: 10px; color: #6070a0; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .gap-bar-track {
+      width: 100%; height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px; overflow: hidden;
+    }
+    .gap-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #4a9eff, #a855f7);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* ── Controls ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 12px 0;
+    }
+    .section-label {
+      font-size: 10px; font-weight: 600;
+      color: #6080a0; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 10px;
+    }
+    .control-group { margin-bottom: 14px; }
+    .control-label {
+      display: block; font-size: 12px; font-weight: 500;
+      margin-bottom: 6px; color: #b0b0b0;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .control-value { float: right; color: #4a9eff; font-weight: 600; }
+    .control-input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%; height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px; outline: none; cursor: pointer;
+    }
+    .control-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      background: #4a9eff; border-radius: 50%;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .control-input::-webkit-slider-thumb:hover { transform: scale(1.25); }
+    .control-input::-moz-range-thumb {
+      width: 14px; height: 14px;
+      background: #4a9eff; border-radius: 50%;
+      cursor: pointer; border: none;
+    }
+
+    /* ── Presets ── */
+    .preset-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .preset-btn {
+      padding: 7px 5px; font-size: 10px; font-weight: 500;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; color: #ccc; cursor: pointer;
+      transition: all 0.2s; text-align: center; line-height: 1.3;
+    }
+    .preset-btn:hover {
+      background: rgba(74,158,255,0.15);
+      border-color: rgba(74,158,255,0.4); color: #fff;
+    }
+    .preset-btn.active {
+      background: rgba(74,158,255,0.2);
+      border-color: #4a9eff; color: #4a9eff;
+    }
+
+    /* ── Canvas Wrapper ── */
+    .simulation-canvas-wrapper {
+      flex: 1; position: relative;
+      margin-left: 300px;
+      transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .simulation-canvas-wrapper.sidebar-collapsed { margin-left: 0; }
+
+    #simulationCanvas {
+      display: block; width: 100%; height: 100%; cursor: pointer;
+    }
+
+    /* ── Sidebar control btn (desktop) ── */
+    .sidebar-control-btn {
+      position: absolute; left: 10px; top: 10px;
+      width: 34px; height: 34px;
+      background: rgba(20,20,40,0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px; display: none;
+      align-items: center; justify-content: center;
+      cursor: pointer; color: #e0e0e0; font-size: 16px;
+      z-index: 150; transition: all 0.2s;
+    }
+    .sidebar-control-btn:hover {
+      background: rgba(74,158,255,0.2); border-color: #4a9eff;
+    }
+
+    /* ── Back Button ── */
+    .back-button {
+      position: absolute; top: 12px; right: 12px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #e0e0e0; text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: all 0.3s; z-index: 150;
+    }
+    .back-button:hover {
+      background: rgba(30,30,50,0.95);
+      border-color: #4a9eff; color: #4a9eff; transform: translateX(-2px);
+    }
+
+    /* ── Stats overlay (canvas top) ── */
+    .simulation-stats {
+      position: absolute; top: 12px;
+      left: 50%; transform: translateX(-50%);
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e0e0e0; font-size: 11px;
+      z-index: 50; display: flex; gap: 16px;
+    }
+    .stat-item { display: flex; gap: 6px; align-items: center; }
+    .stat-item .stat-value { color: #4a9eff; font-weight: 600; }
+
+    /* ── Overlay ── */
+    .simulation-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(5,5,15,0.7); backdrop-filter: blur(4px);
+      z-index: 200; transition: opacity 0.3s;
+    }
+    .simulation-overlay.hidden { opacity: 0; pointer-events: none; }
+    .overlay-content { text-align: center; }
+    .overlay-title {
+      font-size: 22px; font-weight: 700; color: #e0e0e0;
+      margin-bottom: 8px; letter-spacing: 0.5px;
+    }
+    .overlay-desc { font-size: 13px; color: #8090b0; margin-bottom: 24px; max-width: 320px; }
+    .overlay-buttons { display: flex; gap: 12px; justify-content: center; }
+    .overlay-button {
+      padding: 12px 32px; font-size: 14px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s;
+    }
+    .overlay-button.play {
+      background: rgba(74,158,255,0.2); border-color: #4a9eff;
+    }
+    .overlay-button.play:hover {
+      background: rgba(74,158,255,0.4); box-shadow: 0 0 20px rgba(74,158,255,0.3);
+    }
+    .overlay-button.reset {
+      background: rgba(255,74,74,0.15); border-color: #ff4a4a;
+    }
+    .overlay-button.reset:hover {
+      background: rgba(255,74,74,0.3);
+    }
+
+    /* ── Mobile ── */
+    .mobile-expand-btn, .mobile-collapse-btn {
+      display: none; position: absolute;
+      bottom: 12px; left: 50%; transform: translateX(-50%);
+      padding: 8px 20px; font-size: 12px; font-weight: 600;
+      background: rgba(20,20,40,0.9); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px; color: #e0e0e0; cursor: pointer; z-index: 200;
+    }
+
+    @media (max-width: 768px) {
+      .simulation-sidebar {
+        left: 0; top: auto; bottom: 0;
+        width: 100%; max-width: 100%; height: 50%;
+        border-right: none;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      }
+      .simulation-sidebar.collapsed { transform: translateY(100%); }
+      .simulation-sidebar.expanded { transform: translateY(0); }
+      .sidebar-toggle { display: none; }
+      .simulation-canvas-wrapper { margin-left: 0 !important; }
+      .sidebar-control-btn { display: none !important; }
+      .mobile-expand-btn, .mobile-collapse-btn { display: block; }
+      .simulation-stats { font-size: 10px; gap: 10px; padding: 6px 10px; }
+    }
+
+    @media (max-width: 896px) and (orientation: landscape) {
+      .simulation-sidebar { width: 240px; max-width: 240px; }
+      .simulation-canvas-wrapper { margin-left: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="index.html">Viren Patel</a>
+      </div>
+      <div class="logo">
+        <a>Physical Marble Sorter</a>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="simulation-container">
+    <!-- Sidebar -->
+    <div class="simulation-sidebar" id="simulationSidebar">
+      <div class="sidebar-toggle" id="sidebarToggle">&#9776;</div>
+      <div class="sidebar-title">Marble Sorter Controls</div>
+
+      <!-- Live stats -->
+      <div class="stats-panel">
+        <div class="stat-row">
+          <span class="stat-label">Rod Gap</span>
+          <span class="stat-value" id="sbGap">0 px</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Sorted</span>
+          <span class="stat-value" id="sbSorted">0 / 25</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">FPS</span>
+          <span class="stat-value" id="sbFPS">60</span>
+        </div>
+        <div class="gap-bar-container">
+          <div class="gap-bar-label">Sort Progress</div>
+          <div class="gap-bar-track">
+            <div class="gap-bar-fill" id="gapBarFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Marbles</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Count <span class="control-value" id="marbleCountVal">25</span>
+        </label>
+        <input type="range" class="control-input" id="marbleCount" min="5" max="60" step="5" value="25">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Min Size <span class="control-value" id="minRadiusVal">5 px</span>
+        </label>
+        <input type="range" class="control-input" id="minRadius" min="2" max="14" step="1" value="5">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Max Size <span class="control-value" id="maxRadiusVal">25 px</span>
+        </label>
+        <input type="range" class="control-input" id="maxRadius" min="12" max="42" step="1" value="25">
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Physics</div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Separation Speed <span class="control-value" id="separationSpeedVal">12 px/s</span>
+        </label>
+        <input type="range" class="control-input" id="separationSpeed" min="2" max="100" step="2" value="12">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Gravity <span class="control-value" id="gravityVal">450</span>
+        </label>
+        <input type="range" class="control-input" id="gravity" min="80" max="1400" step="40" value="450">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Tray Angle <span class="control-value" id="trayAngleVal">22°</span>
+        </label>
+        <input type="range" class="control-input" id="trayAngle" min="5" max="50" step="1" value="22">
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">
+          Bounce <span class="control-value" id="restitutionVal">0.30</span>
+        </label>
+        <input type="range" class="control-input" id="restitution" min="0.05" max="0.80" step="0.05" value="0.30">
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Presets</div>
+      <div class="preset-grid" id="presetGrid"></div>
+    </div>
+
+    <!-- Canvas Wrapper -->
+    <div class="simulation-canvas-wrapper" id="canvasWrapper">
+      <canvas id="simulationCanvas"></canvas>
+
+      <button class="mobile-expand-btn" id="mobileExpandBtn">Controls &#9650;</button>
+      <button class="mobile-collapse-btn" id="mobileCollapseBtn">&#9660;</button>
+
+      <div class="sidebar-control-btn" id="sidebarControlBtn">&#9776;</div>
+
+      <a href="../../../simulations/index.html" class="back-button">
+        <span>&larr;</span>
+        <span>Back</span>
+      </a>
+
+      <div class="simulation-stats" id="statsDisplay">
+        <div class="stat-item">
+          <span>GAP</span>
+          <span class="stat-value" id="cvGap">0px</span>
+        </div>
+        <div class="stat-item">
+          <span>SORTED</span>
+          <span class="stat-value" id="cvSorted">0/25</span>
+        </div>
+        <div class="stat-item">
+          <span>FPS</span>
+          <span class="stat-value" id="cvFPS">60</span>
+        </div>
+      </div>
+
+      <div class="simulation-overlay" id="simulationOverlay">
+        <div class="overlay-content">
+          <div class="overlay-title">Physical Marble Sorter</div>
+          <div class="overlay-desc">Two parallel rods slowly separate, sorting marbles by size. Smaller marbles fall first.</div>
+          <div class="overlay-buttons">
+            <button class="overlay-button play" id="playButton">&#9654; Start</button>
+            <button class="overlay-button reset" id="resetButton">&#8635; Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  'use strict';
+
+  /* ═══════════════════════════════════════════════
+     CONFIGURATION
+  ═══════════════════════════════════════════════ */
+  const params = {
+    marbleCount: 25,
+    minRadius: 5,
+    maxRadius: 25,
+    separationSpeed: 12,   // px/s gap increase
+    gravity: 450,          // px/s²
+    trayAngle: 22,         // degrees
+    restitution: 0.30,
+    friction: 0.22,
+  };
+
+  const PRESETS = {
+    balanced: {
+      name: 'Balanced', color: '#4a9eff',
+      p: { marbleCount: 25, minRadius: 5, maxRadius: 25, separationSpeed: 12, gravity: 450, trayAngle: 22, restitution: 0.30 }
+    },
+    fastSort: {
+      name: 'Fast Sort', color: '#f97316',
+      p: { marbleCount: 15, minRadius: 4, maxRadius: 22, separationSpeed: 40, gravity: 600, trayAngle: 28, restitution: 0.20 }
+    },
+    slowPrecise: {
+      name: 'Slow & Precise', color: '#4ade80',
+      p: { marbleCount: 35, minRadius: 4, maxRadius: 20, separationSpeed: 4, gravity: 350, trayAngle: 18, restitution: 0.35 }
+    },
+    wideRange: {
+      name: 'Wide Range', color: '#a855f7',
+      p: { marbleCount: 20, minRadius: 3, maxRadius: 38, separationSpeed: 10, gravity: 500, trayAngle: 25, restitution: 0.25 }
+    },
+  };
+
+  /* ═══════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════ */
+  let state = {
+    gap: 0,
+    marbles: [],
+    fallenCount: 0,
+    isRunning: false,
+    complete: false,
+  };
+
+  /* ═══════════════════════════════════════════════
+     LAYOUT (updated on resize)
+  ═══════════════════════════════════════════════ */
+  let L = {
+    cw: 0, ch: 0,
+    orientation: 'landscape',
+    // top view rect
+    tx: 0, ty: 0, tw: 0, th: 0,
+    // side view rect
+    sx: 0, sy: 0, sw: 0, sh: 0,
+    // side view geometry (computed)
+    rodY: 0, rodH: 14, rodW: 20,
+    svCX: 0,
+    trayX1: 0, trayY1: 0, trayX2: 0, trayY2: 0,
+    wallX: 0, wallYtop: 0, wallYbot: 0,
+    floorY: 0,
+    // top view geometry
+    rodTopY: 0, rodBotY: 0,
+    tvCY: 0, tvRodX1: 0, tvRodX2: 0,
+  };
+
+  function updateLayout(cw, ch) {
+    L.cw = cw; L.ch = ch;
+    if (cw >= ch) {
+      L.orientation = 'landscape';
+      L.tx = 0;   L.ty = 0; L.tw = Math.floor(cw / 2); L.th = ch;
+      L.sx = L.tw; L.sy = 0; L.sw = cw - L.tw;         L.sh = ch;
+    } else {
+      L.orientation = 'portrait';
+      L.tx = 0; L.ty = 0;       L.tw = cw; L.th = Math.floor(ch / 2);
+      L.sx = 0; L.sy = L.th;    L.sw = cw; L.sh = ch - L.th;
+    }
+    // Side view geometry
+    L.rodH = Math.max(10, L.sh * 0.034);
+    L.rodW = Math.max(14, L.sw * 0.048);
+
+    const ang      = params.trayAngle * Math.PI / 180;
+    const tMarginL = Math.max(16, L.sw * 0.05);
+    const tMarginR = Math.max(16, L.sw * 0.04);
+
+    // Tray length = largest marble diameter × count × 1.10
+    const maxDiam    = Math.max(params.minRadius, params.maxRadius) * 2;
+    const neededLen  = maxDiam * params.marbleCount * 1.10;
+    const availLen   = L.sw - tMarginL - tMarginR;
+    const trayLen    = Math.min(neededLen, availLen);
+
+    L.trayX1 = L.sx + tMarginL;
+    L.trayX2 = L.trayX1 + trayLen;
+    L.trayY1 = L.sy + L.sh * 0.50;
+    L.trayY2 = L.trayY1 + Math.tan(ang) * trayLen;
+
+    // Rods sit above the START of the tray (left/high end, first ~5%)
+    const rodFrac    = 0.05;
+    L.svCX  = L.trayX1 + rodFrac * trayLen;
+    const trayYatRod = L.trayY1 + rodFrac * (L.trayY2 - L.trayY1);
+    const dropH      = Math.max(28, L.sh * 0.08);
+    L.rodY  = trayYatRod - dropH - L.rodH;
+
+    L.wallX    = L.trayX2;
+    L.wallYtop = L.trayY2 - L.sh * 0.20;   // tall enough to block all marbles
+    L.wallYbot = Math.min(L.trayY2 + L.sh * 0.08, L.sy + L.sh - 4);
+    L.floorY   = L.sy + L.sh - 8;
+
+    // Top view geometry
+    const tvMarg = Math.max(30, L.tw * 0.09);
+    L.tvRodX1 = L.tx + tvMarg;
+    L.tvRodX2 = L.tx + L.tw - tvMarg;
+    L.tvCY = L.ty + L.th / 2;
+  }
+
+  /* ═══════════════════════════════════════════════
+     MARBLE CLASS
+  ═══════════════════════════════════════════════ */
+  class Marble {
+    constructor(id, radius) {
+      this.id     = id;
+      this.radius = radius;
+      const t = (radius - params.minRadius) / Math.max(1, params.maxRadius - params.minRadius);
+      this.hue = 210 - t * 210; // 210 (blue) → 0 (red)
+
+      // Top view: normalized position [0,1] along the rod length
+      this.topXnorm = Math.random();
+      // Top view fade animation
+      this.topAlpha    = 1.0;
+      this.topFalling  = false;
+      this.topFallProg = 0;
+
+      // Side view physics
+      this.state = 'held'; // held | falling | rolling | settled
+      this.x = 0; this.y = 0;
+      this.vx = 0; this.vy = 0;
+      this.fallOrder = -1;
+    }
+    get colorLight() { return `hsl(${this.hue},90%,84%)`; }
+    get colorMid()   { return `hsl(${this.hue},80%,56%)`; }
+    get colorDark()  { return `hsl(${this.hue},75%,22%)`; }
+  }
+
+  /* ═══════════════════════════════════════════════
+     CREATE MARBLES
+  ═══════════════════════════════════════════════ */
+  function createMarbles() {
+    const arr = [];
+    const n = params.marbleCount;
+    const rMin = params.minRadius;
+    const rMax = Math.max(rMin + 2, params.maxRadius);
+    for (let i = 0; i < n; i++) {
+      const t = n > 1 ? i / (n - 1) : 0.5;
+      const r = rMin + t * (rMax - rMin);
+      arr.push(new Marble(i, r));
+    }
+    // Shuffle top positions
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i].topXnorm, arr[j].topXnorm] = [arr[j].topXnorm, arr[i].topXnorm];
+    }
+    return arr;
+  }
+
+  /* ═══════════════════════════════════════════════
+     PHYSICS  –  sub-stepped, constraint-based
+     Each frame is split into SUBS sub-steps.
+     Each sub-step:  integrate → hard constraints × ITERS
+     "settled" marbles are treated as immovable.
+  ═══════════════════════════════════════════════ */
+
+  // Cached tray geometry (updated once per frame in physicsStep)
+  let _tgX = 0, _tgY = 0, _nmX = 0, _nmY = 0, _tLen = 0;
+
+  function cacheTrayGeom() {
+    const tx = L.trayX2 - L.trayX1;
+    const ty = L.trayY2 - L.trayY1;
+    _tLen = Math.sqrt(tx * tx + ty * ty);
+    if (_tLen < 0.001) return;
+    _tgX = tx / _tLen; _tgY = ty / _tLen;        // tangent (down-slope)
+    _nmX = -_tgY;      _nmY = _tgX;              // normal (initially perp)
+    if (_nmY > 0) { _nmX = -_nmX; _nmY = -_nmY; } // ensure it points UP
+  }
+
+  function physicsStep(dt) {
+    dt = Math.min(dt, 0.033);
+
+    cacheTrayGeom();
+
+    const SUBS = 6;    // sub-steps per frame
+    const ITERS = 4;   // constraint iterations per sub-step
+    const sdt = dt / SUBS;
+
+    for (let s = 0; s < SUBS; s++) {
+
+      // ── 1. Gap ──
+      if (!state.complete) state.gap += params.separationSpeed * sdt;
+
+      // ── 2. Trigger falling ──
+      state.marbles.forEach(m => {
+        if (m.state === 'held' && state.gap >= m.radius * 2) {
+          m.state       = 'falling';
+          m.fallOrder   = state.fallenCount++;
+          m.topFalling  = true;
+          m.topFallProg = 0;
+          m.x  = L.svCX + (Math.random() - 0.5) * 3;
+          m.y  = L.rodY + L.rodH + m.radius + 2;
+          m.vx = (Math.random() - 0.5) * 4;
+          m.vy = 6;
+        }
+      });
+
+      // ── 3. Integrate (gravity + move) – skip settled & held ──
+      state.marbles.forEach(m => {
+        if (m.state === 'held' || m.state === 'settled') return;
+        m.vy += params.gravity * sdt;
+        m.x  += m.vx * sdt;
+        m.y  += m.vy * sdt;
+      });
+
+      // ── 4. Constraint resolution (multiple passes) ──
+      for (let k = 0; k < ITERS; k++) {
+        constrainBounds();
+        constrainTray(sdt);
+        constrainBalls();
+      }
+
+      // ── 5. Settle check ──
+      state.marbles.forEach(m => {
+        if (m.state === 'rolling') {
+          const spd = Math.hypot(m.vx, m.vy);
+          if (spd < 1.2) { m.state = 'settled'; m.vx = 0; m.vy = 0; }
+        }
+      });
+    }
+
+    // ── Completion check ──
+    if (!state.complete && state.fallenCount > 0) {
+      const busy = state.marbles.some(
+        m => m.state === 'held' || m.state === 'falling' || m.state === 'rolling'
+      );
+      if (!busy) state.complete = true;
+    }
+
+    // ── Top-view fade animation (full-dt rate, outside sub-steps) ──
+    state.marbles.forEach(m => {
+      if (m.topFalling) {
+        m.topFallProg = Math.min(1, m.topFallProg + dt * 1.8);
+        m.topAlpha    = 1 - m.topFallProg;
+        if (m.topFallProg >= 1) m.topFalling = false;
+      }
+    });
+  }
+
+  /* Hard boundary constraints (wall, floor, left edge) */
+  function constrainBounds() {
+    const wallSurface = L.wallX - 4; // left face of the wall slab
+    state.marbles.forEach(m => {
+      if (m.state === 'held' || m.state === 'settled') return;
+
+      // Left canvas edge
+      if (m.x - m.radius < L.sx + 4) {
+        m.x = L.sx + 4 + m.radius;
+        if (m.vx < 0) m.vx = Math.abs(m.vx) * 0.3;
+      }
+      // Right wall – hard stop, calculated BEFORE position is accepted
+      if (m.x + m.radius > wallSurface) {
+        m.x = wallSurface - m.radius;
+        if (m.vx > 0) m.vx = -m.vx * params.restitution * 0.45;
+      }
+      // Floor
+      if (m.y + m.radius > L.floorY) {
+        m.y = L.floorY - m.radius;
+        if (m.vy > 0) m.vy = -m.vy * params.restitution * 0.4;
+        m.vx *= 0.88;
+      }
+    });
+  }
+
+  /* Tray surface constraint */
+  function constrainTray(sdt) {
+    if (_tLen < 0.001) return;
+    state.marbles.forEach(m => {
+      if (m.state === 'held' || m.state === 'settled') return;
+
+      const dx   = m.x - L.trayX1;
+      const dy   = m.y - L.trayY1;
+      const proj = dx * _tgX + dy * _tgY; // position along tray
+      const dist = dx * _nmX + dy * _nmY; // signed distance from tray surface (+ = above)
+
+      if (proj >= -m.radius && proj <= _tLen + m.radius && dist < m.radius) {
+        // ── Position: push marble above surface ──
+        const pen = m.radius - dist;
+        m.x += _nmX * pen;
+        m.y += _nmY * pen;
+
+        // ── Velocity: reflect normal component ──
+        const vNorm = m.vx * _nmX + m.vy * _nmY;
+        const vTang = m.vx * _tgX + m.vy * _tgY;
+
+        if (vNorm < 0) {
+          const newVn = -vNorm * params.restitution;
+          // Coulomb friction on tangential component
+          const fricImpulse = params.friction * Math.abs(vNorm);
+          let newVt = vTang;
+          if (Math.abs(newVt) <= fricImpulse) {
+            newVt = 0;
+          } else {
+            newVt -= Math.sign(newVt) * fricImpulse;
+          }
+          m.vx = newVn * _nmX + newVt * _tgX;
+          m.vy = newVn * _nmY + newVt * _tgY;
+        }
+
+        // ── Rolling drag (slope friction when gliding) ──
+        const vt = m.vx * _tgX + m.vy * _tgY;
+        const drag = Math.min(Math.abs(vt), params.friction * params.gravity * sdt * 1.5);
+        if (Math.abs(vt) > 0.05) {
+          m.vx -= Math.sign(vt) * drag * _tgX;
+          m.vy -= Math.sign(vt) * drag * _tgY;
+        }
+
+        m.state = 'rolling';
+      } else if (m.state === 'rolling') {
+        m.state = 'falling'; // left the tray surface
+      }
+    });
+  }
+
+  /* Ball–ball constraint: position-based separation + low-restitution impulse.
+     Settled marbles are treated as static (infinite mass). */
+  function constrainBalls() {
+    const active = state.marbles.filter(m => m.state !== 'held');
+    const n = active.length;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const a = active[i], b = active[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist2 = dx * dx + dy * dy;
+        const minD  = a.radius + b.radius;
+        if (dist2 >= minD * minD || dist2 < 1e-6) continue;
+
+        const dist = Math.sqrt(dist2);
+        const pen  = minD - dist;
+        const nx   = dx / dist, ny = dy / dist;
+
+        const aFix = (a.state === 'settled');
+        const bFix = (b.state === 'settled');
+        if (aFix && bFix) continue;
+
+        // ── Position correction (hard separation) ──
+        if (!aFix && !bFix) {
+          const half = pen * 0.5;
+          a.x -= nx * half; a.y -= ny * half;
+          b.x += nx * half; b.y += ny * half;
+        } else if (aFix) {
+          b.x += nx * pen; b.y += ny * pen;
+        } else {
+          a.x -= nx * pen; a.y -= ny * pen;
+        }
+
+        // ── Velocity correction (low restitution = no energy injection) ──
+        const relVn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+        if (relVn < 0) {                           // approaching
+          const e   = 0.08;                        // very inelastic ball-ball
+          const imp = (1 + e) * relVn;
+          if (!aFix && !bFix) {
+            const half = imp * 0.5;
+            a.vx += half * nx; a.vy += half * ny;
+            b.vx -= half * nx; b.vy -= half * ny;
+          } else if (aFix) {
+            b.vx -= imp * nx; b.vy -= imp * ny;
+          } else {
+            a.vx += imp * nx; a.vy += imp * ny;
+          }
+        }
+      }
+    }
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDERING
+  ═══════════════════════════════════════════════ */
+  function render(ctx) {
+    ctx.clearRect(0, 0, L.cw, L.ch);
+    drawTopView(ctx);
+    drawSideView(ctx);
+    drawDivider(ctx);
+  }
+
+  function drawDivider(ctx) {
+    ctx.save();
+    if (L.orientation === 'landscape') {
+      ctx.strokeStyle = 'rgba(74,158,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(L.sx, 0); ctx.lineTo(L.sx, L.ch);
+      ctx.stroke();
+    } else {
+      ctx.strokeStyle = 'rgba(74,158,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, L.sy); ctx.lineTo(L.cw, L.sy);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /* ── TOP VIEW ── */
+  function drawTopView(ctx) {
+    const { tx, ty, tw, th } = L;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(tx, ty, tw, th);
+    ctx.clip();
+
+    // Background
+    const bg = ctx.createLinearGradient(tx, ty, tx, ty + th);
+    bg.addColorStop(0, '#070712');
+    bg.addColorStop(1, '#0d0d1e');
+    ctx.fillStyle = bg;
+    ctx.fillRect(tx, ty, tw, th);
+
+    // Subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+    ctx.lineWidth = 1;
+    const step = 40;
+    for (let x = tx; x < tx + tw; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, ty); ctx.lineTo(x, ty + th); ctx.stroke();
+    }
+    for (let y = ty; y < ty + th; y += step) {
+      ctx.beginPath(); ctx.moveTo(tx, y); ctx.lineTo(tx + tw, y); ctx.stroke();
+    }
+
+    // Rod lines
+    const halfGap = state.gap / 2;
+    const rodTopY = L.tvCY - halfGap;
+    const rodBotY = L.tvCY + halfGap;
+    const rodX1   = L.tvRodX1;
+    const rodX2   = L.tvRodX2;
+    const rodThick = Math.max(6, th * 0.025);
+
+    // Rod A (top)
+    const gradA = ctx.createLinearGradient(0, rodTopY - rodThick, 0, rodTopY);
+    gradA.addColorStop(0, '#4a5568');
+    gradA.addColorStop(1, '#718096');
+    ctx.fillStyle = gradA;
+    ctx.fillRect(rodX1, rodTopY - rodThick, rodX2 - rodX1, rodThick);
+
+    // Rod B (bottom)
+    const gradB = ctx.createLinearGradient(0, rodBotY, 0, rodBotY + rodThick);
+    gradB.addColorStop(0, '#718096');
+    gradB.addColorStop(1, '#4a5568');
+    ctx.fillStyle = gradB;
+    ctx.fillRect(rodX1, rodBotY, rodX2 - rodX1, rodThick);
+
+    // Gap zone highlight
+    if (halfGap > 2) {
+      const gapGrad = ctx.createLinearGradient(0, rodTopY, 0, rodBotY);
+      gapGrad.addColorStop(0, 'rgba(74,158,255,0.04)');
+      gapGrad.addColorStop(0.5, 'rgba(74,158,255,0.02)');
+      gapGrad.addColorStop(1, 'rgba(74,158,255,0.04)');
+      ctx.fillStyle = gapGrad;
+      ctx.fillRect(rodX1, rodTopY, rodX2 - rodX1, rodBotY - rodTopY);
+    }
+
+    // Gap dimension lines
+    if (halfGap > 4) {
+      const lineX = rodX1 - 16;
+      ctx.strokeStyle = 'rgba(74,158,255,0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath();
+      ctx.moveTo(lineX, rodTopY); ctx.lineTo(lineX, rodBotY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Arrows
+      ctx.fillStyle = 'rgba(74,158,255,0.7)';
+      ctx.font = '9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('▲', lineX, rodTopY - 2);
+      ctx.fillText('▼', lineX, rodBotY + 10);
+    }
+
+    // Draw marbles
+    state.marbles.forEach(m => {
+      const alpha = m.topFalling ? m.topAlpha : 1.0;
+      if (alpha <= 0.01) return;
+
+      const mx = rodX1 + m.topXnorm * (rodX2 - rodX1);
+      const my = L.tvCY;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Glow for "about to fall" (gap within 2px of diameter)
+      const deficit = m.radius * 2 - state.gap;
+      if (deficit > 0 && deficit < 6 && m.state === 'held') {
+        ctx.shadowColor = `hsl(${m.hue},90%,65%)`;
+        ctx.shadowBlur  = 10;
+      }
+
+      // Marble gradient sphere
+      const gr = ctx.createRadialGradient(
+        mx - m.radius * 0.35, my - m.radius * 0.38, m.radius * 0.05,
+        mx, my, m.radius
+      );
+      gr.addColorStop(0,   m.colorLight);
+      gr.addColorStop(0.4, m.colorMid);
+      gr.addColorStop(1,   m.colorDark);
+
+      ctx.beginPath();
+      ctx.arc(mx, my, m.radius, 0, Math.PI * 2);
+      ctx.fillStyle = gr;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Fall arrow on just-started falling
+      if (m.topFalling && m.topFallProg < 0.5) {
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `${Math.round(m.radius * 0.9)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('↓', mx, my + m.radius + m.radius * 1.1);
+      }
+
+      ctx.restore();
+    });
+
+    // Label
+    ctx.fillStyle = '#4a9eff';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('TOP VIEW', tx + 10, ty + 18);
+    ctx.fillStyle = 'rgba(140,160,200,0.7)';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.fillText(`Gap: ${state.gap.toFixed(1)} px`, tx + 10, ty + 32);
+
+    ctx.restore();
+  }
+
+  /* ── SIDE VIEW ── */
+  function drawSideView(ctx) {
+    const { sx, sy, sw, sh } = L;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(sx, sy, sw, sh);
+    ctx.clip();
+
+    // Background
+    const bg = ctx.createLinearGradient(sx, sy, sx, sy + sh);
+    bg.addColorStop(0, '#050510');
+    bg.addColorStop(1, '#0a0a1a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(sx, sy, sw, sh);
+
+    // Subtle vertical grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+    ctx.lineWidth = 1;
+    const step = 40;
+    for (let x = sx; x < sx + sw; x += step) {
+      ctx.beginPath(); ctx.moveTo(x, sy); ctx.lineTo(x, sy + sh); ctx.stroke();
+    }
+
+    // ── Draw tray ──
+    ctx.save();
+    ctx.shadowColor = 'rgba(100,150,200,0.3)';
+    ctx.shadowBlur  = 6;
+
+    // Tray fill (solid slab)
+    const trayDX = L.trayX2 - L.trayX1;
+    const trayDY = L.trayY2 - L.trayY1;
+    const trayLen = Math.sqrt(trayDX * trayDX + trayDY * trayDY);
+    const txn = trayDX / trayLen, tyn = trayDY / trayLen; // tangent
+    const nxn = -tyn,           nyn = txn;                // normal (down)
+    const slabD = 10; // slab thickness
+
+    ctx.beginPath();
+    ctx.moveTo(L.trayX1, L.trayY1);
+    ctx.lineTo(L.trayX2, L.trayY2);
+    ctx.lineTo(L.trayX2 + nxn * slabD, L.trayY2 + nyn * slabD);
+    ctx.lineTo(L.trayX1 + nxn * slabD, L.trayY1 + nyn * slabD);
+    ctx.closePath();
+    const trayGrad = ctx.createLinearGradient(0, L.trayY1, 0, L.trayY2 + slabD);
+    trayGrad.addColorStop(0, '#4a5568');
+    trayGrad.addColorStop(1, '#2d3748');
+    ctx.fillStyle = trayGrad;
+    ctx.fill();
+
+    // Tray top edge highlight
+    ctx.strokeStyle = '#718096';
+    ctx.lineWidth   = 2;
+    ctx.lineCap     = 'round';
+    ctx.beginPath();
+    ctx.moveTo(L.trayX1, L.trayY1); ctx.lineTo(L.trayX2, L.trayY2);
+    ctx.stroke();
+
+    // Right wall (solid stop at tray end)
+    const wallW = 8;
+    const wallGrad = ctx.createLinearGradient(L.wallX - wallW, 0, L.wallX, 0);
+    wallGrad.addColorStop(0, '#4a5568');
+    wallGrad.addColorStop(1, '#718096');
+    ctx.fillStyle = wallGrad;
+    ctx.fillRect(L.wallX - wallW / 2, L.wallYtop, wallW, L.wallYbot - L.wallYtop);
+    ctx.strokeStyle = 'rgba(180,200,220,0.3)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(L.wallX - wallW / 2, L.wallYtop, wallW, L.wallYbot - L.wallYtop);
+
+    ctx.restore();
+
+    // ── Draw rods (cross-sections) ──
+    const halfGap = state.gap / 2;
+    const rodCX   = L.svCX;
+    const rodY    = L.rodY;
+    const rodH    = L.rodH;
+    const rodW    = L.rodW;
+
+    // Left rod
+    const lrodX = rodCX - halfGap - rodW;
+    const rrodX = rodCX + halfGap;
+
+    function drawRod(rx) {
+      const rg = ctx.createLinearGradient(rx, rodY, rx + rodW, rodY);
+      rg.addColorStop(0, '#2d3748');
+      rg.addColorStop(0.4, '#718096');
+      rg.addColorStop(1, '#4a5568');
+      ctx.fillStyle = rg;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(rx, rodY, rodW, rodH, 3);
+      } else {
+        ctx.rect(rx, rodY, rodW, rodH);
+      }
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(180,200,220,0.25)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    drawRod(lrodX);
+    drawRod(rrodX);
+
+    // Gap arrows (when gap is still opening)
+    if (halfGap < params.maxRadius + 4) {
+      ctx.fillStyle = 'rgba(74,158,255,0.55)';
+      ctx.font = `${Math.max(9, Math.min(13, sw * 0.035))}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText('← →', rodCX, rodY - 5);
+    }
+
+    // ── Draw marbles (physics bodies) ──
+    state.marbles.forEach(m => {
+      if (m.state === 'held') return;
+
+      ctx.save();
+      // Shadow for depth
+      ctx.shadowColor = `hsla(${m.hue},70%,40%,0.5)`;
+      ctx.shadowBlur  = 8;
+
+      const gr = ctx.createRadialGradient(
+        m.x - m.radius * 0.38, m.y - m.radius * 0.40, m.radius * 0.05,
+        m.x, m.y, m.radius
+      );
+      gr.addColorStop(0,   m.colorLight);
+      gr.addColorStop(0.35, m.colorMid);
+      gr.addColorStop(1,   m.colorDark);
+
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+      ctx.fillStyle = gr;
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Size label for larger marbles
+      if (m.radius >= 12) {
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.font = `bold ${Math.round(m.radius * 0.7)}px Inter, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(Math.round(m.radius * 2), m.x, m.y);
+        ctx.textBaseline = 'alphabetic';
+      }
+
+      ctx.restore();
+    });
+
+    // ── Label ──
+    ctx.fillStyle = '#4a9eff';
+    ctx.font = 'bold 11px Inter, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('SIDE VIEW', sx + 10, sy + 18);
+    ctx.fillStyle = 'rgba(140,160,200,0.7)';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.fillText(`Sorted: ${state.fallenCount} / ${params.marbleCount}`, sx + 10, sy + 32);
+
+    // Complete banner
+    if (state.complete) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(5,5,20,0.65)';
+      const banH = 38;
+      ctx.fillRect(sx, sy + sh / 2 - banH / 2, sw, banH);
+      ctx.fillStyle = '#4ade80';
+      ctx.font = `bold ${Math.round(sw * 0.04)}px Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('✓ SORTING COMPLETE', sx + sw / 2, sy + sh / 2 + 6);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  /* ═══════════════════════════════════════════════
+     SIMULATION CONTROLLER
+  ═══════════════════════════════════════════════ */
+  const Sim = {
+    canvas: null,
+    ctx: null,
+    raf: null,
+    fps: 60, frameCount: 0, fpsTime: 0, lastTime: 0,
+
+    init(canvas) {
+      this.canvas = canvas;
+      this.ctx    = canvas.getContext('2d');
+      this.resize();
+      this.reset();
+      this.lastTime = performance.now();
+      this.fpsTime  = performance.now();
+      this.loop();
+    },
+
+    resize() {
+      const wrapper = this.canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      const w   = wrapper.clientWidth;
+      const h   = wrapper.clientHeight;
+      this.canvas.width  = w * dpr;
+      this.canvas.height = h * dpr;
+      this.canvas.style.width  = w + 'px';
+      this.canvas.style.height = h + 'px';
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      updateLayout(w, h);
+    },
+
+    reset() {
+      state.gap        = 0;
+      state.fallenCount = 0;
+      state.isRunning  = false;
+      state.complete   = false;
+      state.marbles    = createMarbles();
+      // Re-compute tray geometry in case params changed
+      updateLayout(L.cw, L.ch);
+    },
+
+    loop() {
+      this.raf = requestAnimationFrame(now => {
+        const dt = (now - this.lastTime) / 1000;
+        this.lastTime = now;
+
+        // FPS counter
+        this.frameCount++;
+        if (now - this.fpsTime >= 1000) {
+          this.fps = this.frameCount;
+          this.frameCount = 0;
+          this.fpsTime = now;
+        }
+
+        if (state.isRunning) physicsStep(dt);
+
+        render(this.ctx);
+        updateHUD();
+        this.loop();
+      });
+    },
+
+    play()  { state.isRunning = true; },
+    pause() { state.isRunning = false; },
+  };
+
+  /* ═══════════════════════════════════════════════
+     HUD UPDATES
+  ═══════════════════════════════════════════════ */
+  function updateHUD() {
+    const gapStr    = state.gap.toFixed(1) + ' px';
+    const sortStr   = state.fallenCount + ' / ' + params.marbleCount;
+    const fpsStr    = Sim.fps;
+    const progress  = Math.min(1, state.gap / (params.maxRadius * 2)) * 100;
+
+    // Sidebar stats
+    const sbGap    = document.getElementById('sbGap');
+    const sbSorted = document.getElementById('sbSorted');
+    const sbFPS    = document.getElementById('sbFPS');
+    const bar      = document.getElementById('gapBarFill');
+    if (sbGap)    sbGap.textContent    = gapStr;
+    if (sbSorted) sbSorted.textContent = sortStr;
+    if (sbFPS)    sbFPS.textContent    = fpsStr;
+    if (bar)      bar.style.width      = progress + '%';
+
+    // Canvas stats
+    const cvGap    = document.getElementById('cvGap');
+    const cvSorted = document.getElementById('cvSorted');
+    const cvFPS    = document.getElementById('cvFPS');
+    if (cvGap)    cvGap.textContent    = gapStr;
+    if (cvSorted) cvSorted.textContent = sortStr;
+    if (cvFPS)    cvFPS.textContent    = fpsStr;
+  }
+
+  /* ═══════════════════════════════════════════════
+     UI CONTROLLER
+  ═══════════════════════════════════════════════ */
+  const UI = {
+    sidebar: null,
+    overlay: null,
+    sidebarOpen: true,
+
+    init() {
+      this.sidebar = document.getElementById('simulationSidebar');
+      this.overlay = document.getElementById('simulationOverlay');
+      this.setupSidebar();
+      this.setupControls();
+      this.setupPresets();
+      this.setupOverlay();
+      this.setupResize();
+    },
+
+    setupSidebar() {
+      const toggle  = document.getElementById('sidebarToggle');
+      const ctrlBtn = document.getElementById('sidebarControlBtn');
+      const wrapper = document.getElementById('canvasWrapper');
+
+      const toggleFn = () => {
+        this.sidebarOpen = !this.sidebarOpen;
+        if (this.sidebarOpen) {
+          this.sidebar.classList.remove('collapsed');
+          wrapper.classList.remove('sidebar-collapsed');
+          ctrlBtn.style.display = 'none';
+        } else {
+          this.sidebar.classList.add('collapsed');
+          wrapper.classList.add('sidebar-collapsed');
+          ctrlBtn.style.display = 'flex';
+        }
+        setTimeout(() => Sim.resize(), 320);
+      };
+
+      if (toggle)  toggle.addEventListener('click',  toggleFn);
+      if (ctrlBtn) ctrlBtn.addEventListener('click', toggleFn);
+
+      // Mobile
+      const expandBtn   = document.getElementById('mobileExpandBtn');
+      const collapseBtn = document.getElementById('mobileCollapseBtn');
+      if (expandBtn) expandBtn.addEventListener('click', () => {
+        this.sidebar.classList.add('expanded');
+        expandBtn.style.display   = 'none';
+        if (collapseBtn) collapseBtn.style.display = 'block';
+      });
+      if (collapseBtn) collapseBtn.addEventListener('click', () => {
+        this.sidebar.classList.remove('expanded');
+        collapseBtn.style.display = 'none';
+        if (expandBtn) expandBtn.style.display = 'block';
+      });
+    },
+
+    setupControls() {
+      function wire(id, valId, key, fmt) {
+        const input = document.getElementById(id);
+        const val   = document.getElementById(valId);
+        if (!input) return;
+        const update = () => {
+          params[key] = parseFloat(input.value);
+          if (val) val.textContent = fmt ? fmt(params[key]) : params[key];
+        };
+        input.addEventListener('input', update);
+        update();
+      }
+
+      wire('marbleCount',    'marbleCountVal',    'marbleCount',    v => v);
+      wire('minRadius',      'minRadiusVal',      'minRadius',      v => v + ' px');
+      wire('maxRadius',      'maxRadiusVal',      'maxRadius',      v => v + ' px');
+      wire('separationSpeed','separationSpeedVal','separationSpeed',v => v + ' px/s');
+      wire('gravity',        'gravityVal',        'gravity',        v => v);
+      wire('trayAngle',      'trayAngleVal',      'trayAngle',      v => v + '°');
+      wire('restitution',    'restitutionVal',    'restitution',    v => v.toFixed(2));
+    },
+
+    setupPresets() {
+      const grid = document.getElementById('presetGrid');
+      if (!grid) return;
+      Object.entries(PRESETS).forEach(([key, preset]) => {
+        const btn = document.createElement('button');
+        btn.className   = 'preset-btn';
+        btn.textContent = preset.name;
+        btn.style.borderColor = preset.color + '60';
+        btn.addEventListener('click', () => {
+          // Apply preset params
+          Object.assign(params, preset.p);
+          // Update controls
+          const map = {
+            marbleCount: ['marbleCount', 'marbleCountVal', v => v],
+            minRadius:   ['minRadius',   'minRadiusVal',   v => v + ' px'],
+            maxRadius:   ['maxRadius',   'maxRadiusVal',   v => v + ' px'],
+            separationSpeed: ['separationSpeed','separationSpeedVal', v => v + ' px/s'],
+            gravity:     ['gravity',     'gravityVal',     v => v],
+            trayAngle:   ['trayAngle',   'trayAngleVal',   v => v + '°'],
+            restitution: ['restitution', 'restitutionVal', v => v.toFixed(2)],
+          };
+          Object.entries(map).forEach(([k, [inputId, valId, fmt]]) => {
+            const el = document.getElementById(inputId);
+            const vl = document.getElementById(valId);
+            if (el) el.value = params[k];
+            if (vl) vl.textContent = fmt(params[k]);
+          });
+          // Mark active
+          grid.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          // Reset
+          Sim.reset();
+          this.showOverlay();
+        });
+        grid.appendChild(btn);
+      });
+    },
+
+    setupOverlay() {
+      const play  = document.getElementById('playButton');
+      const reset = document.getElementById('resetButton');
+      if (play) play.addEventListener('click', () => {
+        this.hideOverlay();
+        Sim.play();
+      });
+      if (reset) reset.addEventListener('click', () => {
+        Sim.reset();
+        this.showOverlay();
+      });
+
+      // Click canvas to pause
+      const canvas = document.getElementById('simulationCanvas');
+      if (canvas) canvas.addEventListener('click', () => {
+        if (state.isRunning) {
+          Sim.pause();
+          this.showOverlay();
+        }
+      });
+    },
+
+    showOverlay() {
+      if (this.overlay) this.overlay.classList.remove('hidden');
+    },
+    hideOverlay() {
+      if (this.overlay) this.overlay.classList.add('hidden');
+    },
+
+    setupResize() {
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => Sim.resize(), 80);
+      });
+    },
+  };
+
+  /* ═══════════════════════════════════════════════
+     BOOT
+  ═══════════════════════════════════════════════ */
+  window.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('simulationCanvas');
+    Sim.init(canvas);
+    UI.init();
+  });
+  </script>
+  <script src="../../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -m http.server:*)"
+      "Bash(python -m http.server:*)",
+      "Bash(ls simulations/*.html)",
+      "Bash(grep -l \"sim-card\\\\|sim-info\" simulations/*.css simulations/**/*.css)"
     ],
     "deny": [],
     "ask": []

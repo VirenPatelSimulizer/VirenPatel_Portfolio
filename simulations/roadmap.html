@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ── Roadmap spine variables ── */
+        :root {
+            --rm-gap: 2rem;       /* gap between grid columns */
+            --rm-pad: 2rem;       /* grid side padding */
+            --rm-grid-max: 1000px; /* junction + merge grid max-width */
+            --rm-branch-max: 1200px; /* outer branch container max-width */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -186,25 +194,15 @@
             border-radius: 50%;
             left: 50%;
             transform: translateX(-50%);
-            animation: pulseDown 2s ease-in-out infinite;
+            animation: pulseDown 2.4s linear infinite;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
         }
 
         @keyframes pulseDown {
-            0% {
-                top: 0;
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                top: 100%;
-                opacity: 0;
-            }
+            0%        { top: 0; opacity: 0; animation-timing-function: ease-in-out; }
+            5%        { opacity: 1; }
+            25%       { top: 100%; opacity: 1; }
+            30%, 100% { opacity: 0; }
         }
 
         /* Connection label */
@@ -309,6 +307,14 @@
         .node-status.planned {
             background: rgba(245, 158, 11, 0.2);
             color: #f59e0b;
+        }
+
+        .node-date {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.65rem;
+            color: #475569;
+            letter-spacing: 0.04em;
         }
 
         .sim-node.planned-node {
@@ -479,7 +485,7 @@
         .three-way-branch {
             position: relative;
             width: 100%;
-            max-width: 1200px;
+            max-width: var(--rm-branch-max);
             margin: 0 auto;
         }
 
@@ -507,10 +513,11 @@
 
         .junction-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            padding: 0 2rem;
-            max-width: 1000px;
+            /* Named lines: col-l = left col, col-s = spine col, col-r = right col */
+            grid-template-columns: [col-l] 1fr [col-s] 1fr [col-r] 1fr [col-end];
+            gap: var(--rm-gap);
+            padding: 0 var(--rm-pad);
+            max-width: var(--rm-grid-max);
             margin: 0 auto;
         }
 
@@ -527,7 +534,9 @@
             position: absolute;
             top: 0;
             left: 50%;
-            width: calc(100% + 2rem);
+            /* from this cell's center to the adjacent cell's center:
+               50% (half this cell) + gap + 50% (half next cell) = 100% + gap */
+            width: calc(100% + var(--rm-gap));
             height: 3px;
             background: linear-gradient(90deg, #8b5cf6, #a78bfa);
             border-radius: 2px;
@@ -586,7 +595,7 @@
         .convergence-section {
             position: relative;
             width: 100%;
-            max-width: 1200px;
+            max-width: var(--rm-branch-max);
             margin: 1rem auto 2rem;
             display: flex;
             flex-direction: column;
@@ -595,11 +604,12 @@
 
         .merge-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            column-gap: 2rem;
+            /* Same named spine as junction-grid — both grids share one coordinate system */
+            grid-template-columns: [col-l] 1fr [col-s] 1fr [col-r] 1fr [col-end];
+            column-gap: var(--rm-gap);
             row-gap: 0;
-            padding: 0 2rem;
-            max-width: 1000px;
+            padding: 0 var(--rm-pad);
+            max-width: var(--rm-grid-max);
             margin: 0 auto;
             width: 100%;
         }
@@ -616,7 +626,8 @@
             position: absolute;
             bottom: 0;
             left: 50%;
-            width: calc(100% + 2rem);
+            /* from col-l center to col-s center (the spine) */
+            width: calc(100% + var(--rm-gap));
             height: 3px;
             background: linear-gradient(90deg, #8b5cf6, #ec4899);
             border-radius: 2px;
@@ -631,7 +642,13 @@
         }
 
         .merge-stem-cell {
-            grid-column: 1 / 3;
+            /* Position is computed by positionMergeJunction() in JS.
+               CSS Grid cannot express "midpoint between these two specific DOM nodes"
+               so we remove it from grid flow and position it absolutely.
+               JS reads getBoundingClientRect() on the two source nodes and
+               sets left = midpoint(source-left-centerX, source-center-centerX). */
+            position: absolute;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -704,11 +721,11 @@
 
         /* === SPLIT — Phase 1 (0–30%): stem pulse travels down === */
         .split-stem > .flow-pulse {
-            animation: splitP1 2.4s ease-in-out infinite;
+            animation: splitP1 2.4s linear infinite;
         }
 
         @keyframes splitP1 {
-            0%        { top: -6px; opacity: 0; }
+            0%        { top: -6px; opacity: 0; animation-timing-function: ease-in-out; }
             5%        { opacity: 1; }
             25%       { top: 100%; opacity: 1; }
             30%, 100% { opacity: 0; }
@@ -731,11 +748,12 @@
 
         /* Col 1: fan LEFT — pulse sweeps right→left along col 1's h-segment */
         .split-drop:first-child::before {
-            animation: hFanLeft 2.4s ease-in-out infinite;
+            animation: hFanLeft 2.4s linear infinite;
         }
 
         @keyframes hFanLeft {
-            0%, 28%   { left: calc(100% + 2rem); opacity: 0; }
+            0%, 27%   { left: calc(150% + var(--rm-gap)); opacity: 0; }
+            28%       { left: calc(150% + var(--rm-gap)); opacity: 0; animation-timing-function: ease-in-out; }
             32%       { opacity: 1; }
             55%       { left: 50%; opacity: 1; }
             60%, 100% { opacity: 0; }
@@ -743,13 +761,14 @@
 
         /* Col 2: fan RIGHT — pulse sweeps left→right along col 2's h-segment */
         .split-drop:nth-child(2)::before {
-            animation: hFanRight 2.4s ease-in-out infinite;
+            animation: hFanRight 2.4s linear infinite;
         }
 
         @keyframes hFanRight {
-            0%, 28%   { left: 50%; opacity: 0; }
+            0%, 27%   { left: 50%; opacity: 0; }
+            28%       { left: 50%; opacity: 0; animation-timing-function: ease-in-out; }
             32%       { opacity: 1; }
-            55%       { left: calc(100% + 2rem); opacity: 1; }
+            55%       { left: calc(150% + var(--rm-gap)); opacity: 1; }
             60%, 100% { opacity: 0; }
         }
 
@@ -760,11 +779,12 @@
 
         /* === SPLIT — Phase 3 (58–95%): drop pulses travel down === */
         .drop-line > .flow-pulse {
-            animation: splitP3 2.4s ease-in-out infinite;
+            animation: splitP3 2.4s linear infinite;
         }
 
         @keyframes splitP3 {
-            0%, 58%   { top: -6px; opacity: 0; }
+            0%, 57%   { top: -6px; opacity: 0; }
+            58%       { top: -6px; opacity: 0; animation-timing-function: ease-in-out; }
             62%       { opacity: 1; }
             90%       { top: 100%; opacity: 1; }
             95%, 100% { opacity: 0; }
@@ -772,11 +792,11 @@
 
         /* === MERGE — Phase 1 (0–30%): rise pulses travel down toward h-line === */
         .rise-line > .flow-pulse {
-            animation: mergeP1 2.4s ease-in-out infinite;
+            animation: mergeP1 2.4s linear infinite;
         }
 
         @keyframes mergeP1 {
-            0%        { top: -6px; opacity: 0; }
+            0%        { top: -6px; opacity: 0; animation-timing-function: ease-in-out; }
             5%        { opacity: 1; }
             25%       { top: 100%; opacity: 1; }
             30%, 100% { opacity: 0; }
@@ -795,23 +815,25 @@
             z-index: 1;
             pointer-events: none;
             opacity: 0;
-            animation: hConverge 2.4s ease-in-out infinite;
+            animation: hConverge 2.4s linear infinite;
         }
 
         @keyframes hConverge {
-            0%, 28%   { left: 50%; opacity: 0; }
+            0%, 27%   { left: 50%; opacity: 0; }
+            28%       { left: 50%; opacity: 0; animation-timing-function: ease-in-out; }
             32%       { opacity: 1; }
-            55%       { left: calc(100% + 2rem); opacity: 1; }
+            55%       { left: calc(150% + var(--rm-gap)); opacity: 1; }
             60%, 100% { opacity: 0; }
         }
 
         /* === MERGE — Phase 3 (58–95%): stem pulse drops to merged node === */
         .merge-stem > .flow-pulse {
-            animation: mergeP3 2.4s ease-in-out infinite;
+            animation: mergeP3 2.4s linear infinite;
         }
 
         @keyframes mergeP3 {
-            0%, 58%   { top: -6px; opacity: 0; }
+            0%, 57%   { top: -6px; opacity: 0; }
+            58%       { top: -6px; opacity: 0; animation-timing-function: ease-in-out; }
             62%       { opacity: 1; }
             90%       { top: 100%; opacity: 1; }
             95%, 100% { opacity: 0; }
@@ -1117,6 +1139,7 @@
                     <h3 class="node-title">Brownian Motion</h3>
                     <p class="node-subtitle">Random particle movement & diffusion</p>
                     <span class="node-status">Active</span>
+                    <span class="node-date">4 Feb 2025</span>
                 </div>
 
                 <!-- Connection Line -->
@@ -1135,6 +1158,7 @@
                     <h3 class="node-title">Gravitational N-Body</h3>
                     <p class="node-subtitle">Orbital mechanics & attraction</p>
                     <span class="node-status">Active</span>
+                    <span class="node-date">11 Feb 2026</span>
                 </div>
 
                 <!-- Connection Line -->
@@ -1153,6 +1177,7 @@
                     <h3 class="node-title">Dual Particle</h3>
                     <p class="node-subtitle">Dual-species interactions & emergent patterns</p>
                     <span class="node-status">Active</span>
+                    <span class="node-date">18 Feb 2026</span>
                 </div>
 
                 <!-- Three-way branch: SPLIT JUNCTION from Dual Particle -->
@@ -1200,13 +1225,14 @@
                             </div>
                         </div>
                         <div class="flow-col">
-                            <div class="sim-node branch-node planned-node" data-sim="sim4_b03" id="node-sim4_b03">
+                            <div class="sim-node branch-node" data-sim="sim4_b03" id="node-sim4_b03">
                                 <div class="node-icon">
-                                    <img src="assets/media/logo/sim4_b01.png" alt="Tri-Particle">
+                                    <img src="assets/media/logo/sin4_b03.png" alt="Tri-Particle">
                                 </div>
                                 <h3 class="node-title">Tri-Particle</h3>
                                 <p class="node-subtitle">3 species, symmetric forces</p>
-                                <span class="node-status planned">Coming Soon</span>
+                                <span class="node-status">Active</span>
+                                <span class="node-date">5 Mar 2026</span>
                             </div>
                         </div>
                         <div class="flow-col">
@@ -1217,6 +1243,7 @@
                                 <h3 class="node-title">Linear Aggregates</h3>
                                 <p class="node-subtitle">Filament self-assembly from simple bonding rules</p>
                                 <span class="node-status">Active</span>
+                                <span class="node-date">25 Feb 2026</span>
                             </div>
                         </div>
                     </div>
@@ -1313,6 +1340,7 @@
                 difficulty: 'Beginner',
                 time: '5-10 min',
                 tags: ['Physics', 'Particles', 'Diffusion'],
+                publishedDate: '4 Feb 2025',
                 iconImg: 'assets/media/logo/sim1.png',
                 launchUrl: 'sims/sim1.html',
                 infoUrl: 'sims/sim1_info.html'
@@ -1324,6 +1352,7 @@
                 difficulty: 'Intermediate',
                 time: '10-15 min',
                 tags: ['Gravity', 'N-Body', 'Astrophysics'],
+                publishedDate: '11 Feb 2026',
                 iconImg: 'assets/media/logo/sim2.png',
                 launchUrl: 'sims/sim2.html',
                 infoUrl: 'sims/sim2_info.html'
@@ -1335,6 +1364,7 @@
                 difficulty: 'Intermediate',
                 time: '10-15 min',
                 tags: ['Particles', 'Dual-Species', 'Emergence'],
+                publishedDate: '18 Feb 2026',
                 iconImg: 'assets/media/logo/sim3.png',
                 launchUrl: 'sims/sim3.html',
                 infoUrl: ''
@@ -1346,7 +1376,8 @@
                 difficulty: 'Intermediate',
                 time: '10-15 min',
                 tags: ['+ 3rd Species', 'Symmetric', '6 Forces'],
-                iconImg: 'assets/media/logo/sim4_b01.png',
+                publishedDate: '5 Mar 2026',
+                iconImg: 'assets/media/logo/sin4_b03.png',
                 launchUrl: 'sims/sim4_b03.html',
                 infoUrl: ''
             },
@@ -1379,6 +1410,7 @@
                 difficulty: 'Intermediate',
                 time: '10-15 min',
                 tags: ['+ Bonding Rules', 'Self-Assembly', 'Filaments'],
+                publishedDate: '25 Feb 2026',
                 iconImg: 'assets/media/logo/sim4_b01.png',
                 launchUrl: 'sims/sim4_b01.html',
                 infoUrl: 'sims/sim4_b01_info.html'
@@ -1422,6 +1454,7 @@
                     ${sim.time}
                 </div>
                 ${sim.tags.map(tag => `<div class="meta-tag">${tag}</div>`).join('')}
+                ${sim.publishedDate ? `<div class="meta-tag" style="font-size:0.65rem;opacity:0.6;">${sim.publishedDate}</div>` : ''}
             `;
 
             // Update buttons
@@ -1464,6 +1497,119 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') hideInfo();
         });
+
+        // ── Topology-based merge geometry ──
+        // CSS Grid cannot express "centered between exactly these two DOM nodes."
+        // We read actual rendered positions via getBoundingClientRect and compute
+        // the merge junction x as the midpoint of the two source node centers.
+        function positionMergeJunction() {
+            var srcLeft   = document.getElementById('node-sim4_b05'); // Asymmetric Dual-Particle
+            var srcCenter = document.getElementById('node-sim4_b03'); // Tri-Particle
+            var stemCell  = document.querySelector('.merge-stem-cell');
+            var section   = document.querySelector('.convergence-section');
+            var grid      = section && section.querySelector('.merge-grid');
+            if (!srcLeft || !srcCenter || !stemCell || !section || !grid) return;
+
+            // Reset so rects reflect natural layout before our adjustments
+            section.style.paddingBottom = '';
+
+            var r1    = srcLeft.getBoundingClientRect();
+            var r2    = srcCenter.getBoundingClientRect();
+            var rSec  = section.getBoundingClientRect();
+            var rGrid = grid.getBoundingClientRect();
+
+            // Midpoint between the two source node center-x values (viewport coords)
+            var mergeX = (r1.left + r1.width / 2 + r2.left + r2.width / 2) / 2;
+
+            // Set position relative to convergence-section (the nearest positioned ancestor)
+            stemCell.style.left = (mergeX - rSec.left) + 'px';
+            stemCell.style.top  = (rGrid.bottom - rSec.top) + 'px';
+
+            // Extend section height so the absolutely-positioned stem cell isn't clipped
+            section.style.paddingBottom = stemCell.getBoundingClientRect().height + 'px';
+        }
+
+        window.addEventListener('load', positionMergeJunction);
+        window.addEventListener('resize', positionMergeJunction);
+
+        // ── DEBUG: display rendered height of each segment ──
+        window.addEventListener('load', function() {
+            const styleEl = document.createElement('style');
+            styleEl.textContent = `
+                .seg-dbg {
+                    position: absolute;
+                    background: rgba(250, 204, 21, 0.92);
+                    color: #000;
+                    font-family: monospace;
+                    font-size: 10px;
+                    font-weight: bold;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    white-space: nowrap;
+                    pointer-events: none;
+                    z-index: 9999;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+            `;
+            document.head.appendChild(styleEl);
+
+            function addLabel(el, name, side) {
+                el.style.position = 'relative';
+                const badge = document.createElement('span');
+                badge.className = 'seg-dbg';
+                badge.textContent = name + ': ' + Math.round(el.getBoundingClientRect().height) + 'px';
+                badge.style[side === 'left' ? 'right' : 'left'] = 'calc(100% + 6px)';
+                el.appendChild(badge);
+            }
+
+            // Split stem (before 3-way branch)
+            document.querySelectorAll('.split-stem').forEach(function(el, i) {
+                addLabel(el, 'split-stem', 'right');
+            });
+
+            // Drop lines (3 branches down from junction)
+            document.querySelectorAll('.drop-line').forEach(function(el, i) {
+                addLabel(el, 'drop' + (i + 1), 'right');
+            });
+
+            // Rise lines (merging up into combo node)
+            document.querySelectorAll('.rise-line').forEach(function(el, i) {
+                addLabel(el, 'rise' + (i + 1), 'right');
+            });
+
+            // Merge stem (after convergence point)
+            document.querySelectorAll('.merge-stem').forEach(function(el, i) {
+                addLabel(el, 'merge-stem', 'right');
+            });
+
+            // Horizontal h-lines in split junction (::after pseudo-elements on .split-drop)
+            // Last child has display:none so skip it
+            document.querySelectorAll('.split-drop').forEach(function(el, i) {
+                if (i === 2) return;
+                const w = Math.round(parseFloat(getComputedStyle(el, '::after').width));
+                if (!w) return;
+                const badge = document.createElement('span');
+                badge.className = 'seg-dbg';
+                badge.textContent = 'h-split' + (i + 1) + ': ' + w + 'px';
+                badge.style.cssText = 'top: 0; transform: translateY(-160%); left: 50%;';
+                el.appendChild(badge);
+            });
+
+            // Horizontal h-line in merge section (::after pseudo-element on .merge-rise:first-child)
+            var mergeRiseFirst = document.querySelector('.merge-rise:first-child');
+            if (mergeRiseFirst) {
+                var w = Math.round(parseFloat(getComputedStyle(mergeRiseFirst, '::after').width));
+                if (w) {
+                    var badge = document.createElement('span');
+                    badge.className = 'seg-dbg';
+                    badge.textContent = 'h-merge: ' + w + 'px';
+                    badge.style.cssText = 'bottom: 0; top: auto; transform: translateY(160%); left: 50%;';
+                    mergeRiseFirst.appendChild(badge);
+                }
+            }
+        });
+        // ── END DEBUG ──
     </script>
 </body>
 </html>

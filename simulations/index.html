@@ -543,6 +543,14 @@
       border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
+    .sim-date-badge {
+      background: transparent;
+      color: #475569;
+      border-color: transparent;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.25rem;
+    }
+
     .sim-btn {
       display: inline-block;
       background: linear-gradient(135deg, #3b82f6, #8b5cf6);
@@ -819,7 +827,7 @@
           header: true,
           skipEmptyLines: true,
           complete: function(results) {
-            allSimulations = results.data.filter(sim => sim.status === 'active');
+            allSimulations = results.data.filter(sim => sim.status === 'active').reverse();
             upcomingSimulations = results.data.filter(sim => sim.status === 'upcoming');
             processData();
             init();
@@ -971,6 +979,7 @@
               <div class="sim-meta">
                 <span class="meta-badge">${sim.difficulty}</span>
                 <span class="meta-badge">${sim.estimatedTime}</span>
+                ${sim.publishedDate ? `<span class="meta-badge sim-date-badge">${sim.publishedDate}</span>` : ''}
               </div>
               <p>${sim.shortDescription}</p>
               <a href="${sim.simulationPage}" class="sim-btn">Launch Simulation</a>
