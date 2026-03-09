@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python -m http.server:*)",
       "Bash(ls simulations/*.html)",
-      "Bash(grep -l \"sim-card\\\\|sim-info\" simulations/*.css simulations/**/*.css)"
+      "Bash(grep -l \"sim-card\\\\|sim-info\" simulations/*.css simulations/**/*.css)",
+      "Bash(node -e \":*)"
     ],
     "deny": [],
     "ask": []

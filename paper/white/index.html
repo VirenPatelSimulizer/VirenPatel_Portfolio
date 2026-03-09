@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Technical White Papers by Viren Patel — Research on quantum computing, semiconductor testing, and physics-driven computation.">
+  <title>White Papers - Viren Patel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DMXF1FG10E');
+  </script>
+
+  <style>
+    /* ── PAGE HERO ── */
+    .wp-hero {
+      padding: 130px 2rem 70px;
+      text-align: center;
+    }
+    .wp-hero-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .wp-label {
+      display: inline-block;
+      background: rgba(99,102,241,0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.3);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .wp-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #e2e8f0 0%, #a5b4fc 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.1rem;
+    }
+    .wp-hero p {
+      color: #94a3b8;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      max-width: 580px;
+      margin: 0 auto 2.5rem;
+    }
+    .wp-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .wp-stat-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #a5b4fc;
+      display: block;
+    }
+    .wp-stat-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .wp-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+    .wp-section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .wp-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary-color);
+      white-space: nowrap;
+    }
+    .wp-section-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* ── PAPER CARDS ── */
+    .papers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+    .paper-card {
+      background: rgba(30,41,59,0.75);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .paper-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(99,102,241,0.45);
+      box-shadow: 0 28px 56px rgba(99,102,241,0.18);
+    }
+    .paper-thumb {
+      position: relative;
+      height: 215px;
+      overflow: hidden;
+      background: #080e1a;
+    }
+    .paper-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.5s ease;
+    }
+    .paper-card:hover .paper-thumb img { transform: scale(1.05); }
+    .paper-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, rgba(10,18,35,0.9) 100%);
+    }
+    .paper-thumb-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(99,102,241,0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 10px;
+    }
+    .paper-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+    }
+    .paper-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .paper-field {
+      background: rgba(139,92,246,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(139,92,246,0.22);
+      padding: 0.2rem 0.7rem;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .paper-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #f1f5f9;
+    }
+    .paper-abstract {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+    .paper-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .paper-tag {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      color: #94a3b8;
+      padding: 0.18rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.7rem;
+    }
+    .paper-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+    .wp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .wp-btn-primary {
+      background: var(--primary-color);
+      color: #fff;
+    }
+    .wp-btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
+    .wp-btn-outline {
+      background: transparent;
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    .wp-btn-outline:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+    .wp-btn-sim {
+      background: rgba(139,92,246,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(139,92,246,0.22);
+    }
+    .wp-btn-sim:hover { background: rgba(139,92,246,0.28); color: #c4b5fd; }
+
+    /* ── UPCOMING ── */
+    .upcoming-card {
+      background: rgba(30,41,59,0.4);
+      border: 1px dashed rgba(99,102,241,0.25);
+      border-radius: 16px;
+      padding: 2rem 2.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .upcoming-icon { font-size: 2.25rem; flex-shrink: 0; margin-top: 0.2rem; }
+    .upcoming-badge {
+      display: inline-block;
+      background: rgba(100,116,139,0.18);
+      color: #94a3b8;
+      border: 1px solid rgba(100,116,139,0.28);
+      padding: 0.2rem 0.65rem;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .upcoming-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 0.4rem;
+    }
+    .upcoming-card p { color: #64748b; font-size: 0.85rem; line-height: 1.65; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .papers-grid { grid-template-columns: 1fr; }
+      .wp-hero { padding: 110px 1.25rem 50px; }
+      .wp-content { padding: 0 1.25rem 4rem; }
+      .wp-stats { gap: 2rem; }
+      .upcoming-card { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Navbar -->
+  <header>
+    <nav>
+      <div class="logo">
+        <a href="../../index.html">Viren Patel</a>
+      </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../portfolio.html">Portfolio</a></li>
+        <li><a href="../../simulations/index.html">Simulations</a></li>
+        <li><a href="index.html" class="active">White Papers</a></li>
+        <li><a href="../../contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="wp-hero">
+    <div class="wp-hero-inner">
+      <div class="wp-label">Research &amp; Analysis</div>
+      <h1>Technical White Papers</h1>
+      <p>Original research on quantum computing, semiconductor testing methodology, and physics-driven computation — each paper paired with interactive simulations.</p>
+      <div class="wp-stats">
+        <div class="wp-stat">
+          <span class="wp-stat-num">1</span>
+          <span class="wp-stat-label">Published</span>
+        </div>
+        <div class="wp-stat">
+          <span class="wp-stat-num">3</span>
+          <span class="wp-stat-label">Simulations</span>
+        </div>
+        <div class="wp-stat">
+          <span class="wp-stat-num">2</span>
+          <span class="wp-stat-label">In Progress</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Papers Content -->
+  <div class="wp-content">
+
+    <!-- Published -->
+    <div class="wp-section-header">
+      <span class="wp-section-title">Published</span>
+      <div class="wp-section-line"></div>
+    </div>
+
+    <div class="papers-grid">
+
+      <!-- Paper 1: Letting Physics Do The Computation -->
+      <div class="paper-card">
+        <div class="paper-thumb">
+          <img src="QuantumComputer_simulation_25bit_processor/Grovers_logo.png"
+               alt="Letting Physics Do The Computation">
+          <div class="paper-thumb-overlay"></div>
+          <div class="paper-thumb-badge">March 2026</div>
+        </div>
+        <div class="paper-body">
+          <div class="paper-meta">
+            <span class="paper-field">Quantum Computing</span>
+            <span class="paper-field" style="background:rgba(6,182,212,0.12);color:#67e8f9;border-color:rgba(6,182,212,0.2);">Physics</span>
+          </div>
+          <div class="paper-title">Letting Physics Do The Computation</div>
+          <div class="paper-abstract">
+            Explores how physical systems can perform computation intrinsically — and what this means for the role of quantum computers. Examines Grover's search algorithm on a 25-bit processor as a concrete demonstration of quantum advantage over classical brute-force search.
+          </div>
+          <div class="paper-tags">
+            <span class="paper-tag">Quantum Computing</span>
+            <span class="paper-tag">Grover's Algorithm</span>
+            <span class="paper-tag">Amplitude Amplification</span>
+            <span class="paper-tag">25-bit Processor</span>
+            <span class="paper-tag">Physical Sorting</span>
+          </div>
+          <div class="paper-actions">
+            <a href="QuantumComputer_simulation_25bit_processor/Letting_Physics_Do_the_Computation_WhitePaper.pdf"
+               target="_blank" class="wp-btn wp-btn-primary">📄 Read Paper</a>
+            <a href="QuantumComputer_simulation_25bit_processor/Grovers_Algorithm_Demo.html"
+               class="wp-btn wp-btn-sim">⚛️ Grover's Demo</a>
+            <a href="QuantumComputer_simulation_25bit_processor/Physical_Sorting.html"
+               class="wp-btn wp-btn-sim">🔀 Physical Sorting</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Upcoming -->
+    <div class="wp-section-header">
+      <span class="wp-section-title">Upcoming</span>
+      <div class="wp-section-line"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <div class="upcoming-card">
+        <div class="upcoming-icon">⚙️</div>
+        <div>
+          <div class="upcoming-badge">In Progress</div>
+          <h3>SPAT vs DPAT — Backend Semiconductor Assembly &amp; Test</h3>
+          <p>A comprehensive analytical framework comparing Static and Dynamic Part Average Testing in backend semiconductor manufacturing. Covers dependency modelling, variance analysis, hybrid PAT framework design, and an interactive backend simulator.</p>
+        </div>
+      </div>
+
+      <div class="upcoming-card">
+        <div class="upcoming-icon">🔭</div>
+        <div>
+          <div class="upcoming-badge">In Progress</div>
+          <h3>Quantum Advantage in Molecular Simulation</h3>
+          <p>Why quantum computers become necessary as molecular systems scale in complexity — exploring the crossover point where classical methods break down and quantum approaches take over.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 Viren Patel. All rights reserved.</p>
+      <div class="social-links">
+        <a href="mailto:virenp.jobs@gmail.com">Email</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
