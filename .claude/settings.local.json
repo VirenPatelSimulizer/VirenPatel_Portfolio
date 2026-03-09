@@ -4,7 +4,8 @@
       "Bash(python -m http.server:*)",
       "Bash(ls simulations/*.html)",
       "Bash(grep -l \"sim-card\\\\|sim-info\" simulations/*.css simulations/**/*.css)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(ls -1 d:/Portfolio-website/*.html)"
     ],
     "deny": [],
     "ask": []
