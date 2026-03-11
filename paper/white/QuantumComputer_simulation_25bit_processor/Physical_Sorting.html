@@ -391,6 +391,13 @@
         <input type="range" class="control-input" id="restitution" min="0.05" max="0.80" step="0.05" value="0.30">
       </div>
 
+      <div class="control-group">
+        <label class="control-label">
+          Upper Rail <span class="control-value" id="ceilLengthVal">70%</span>
+        </label>
+        <input type="range" class="control-input" id="ceilLength" min="20" max="100" step="5" value="70">
+      </div>
+
       <hr class="section-divider">
       <div class="section-label">Presets</div>
       <div class="preset-grid" id="presetGrid"></div>
@@ -463,7 +470,8 @@
     gravity: 450,          // px/s²
     trayAngle: 22,         // degrees
     restitution: 0.30,
-    friction: 0.22,
+    friction: 0,
+    ceilLength: 70,   // upper rail length as % of tray
   };
 
   const PRESETS = {
@@ -510,24 +518,23 @@
     rodY: 0, rodH: 14, rodW: 20,
     svCX: 0,
     trayX1: 0, trayY1: 0, trayX2: 0, trayY2: 0,
+    tray2X1: 0, tray2Y1: 0, tray2X2: 0, tray2Y2: 0,
+    tray2StartProj: 0, tray2EndProj: 0,
     wallX: 0, wallYtop: 0, wallYbot: 0,
     floorY: 0,
     // top view geometry
     rodTopY: 0, rodBotY: 0,
     tvCY: 0, tvRodX1: 0, tvRodX2: 0,
+    // uniform scale applied to marble radii + tray to fit everything on screen
+    layoutScale: 1,
   };
 
   function updateLayout(cw, ch) {
     L.cw = cw; L.ch = ch;
-    if (cw >= ch) {
-      L.orientation = 'landscape';
-      L.tx = 0;   L.ty = 0; L.tw = Math.floor(cw / 2); L.th = ch;
-      L.sx = L.tw; L.sy = 0; L.sw = cw - L.tw;         L.sh = ch;
-    } else {
-      L.orientation = 'portrait';
-      L.tx = 0; L.ty = 0;       L.tw = cw; L.th = Math.floor(ch / 2);
-      L.sx = 0; L.sy = L.th;    L.sw = cw; L.sh = ch - L.th;
-    }
+    // Always horizontal split: top view on top (30%), side view on bottom (70%)
+    L.orientation = 'portrait';
+    L.tx = 0; L.ty = 0;    L.tw = cw; L.th = Math.floor(ch * 0.30);
+    L.sx = 0; L.sy = L.th; L.sw = cw; L.sh = ch - L.th;
     // Side view geometry
     L.rodH = Math.max(10, L.sh * 0.034);
     L.rodW = Math.max(14, L.sw * 0.048);
@@ -536,23 +543,67 @@
     const tMarginL = Math.max(16, L.sw * 0.05);
     const tMarginR = Math.max(16, L.sw * 0.04);
 
-    // Tray length = largest marble diameter × count × 1.10
-    const maxDiam    = Math.max(params.minRadius, params.maxRadius) * 2;
-    const neededLen  = maxDiam * params.marbleCount * 1.10;
-    const availLen   = L.sw - tMarginL - tMarginR;
-    const trayLen    = Math.min(neededLen, availLen);
+    // Compute uniform layout scale so marble count + size fit on screen
+    const maxDiam      = Math.max(params.minRadius, params.maxRadius) * 2;
+    const rawNeededLen = maxDiam * params.marbleCount * 1.10;
+    const availLen     = L.sw - tMarginL - tMarginR;
+
+    // Horizontal: tray must fit in available width
+    const scaleH = availLen / rawNeededLen;
+    // Vertical: drop-zone + tray height + floor margin must fit in side view
+    const vertAtFull = Math.tan(ang) * rawNeededLen + params.maxRadius * 7;
+    const scaleV = (L.sh - L.rodH - 40) / vertAtFull;
+
+    // Use the tighter constraint; cap at 1 (never enlarge)
+    L.layoutScale = Math.min(1.0, scaleH, scaleV);
+    if (!isFinite(L.layoutScale) || L.layoutScale <= 0) L.layoutScale = 1.0;
+
+    const s = L.layoutScale;
+    const trayLen = rawNeededLen * s;
 
     L.trayX1 = L.sx + tMarginL;
     L.trayX2 = L.trayX1 + trayLen;
-    L.trayY1 = L.sy + L.sh * 0.50;
-    L.trayY2 = L.trayY1 + Math.tan(ang) * trayLen;
+
+    // Vertical positioning — clearances scale with marbles
+    const vertDrop  = Math.tan(ang) * trayLen;
+    const botMargin = Math.max(params.maxRadius * 2 * s, 20);
+    const rodDropH  = Math.max(params.maxRadius * 5 * s, L.sh * 0.08);
+    const topMin    = L.sy + rodDropH + L.rodH + 20;
+    const botMax    = L.sy + L.sh - botMargin;
+    const idealY1   = L.sy + L.sh * 0.40;
+    L.trayY1 = Math.min(idealY1, botMax - vertDrop);
+    L.trayY1 = Math.max(L.trayY1, topMin);
+    L.trayY2 = L.trayY1 + vertDrop;
 
     // Rods sit above the START of the tray (left/high end, first ~5%)
     const rodFrac    = 0.05;
     L.svCX  = L.trayX1 + rodFrac * trayLen;
     const trayYatRod = L.trayY1 + rodFrac * (L.trayY2 - L.trayY1);
-    const dropH      = Math.max(28, L.sh * 0.08);
+    const dropH      = Math.max(params.maxRadius * 5 * s, L.sh * 0.08);
     L.rodY  = trayYatRod - dropH - L.rodH;
+
+    // Upper parallel tray (ceiling, last 70%) — tapered from 2×minRadius to 1.5×maxRadius
+    const tDX = L.trayX2 - L.trayX1;
+    const tDY = L.trayY2 - L.trayY1;
+    const tL  = Math.sqrt(tDX * tDX + tDY * tDY);
+    const tgX2 = tDX / tL, tgY2 = tDY / tL;
+    let nnmX = -tgY2, nnmY = tgX2;
+    if (nnmY > 0) { nnmX = -nnmX; nnmY = -nnmY; } // ensure points UP
+    const ceilEndFrac   = 1.0; // always reaches the wall
+    const ceilStartFrac = Math.max(0, 1.0 - (params.ceilLength || 70) / 100); // user-controlled start
+    // Wide near rods (2× maxRadius), narrow at wall (2× minRadius)
+    const ceilSep1 = params.maxRadius * 2 * s; // wide at rod entry
+    const ceilSep2 = params.minRadius * 2 * s;   // narrow at wall
+    const ceilStartX = L.trayX1 + tgX2 * ceilStartFrac * tL;
+    const ceilStartY = L.trayY1 + tgY2 * ceilStartFrac * tL;
+    const ceilEndX   = L.trayX1 + tgX2 * ceilEndFrac * tL;
+    const ceilEndY   = L.trayY1 + tgY2 * ceilEndFrac * tL;
+    L.tray2X1 = ceilStartX + nnmX * ceilSep1;
+    L.tray2Y1 = ceilStartY + nnmY * ceilSep1;
+    L.tray2X2 = ceilEndX + nnmX * ceilSep2;
+    L.tray2Y2 = ceilEndY + nnmY * ceilSep2;
+    L.tray2StartProj = ceilStartFrac * tL;
+    L.tray2EndProj   = ceilEndFrac * tL;
 
     L.wallX    = L.trayX2;
     L.wallYtop = L.trayY2 - L.sh * 0.20;   // tall enough to block all marbles
@@ -604,7 +655,7 @@
     const rMax = Math.max(rMin + 2, params.maxRadius);
     for (let i = 0; i < n; i++) {
       const t = n > 1 ? i / (n - 1) : 0.5;
-      const r = rMin + t * (rMax - rMin);
+      const r = (rMin + t * (rMax - rMin)) * (L.layoutScale || 1);
       arr.push(new Marble(i, r));
     }
     // Shuffle top positions
@@ -646,8 +697,9 @@
 
     for (let s = 0; s < SUBS; s++) {
 
-      // ── 1. Gap ──
-      if (!state.complete) state.gap += params.separationSpeed * sdt;
+      // ── 1. Gap ── stop once every marble has been triggered (none 'held')
+      const hasHeld = state.marbles.some(m => m.state === 'held');
+      if (hasHeld) state.gap += params.separationSpeed * sdt;
 
       // ── 2. Trigger falling ──
       state.marbles.forEach(m => {
@@ -675,6 +727,7 @@
       for (let k = 0; k < ITERS; k++) {
         constrainBounds();
         constrainTray(sdt);
+        constrainUpperTray();
         constrainBalls();
       }
 
@@ -753,29 +806,48 @@
 
         if (vNorm < 0) {
           const newVn = -vNorm * params.restitution;
-          // Coulomb friction on tangential component
-          const fricImpulse = params.friction * Math.abs(vNorm);
-          let newVt = vTang;
-          if (Math.abs(newVt) <= fricImpulse) {
-            newVt = 0;
-          } else {
-            newVt -= Math.sign(newVt) * fricImpulse;
-          }
-          m.vx = newVn * _nmX + newVt * _tgX;
-          m.vy = newVn * _nmY + newVt * _tgY;
+          // No friction — preserve full tangential velocity
+          m.vx = newVn * _nmX + vTang * _tgX;
+          m.vy = newVn * _nmY + vTang * _tgY;
         }
 
-        // ── Rolling drag (slope friction when gliding) ──
-        const vt = m.vx * _tgX + m.vy * _tgY;
-        const drag = Math.min(Math.abs(vt), params.friction * params.gravity * sdt * 1.5);
-        if (Math.abs(vt) > 0.05) {
-          m.vx -= Math.sign(vt) * drag * _tgX;
-          m.vy -= Math.sign(vt) * drag * _tgY;
-        }
+        // No rolling drag — perfectly frictionless slope
 
         m.state = 'rolling';
       } else if (m.state === 'rolling') {
         m.state = 'falling'; // left the tray surface
+      }
+    });
+  }
+
+  /* Upper tray (ceiling) constraint — tapered, covers last 70% of slope */
+  function constrainUpperTray() {
+    if (_tLen < 0.001) return;
+    const startProj = L.tray2StartProj;
+    const sep1 = params.maxRadius * 2 * (L.layoutScale || 1); // wide near rods (2× maxRadius)
+    const sep2 = params.minRadius * 2 * (L.layoutScale || 1);   // narrow at far end
+    const endProj = L.tray2EndProj || _tLen;
+    const span = endProj - startProj;
+    state.marbles.forEach(m => {
+      if (m.state === 'held' || m.state === 'settled') return;
+      const dx   = m.x - L.trayX1;
+      const dy   = m.y - L.trayY1;
+      const proj = dx * _tgX + dy * _tgY;
+      const dist = dx * _nmX + dy * _nmY;
+      if (proj >= startProj - m.radius && proj <= endProj + m.radius) {
+        const t   = span > 0 ? Math.max(0, Math.min(1, (proj - startProj) / span)) : 1;
+        const sep = sep1 + t * (sep2 - sep1);
+        if (dist > sep - m.radius) {
+          const pen = dist - (sep - m.radius);
+          m.x -= _nmX * pen;
+          m.y -= _nmY * pen;
+          const vNorm = m.vx * _nmX + m.vy * _nmY;
+          const vTang = m.vx * _tgX + m.vy * _tgY;
+          if (vNorm > 0) {
+            m.vx = -vNorm * params.restitution * _nmX + vTang * _tgX;
+            m.vy = -vNorm * params.restitution * _nmY + vTang * _tgY;
+          }
+        }
       }
     });
   }
@@ -1051,6 +1123,25 @@
     ctx.moveTo(L.trayX1, L.trayY1); ctx.lineTo(L.trayX2, L.trayY2);
     ctx.stroke();
 
+    // ── Upper parallel tray (ceiling) ──
+    ctx.beginPath();
+    ctx.moveTo(L.tray2X1, L.tray2Y1);
+    ctx.lineTo(L.tray2X2, L.tray2Y2);
+    ctx.lineTo(L.tray2X2 - nxn * slabD, L.tray2Y2 - nyn * slabD);
+    ctx.lineTo(L.tray2X1 - nxn * slabD, L.tray2Y1 - nyn * slabD);
+    ctx.closePath();
+    const tray2Grad = ctx.createLinearGradient(0, L.tray2Y1 - slabD, 0, L.tray2Y1);
+    tray2Grad.addColorStop(0, '#2d3748');
+    tray2Grad.addColorStop(1, '#4a5568');
+    ctx.fillStyle = tray2Grad;
+    ctx.fill();
+    // Bottom edge highlight (the surface facing the balls)
+    ctx.strokeStyle = '#718096';
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    ctx.moveTo(L.tray2X1, L.tray2Y1); ctx.lineTo(L.tray2X2, L.tray2Y2);
+    ctx.stroke();
+
     // Right wall (solid stop at tray end)
     const wallW = 8;
     const wallGrad = ctx.createLinearGradient(L.wallX - wallW, 0, L.wallX, 0);
@@ -1096,7 +1187,7 @@
     drawRod(rrodX);
 
     // Gap arrows (when gap is still opening)
-    if (halfGap < params.maxRadius + 4) {
+    if (halfGap < params.maxRadius * (L.layoutScale || 1) + 4) {
       ctx.fillStyle = 'rgba(74,158,255,0.55)';
       ctx.font = `${Math.max(9, Math.min(13, sw * 0.035))}px Arial`;
       ctx.textAlign = 'center';
@@ -1205,9 +1296,9 @@
       state.fallenCount = 0;
       state.isRunning  = false;
       state.complete   = false;
-      state.marbles    = createMarbles();
-      // Re-compute tray geometry in case params changed
+      // Layout first — sets layoutScale used by createMarbles
       updateLayout(L.cw, L.ch);
+      state.marbles    = createMarbles();
     },
 
     loop() {
@@ -1242,7 +1333,7 @@
     const gapStr    = state.gap.toFixed(1) + ' px';
     const sortStr   = state.fallenCount + ' / ' + params.marbleCount;
     const fpsStr    = Sim.fps;
-    const progress  = Math.min(1, state.gap / (params.maxRadius * 2)) * 100;
+    const progress  = Math.min(1, state.gap / (params.maxRadius * 2 * (L.layoutScale || 1))) * 100;
 
     // Sidebar stats
     const sbGap    = document.getElementById('sbGap');
@@ -1338,6 +1429,7 @@
       wire('gravity',        'gravityVal',        'gravity',        v => v);
       wire('trayAngle',      'trayAngleVal',      'trayAngle',      v => v + '°');
       wire('restitution',    'restitutionVal',    'restitution',    v => v.toFixed(2));
+      wire('ceilLength',     'ceilLengthVal',     'ceilLength',     v => v + '%');
     },
 
     setupPresets() {
@@ -1360,6 +1452,7 @@
             gravity:     ['gravity',     'gravityVal',     v => v],
             trayAngle:   ['trayAngle',   'trayAngleVal',   v => v + '°'],
             restitution: ['restitution', 'restitutionVal', v => v.toFixed(2)],
+            ceilLength:  ['ceilLength',  'ceilLengthVal',  v => v + '%'],
           };
           Object.entries(map).forEach(([k, [inputId, valId, fmt]]) => {
             const el = document.getElementById(inputId);
