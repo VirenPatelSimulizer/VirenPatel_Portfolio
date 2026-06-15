@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="DPAT vs SPAT Semiconductor Backend Assembly & Test Simulation - Interactive demonstration of dynamic vs static part average testing instability.">
-  <title>DPAT vs SPAT Simulation - WhitePaper 01 - Viren Patel</title>
+  <meta name="description" content="Assembly Simulator - Interactive semiconductor backend assembly and test simulation with Six Sigma analysis tools.">
+  <title>Assembly Simulator - Viren Patel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,8 +24,8 @@
     .simulation-container {
       position: relative;
       width: 100%;
-      height: calc(100vh - 60px);
-      margin-top: 60px;
+      height: calc(100vh - 100px);
+      margin-top: 100px;
       display: flex;
       background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
       overflow: hidden;
@@ -958,6 +958,200 @@
         transform: translateX(-50%) translateY(-20px);
       }
     }
+
+    /* ===== MAIN TAB NAVIGATION ===== */
+    .main-tab-bar {
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      background: rgba(8, 8, 18, 0.98);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 20px;
+      gap: 2px;
+    }
+    .main-tab-btn {
+      padding: 0 22px;
+      height: 40px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #666;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .main-tab-btn:hover { color: #bbb; }
+    .main-tab-btn.active { color: #4aff80; border-bottom-color: #4aff80; }
+    /* Analysis panel */
+    #main-tab-analysis {
+      position: fixed;
+      top: 100px; left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      padding: 20px 24px;
+      box-sizing: border-box;
+      display: none;
+    }
+    .analysis-dashboard { max-width: 1400px; margin: 0 auto; }
+    .analysis-empty {
+      display: flex; align-items: center; justify-content: center;
+      height: 240px; color: #444; font-size: 14px; flex-direction: column; gap: 10px;
+    }
+    .analysis-section {
+      background: rgba(20, 20, 40, 0.8);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .analysis-section-header {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #4aff80;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(74,255,128,0.15);
+    }
+    .analysis-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+    }
+    .stat-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .stat-table th {
+      text-align: left; padding: 6px 10px; color: #666;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-table td {
+      padding: 5px 10px; color: #ccc;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .stat-table td:first-child { color: #888; font-weight: 600; }
+    .stat-table tr:last-child td { border-bottom: none; }
+    .capability-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+    }
+    .cap-card {
+      background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px; padding: 12px 8px; text-align: center;
+    }
+    .cap-card-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 6px; }
+    .cap-card-value { font-size: 20px; font-weight: 700; }
+    .cap-good { color: #4aff80; } .cap-warn { color: #ffcc4a; } .cap-bad { color: #ff4a4a; }
+    .analysis-canvas { display: block; width: 100%; }
+    .cap-legend { font-size: 10px; color: #555; margin-top: 10px; }
+    @media (max-width: 900px) {
+      .analysis-row { grid-template-columns: 1fr; }
+      .capability-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    /* ---- Primary Action Block ---- */
+    .primary-action-block {
+      background: linear-gradient(135deg, rgba(74,255,128,0.06) 0%, rgba(20,20,40,0.9) 100%);
+      border: 1px solid rgba(74,255,128,0.3);
+      border-left: 4px solid #4aff80;
+      border-radius: 8px; padding: 20px 22px; margin-bottom: 16px;
+    }
+    .pa-label { font-size:9px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#4aff80; margin-bottom:6px; }
+    .pa-action { font-size:16px; font-weight:700; color:#fff; margin-bottom:16px; line-height:1.3; }
+    .pa-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .pa-field-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#555; margin-bottom:4px; }
+    .pa-field-value { font-size:12px; color:#ccc; line-height:1.5; }
+    .pa-field-value .driver-tag { font-weight:700; }
+    .pa-impact-val { font-size:18px; font-weight:800; color:#4aff80; }
+    .pa-impact-sub { font-size:10px; color:#555; margin-top:2px; }
+    @media(max-width:900px){ .pa-grid{ grid-template-columns:1fr; } }
+    /* ---- Root Cause Engine ---- */
+    .rc-table { width:100%; border-collapse:collapse; font-size:11px; }
+    .rc-table th { padding:6px 10px; color:#555; font-weight:700; text-transform:uppercase; font-size:9px; letter-spacing:0.5px; border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; }
+    .rc-table td { padding:7px 10px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:middle; }
+    .rc-table tr:last-child td { border-bottom:none; }
+    .rc-table tr:hover td { background:rgba(255,255,255,0.02); }
+    .rc-driver-name { font-weight:600; color:#ccc; }
+    .rc-bar-wrap { display:flex; align-items:center; gap:8px; min-width:160px; }
+    .rc-bar-track { flex:1; height:7px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; }
+    .rc-bar-fill  { height:100%; border-radius:4px; transition:width 0.4s ease; }
+    .rc-pct  { font-size:11px; font-weight:700; min-width:34px; text-align:right; }
+    .rc-cost { font-weight:700; color:#ffcc4a; }
+    .conf-badge { font-size:9px; padding:2px 7px; border-radius:3px; font-weight:700; }
+    .conf-high   { background:rgba(74,255,128,0.12); color:#4aff80; }
+    .conf-medium { background:rgba(255,204,74,0.12);  color:#ffcc4a; }
+    .conf-low    { background:rgba(255,138,68,0.12);  color:#ff8844; }
+    /* ---- Recommended Fixes ---- */
+    .rec-list { display: flex; flex-direction: column; gap: 10px; }
+    .rec-card {
+      display: grid; grid-template-columns: 36px 1fr auto;
+      gap: 12px; align-items: start;
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px; padding: 12px 14px;
+      transition: border-color 0.2s;
+    }
+    .rec-card:hover { border-color: rgba(255,255,255,0.14); }
+    .rec-card.priority-1 { border-left: 3px solid #ff4a4a; }
+    .rec-card.priority-2 { border-left: 3px solid #ffcc4a; }
+    .rec-card.priority-3 { border-left: 3px solid #4a9eff; }
+    .rec-badge {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+    }
+    .rec-badge.p1 { background: rgba(255,74,74,0.18); color: #ff4a4a; }
+    .rec-badge.p2 { background: rgba(255,204,74,0.18); color: #ffcc4a; }
+    .rec-badge.p3 { background: rgba(74,158,255,0.18); color: #4a9eff; }
+    .rec-body { min-width: 0; }
+    .rec-title { font-size: 12px; font-weight: 700; color: #e0e0e0; margin-bottom: 3px; }
+    .rec-why   { font-size: 11px; color: #777; margin-bottom: 3px; line-height: 1.4; }
+    .rec-how   { font-size: 10px; color: #4aff80; line-height: 1.4; }
+    .rec-impact { font-size: 12px; font-weight: 700; color: #4aff80; white-space: nowrap; text-align: right; padding-top: 2px; }
+    .rec-impact.warn { color: #ffcc4a; }
+    .rec-empty { font-size: 12px; color: #4aff80; text-align: center; padding: 16px; }
+    /* ---- Scenario Comparison ---- */
+    .scenario-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .scenario-slot { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; padding: 10px; text-align: center; }
+    .scenario-slot.filled { border-color: rgba(74,158,255,0.4); }
+    .scenario-slot-label { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .scenario-slot-name { font-size: 12px; color: #ccc; margin-bottom: 4px; min-height: 16px; font-weight: 600; }
+    .scenario-slot-time { font-size: 9px; color: #444; margin-bottom: 8px; }
+    .scenario-slot-btns { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+    .scn-btn { padding: 3px 8px; font-size: 9px; font-weight: 600; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.12); border-radius: 3px; background: rgba(255,255,255,0.04); color: #777; cursor: pointer; transition: all 0.2s; }
+    .scn-btn:hover { background: rgba(74,158,255,0.15); border-color: #4a9eff; color: #fff; }
+    .scn-btn.save { border-color: rgba(74,255,128,0.3); color: #4aff80; }
+    .scn-btn.save:hover { background: rgba(74,255,128,0.12); }
+    .scn-btn.clear:hover { background: rgba(255,74,74,0.12); border-color: #ff4a4a; color: #ff4a4a; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .compare-table th { padding: 6px 10px; color: #555; font-weight: 700; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
+    .compare-table td { padding: 5px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #bbb; }
+    .compare-table td:first-child { color: #666; }
+    .d-pos { color: #4aff80; font-weight: 700; } .d-neg { color: #ff4a4a; font-weight: 700; } .d-neu { color: #666; }
+    .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+    /* ---- Economic Layer ---- */
+    .coq-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .coq-card { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; padding: 14px 8px; text-align: center; }
+    .coq-card-label { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .coq-card-value { font-size: 20px; font-weight: 700; }
+    .coq-prev { color: #4a9eff; } .coq-appr { color: #ffcc4a; } .coq-int { color: #ff8844; } .coq-ext { color: #ff4a4a; }
+    .coq-card-sub { font-size: 9px; color: #444; margin-top: 4px; }
+    .roi-box { background: rgba(74,255,128,0.04); border: 1px solid rgba(74,255,128,0.18); border-radius: 6px; padding: 14px 16px; margin-top: 14px; }
+    .roi-box-title { font-size: 10px; font-weight: 700; color: #4aff80; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .roi-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .roi-row:last-child { border-bottom: none; }
+    .roi-label { color: #777; }
+    .roi-val-good { color: #4aff80; font-weight: 700; }
+    .roi-val-warn { color: #ffcc4a; font-weight: 700; }
+    .driver-role-badge { font-size:9px; padding:1px 6px; border-radius:3px; font-weight:700; margin-left:6px; vertical-align:middle; }
+    .role-primary    { background:rgba(255,74,74,0.15);   color:#ff6b6b; }
+    .role-amplifier  { background:rgba(255,204,74,0.15);  color:#ffcc4a; }
+    .conflict-note { font-size:10px; color:#777; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); line-height:1.5; }
+    /* Driver cross-highlight */
+    [data-driver].driver-lit { outline: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.04) !important; transition: background 0.15s, outline 0.15s; }
+    .roi-row[data-driver] { cursor: default; border-radius: 4px; padding-left: 4px; margin-left: -4px; transition: background 0.15s; }
+    @media (max-width: 900px) {
+      .coq-grid { grid-template-columns: repeat(2, 1fr); }
+      .scenario-slots { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -970,7 +1164,7 @@
         <a href="../../index.html">Viren Patel</a>
       </div>
       <div class="logo">
-        <a>DPAT vs SPAT Simulation</a>
+        <a>Assembly Simulator</a>
       </div>
       <ul class="nav-links">
         <li><a href="../../index.html">Home</a></li>
@@ -981,8 +1175,14 @@
     </nav>
   </header>
 
+  <!-- Main Tab Navigation -->
+  <div class="main-tab-bar">
+    <button class="main-tab-btn active" data-main-tab="simulation">Simulation</button>
+    <button class="main-tab-btn" data-main-tab="analysis">Analysis</button>
+  </div>
+
   <!-- Simulation Container -->
-  <div class="simulation-container">
+  <div class="simulation-container" id="main-tab-simulation">
     <!-- Sidebar Toggle Button (outside sidebar) -->
     <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Controls Panel">&laquo;</button>
 
@@ -999,7 +1199,7 @@
             <option value="mixChange">Mix Change Shock</option>
             <option value="testerDrift">Tester Degradation Drift</option>
             <option value="chaos" selected>High Variance Chaos</option>
-            <option value="firmware">Firmware Mode Switching</option>
+            <option value="firmware">Test Software Mode Switching</option>
             <option value="custom">Custom Configuration</option>
           </select>
         </div>
@@ -1080,7 +1280,7 @@
         <div class="section-title">Advanced PAT Settings</div>
         <div style="font-size: 9px; color: #888; margin-bottom: 8px; line-height: 1.3;">
           Note: SPAT may increase fallout during legitimate qualified shifts.
-          Stratified DPAT matches lots by thermal/firmware/tester conditions.
+          Stratified DPAT matches lots by thermal/test software/tester conditions.
         </div>
 
         <!-- SPAT Periodic Refresh -->
@@ -1136,17 +1336,46 @@
         </div>
       </div>
 
-      <!-- Firmware Variants -->
+      <!-- Economic Parameters -->
       <div class="sidebar-section">
-        <div class="section-title">Firmware Variants</div>
+        <div class="section-title">Economic Parameters</div>
         <div style="font-size: 9px; color: #888; margin-bottom: 8px; line-height: 1.3;">
-          Each Firmware node = ONE variant. Connect multiple FW nodes to a Tester to test multiple variants. Use connection weights (%) to define split ratio.
+          Used in Cost of Quality analysis on the Analysis tab.
+        </div>
+        <div class="control-group">
+          <label class="control-label">
+            Escape Cost Multiplier
+            <span class="control-value" id="escapeCostMultValue">10×</span>
+          </label>
+          <input type="range" class="control-input" id="escapeCostMult" min="1" max="50" step="1" value="10">
+        </div>
+        <div class="control-group">
+          <label class="control-label">
+            False Reject Recovery %
+            <span class="control-value" id="falseRejectRecoveryValue">20%</span>
+          </label>
+          <input type="range" class="control-input" id="falseRejectRecovery" min="0" max="100" step="5" value="20">
+        </div>
+        <div class="control-group">
+          <label class="control-label">
+            Prevention Cost / Lot ($)
+            <span class="control-value" id="preventionCostValue">$5</span>
+          </label>
+          <input type="range" class="control-input" id="preventionCost" min="0" max="100" step="5" value="5">
+        </div>
+      </div>
+
+      <!-- Test Software Variants -->
+      <div class="sidebar-section">
+        <div class="section-title">Test Software Variants</div>
+        <div style="font-size: 9px; color: #888; margin-bottom: 8px; line-height: 1.3;">
+          Each Test Software node = ONE variant. Connect multiple TS nodes to a Tester to test multiple variants. Use connection weights (%) to define split ratio.
         </div>
         <div id="firmwareVariantsList" style="max-height: 150px; overflow-y: auto; margin-top: 8px;">
-          <!-- List of firmware nodes in the graph -->
+          <!-- List of test software nodes in the graph -->
         </div>
         <p style="font-size: 9px; color: #666; margin-top: 8px;">
-          Add firmware nodes from the palette and connect them to a Tester. Set the connection weight to control % of lots through each variant.
+          Add Test Software nodes from the palette and connect them to a Tester. Set the connection weight to control % of lots through each variant.
         </p>
       </div>
 
@@ -1176,6 +1405,24 @@
         <button class="btn btn-danger" id="resetSimBtn">Reset</button>
       </div>
 
+      <!-- Disclaimer -->
+      <div class="sidebar-section">
+        <div class="section-title">Disclaimer</div>
+        <div style="font-size: 10px; color: #888; line-height: 1.5;">
+          <p style="margin: 0 0 6px;">This simulation models semiconductor manufacturing variation and reliability mechanisms using publicly available research and textbooks.</p>
+          <p style="margin: 0 0 6px;">All modeled mechanisms (wire bond defects, microbump failures, delamination, gate oxide breakdown, electromigration, etc.) are derived from open academic and industry literature.</p>
+          <p style="margin: 0 0 4px; color: #aaa;">References include:</p>
+          <ul style="margin: 0 0 6px; padding-left: 14px; color: #777;">
+            <li>Semiconductor Packaging — A. Chen</li>
+            <li>Semiconductor Advanced Packaging — J. H. Lau</li>
+            <li>Reliability Physics and Engineering — J. W. McPherson</li>
+            <li>IEEE / Microelectronics Reliability publications</li>
+            <li>Public semiconductor reliability handbooks</li>
+          </ul>
+          <p style="margin: 0;">This project does not use any proprietary manufacturing data, internal process details, or confidential information from any semiconductor company. All failure mechanisms are modeled at a high-level educational abstraction for demonstration purposes only.</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- Canvas Wrapper -->
@@ -1202,7 +1449,7 @@
             </div>
             <div class="palette-node" data-type="firmware" draggable="true">
               <span class="palette-node-icon" style="background: #ff4a9f;">F</span>
-              Firmware Mode
+              Test Software
             </div>
             <div class="palette-node" data-type="thermal" draggable="true">
               <span class="palette-node-icon" style="background: #ffff4a;">H</span>
@@ -1350,6 +1597,8 @@
             </div>
           </div>
           <input type="file" id="importLayoutInput" accept=".json" style="display: none;">
+          <div class="status-divider"></div>
+          <button class="status-btn" id="saveScenarioBtn" disabled title="Save current results as a named scenario for comparison" style="font-size:13px; letter-spacing:0;">⚑ Scenario</button>
         </div>
 
         <!-- Progress Bar -->
@@ -1446,6 +1695,110 @@
     </div>
   </div>
 
+  <!-- Analysis Tab Panel -->
+  <div id="main-tab-analysis">
+    <div class="analysis-dashboard">
+
+      <!-- Header bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <div>
+          <div style="font-size:16px; font-weight:700; color:#e0e0e0;">Six Sigma Analysis</div>
+          <div style="font-size:11px; color:#555; margin-top:2px;">Run the simulation first, then switch here to analyze results.</div>
+        </div>
+        <div id="analysisStatus" style="font-size:11px; color:#555; padding:6px 14px; background:rgba(255,255,255,0.04); border-radius:4px; border:1px solid rgba(255,255,255,0.08);">
+          No data — run simulation
+        </div>
+      </div>
+
+      <!-- Empty state (shown before simulation runs) -->
+      <div id="analysisEmptyState" class="analysis-empty">
+        <div style="font-size:32px; opacity:0.2;">&#9654;</div>
+        <div>Run the simulation on the <strong style="color:#4aff80">Simulation</strong> tab, then return here.</div>
+      </div>
+
+      <!-- Analysis content (hidden until data available) -->
+      <div id="analysisContent" style="display:none;">
+
+        <!-- Primary Action Block -->
+        <div id="primaryActionBlock" class="primary-action-block" style="display:none;"></div>
+
+        <!-- 1. Economic Summary -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">1. Economic Summary — Cost of Quality (CoQ)</div>
+          <div class="coq-grid" id="coqCards">
+            <div class="coq-card"><div class="coq-card-label">Prevention</div><div class="coq-card-value coq-prev">--</div></div>
+            <div class="coq-card"><div class="coq-card-label">Appraisal</div><div class="coq-card-value coq-appr">--</div></div>
+            <div class="coq-card"><div class="coq-card-label">Internal Failure</div><div class="coq-card-value coq-int">--</div></div>
+            <div class="coq-card"><div class="coq-card-label">External Failure</div><div class="coq-card-value coq-ext">--</div></div>
+          </div>
+          <canvas id="coqChart" class="analysis-canvas" height="160"></canvas>
+          <div id="roiBox"></div>
+        </div>
+
+        <!-- 2. Root Cause Engine -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">2. 🎯 Primary Drivers of Loss</div>
+          <div id="rootCauseTable"><p style="font-size:11px;color:#444;padding:10px 0;">No data — run simulation.</p></div>
+        </div>
+
+        <!-- 3. Recommended Fixes -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">3. Recommended Fixes — Ranked by Impact</div>
+          <div id="recList" class="rec-list">
+            <div class="rec-empty">Run the simulation to generate recommendations.</div>
+          </div>
+        </div>
+
+        <!-- 3. Scenario Comparison -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">4. Scenario Comparison</div>
+          <div style="font-size:10px; color:#555; margin-bottom:12px;">
+            Save up to 3 named simulation runs using the <strong style="color:#4aff80">⚑ Scenario</strong> button on the canvas toolbar. Compare metrics side-by-side with deltas.
+          </div>
+          <div class="scenario-slots" id="scenarioSlots"></div>
+          <div id="scenarioCompareTable"><p style="font-size:11px;color:#444;text-align:center;padding:10px 0;">No scenarios saved yet.</p></div>
+        </div>
+
+        <!-- Row 1: Descriptive Stats + Capability -->
+        <div class="analysis-row">
+          <div class="analysis-section">
+            <div class="analysis-section-header">5. Descriptive Statistics</div>
+            <div id="analysisDescStats"></div>
+          </div>
+          <div class="analysis-section">
+            <div class="analysis-section-header">6. Process Capability (Cp / Cpk / Pp / Ppk)</div>
+            <div id="analysisCapability"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Histogram + Box Plot -->
+        <div class="analysis-row">
+          <div class="analysis-section">
+            <div class="analysis-section-header">7. Distribution — Histogram (Measured)</div>
+            <canvas id="analysisHistogram" class="analysis-canvas" height="220"></canvas>
+          </div>
+          <div class="analysis-section">
+            <div class="analysis-section-header">8. Box Plot by Lot</div>
+            <canvas id="analysisBoxplot" class="analysis-canvas" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- Row 3: X-bar Run Chart -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">9. SPC Run Chart — X&#772; with Control Limits (UCL / LCL)</div>
+          <canvas id="analysisRunChart" class="analysis-canvas" height="200"></canvas>
+        </div>
+
+        <!-- Row 4: Pareto -->
+        <div class="analysis-section">
+          <div class="analysis-section-header">10. Pareto Analysis — Defect Types</div>
+          <canvas id="analysisPareto" class="analysis-canvas" height="240"></canvas>
+        </div>
+
+      </div><!-- end analysisContent -->
+    </div><!-- end analysis-dashboard -->
+  </div><!-- end main-tab-analysis -->
+
   <!-- Tooltip -->
   <div class="tooltip" id="tooltip"></div>
 
@@ -1463,7 +1816,7 @@
 
   <script>
     /**
-     * DPAT vs SPAT Backend Assembly & Test Simulation
+     * Assembly Simulator
      * Demonstrates why Dynamic Part Average Testing can become unstable
      * compared to Static Part Average Testing in semiconductor backend.
      */
@@ -1712,7 +2065,7 @@
             instances: [{ name: 'Tester-1', active: true }, { name: 'Tester-2', active: true }]
           },
           firmware: {
-            name: 'FW-A',  // This node represents ONE specific firmware variant
+            name: 'TS-A',  // This node represents ONE specific test software variant
             baseMean: 0,
             baseSigma: 0.05,
             meanDeltaSigma: 0,
@@ -1722,20 +2075,20 @@
             stepShiftMag: 0,
             weight: 1.0,
             color: '#ff4a9f',
-            // FW nodes only have OUTGOING connections (no input port)
-            hasInputPort: false,           // FW nodes don't receive connections
-            hasOutputPort: true,           // FW nodes connect TO testers or Measurement nodes
-            canConnectTo: ['tester', 'output'],  // FW can connect to Tester or Measurement nodes
-            // Firmware variant effects (this node = one variant)
-            variantType: 'FW-A',           // Selected from predefined list
+            // TS nodes only have OUTGOING connections (no input port)
+            hasInputPort: false,           // TS nodes don't receive connections
+            hasOutputPort: true,           // TS nodes connect TO testers or Measurement nodes
+            canConnectTo: ['tester', 'output'],  // TS can connect to Tester or Measurement nodes
+            // Test software variant effects (this node = one variant)
+            variantType: 'TS-A',           // Selected from predefined list
             meanOffsetSigma: 1.0,          // Mean offset in units of baseline sigma
             sigmaMultiplier: 1.3,          // Sigma multiplier for this variant
             // Predefined firmware types to choose from
             availableVariants: [
-              { name: 'FW-A', meanOffsetSigma: 1.0, sigmaMultiplier: 1.3 },
-              { name: 'FW-B', meanOffsetSigma: -0.5, sigmaMultiplier: 0.8 },
-              { name: 'FW-C', meanOffsetSigma: 0.5, sigmaMultiplier: 1.0 },
-              { name: 'FW-D', meanOffsetSigma: -1.0, sigmaMultiplier: 1.1 }
+              { name: 'TS-A', meanOffsetSigma: 1.0, sigmaMultiplier: 1.3 },
+              { name: 'TS-B', meanOffsetSigma: -0.5, sigmaMultiplier: 0.8 },
+              { name: 'TS-C', meanOffsetSigma: 0.5, sigmaMultiplier: 1.0 },
+              { name: 'TS-D', meanOffsetSigma: -1.0, sigmaMultiplier: 1.1 }
             ]
           },
           thermal: {
@@ -2967,7 +3320,7 @@
           fwWeightsHTML = `
           <div style="margin-bottom: 8px; border-top: 1px solid rgba(255,74,159,0.3); padding-top: 8px;">
             <label style="color: #ff4a9f; font-size: 10px; font-weight: 600; display: block; margin-bottom: 6px;">
-              Firmware Split to ${conn.to.params.name} (must sum to 100%)
+              Test Software Split to ${conn.to.params.name} (must sum to 100%)
             </label>
             ${incomingFwConns.map((c, i) => {
               const isCurrentConn = c === conn;
@@ -2984,7 +3337,7 @@
               </div>`;
             }).join('')}
             <div style="font-size: 9px; color: #888; margin-top: 4px;">
-              Adjust how test lots are distributed across firmware variants.
+              Adjust how test lots are distributed across test software variants.
             </div>
           </div>`;
         }
@@ -3859,12 +4212,12 @@
               <input type="range" class="control-input" id="prop_testerCost" min="0.1" max="5" step="0.1" value="${node.params.costPerUnit || 0.5}">
             </div>
             <div class="control-group">
-              <label class="control-label">FW Selection Mode</label>
+              <label class="control-label">TS Selection Mode</label>
               <select id="prop_fwSelectionMode" style="width: 100%; padding: 4px; background: #1a1a2e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; font-size: 11px;">
                 <option value="random" ${(node.params.fwSelectionMode || 'random') === 'random' ? 'selected' : ''}>Random (probabilistic)</option>
                 <option value="sequential" ${node.params.fwSelectionMode === 'sequential' ? 'selected' : ''}>Sequential (in order)</option>
               </select>
-              <p style="font-size: 9px; color: #666; margin-top: 4px;">How to select FW when multiple FW nodes connect to this tester</p>
+              <p style="font-size: 9px; color: #666; margin-top: 4px;">How to select TS when multiple TS nodes connect to this tester</p>
             </div>
             <div class="control-group" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
               <label class="control-label" style="font-weight: 600; color: #4aff80;">Output Groups</label>
@@ -3963,7 +4316,7 @@
             ` : ''}
             ${node.type === 'firmware' ? `
             <div class="control-group" style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-              <label class="control-label" style="font-weight: 600; color: #ff4a9f;">Firmware Variant Type</label>
+              <label class="control-label" style="font-weight: 600; color: #ff4a9f;">Test Software Variant Type</label>
             </div>
             <div class="control-group">
               <label class="control-label">Select Variant</label>
@@ -3982,7 +4335,7 @@
               <input type="range" class="control-input" id="prop_sigmaMultiplier" min="0.5" max="2" step="0.05" value="${node.params.sigmaMultiplier || 1}">
             </div>
             <p style="font-size: 9px; color: #888; margin-top: 8px;">
-              Each Firmware node = ONE variant. Connect multiple FW nodes to a Tester to test multiple variants. Use connection weights (%) to define split ratio.
+              Each Test Software node = ONE variant. Connect multiple TS nodes to a Tester to test multiple variants. Use connection weights (%) to define split ratio.
             </p>
             ` : ''}
             <div class="control-group" id="splitModeGroup" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
@@ -5388,6 +5741,516 @@
         };
       }
 
+      // ============================================================
+      // Die Attach Defect Physics
+      // Operates on INNATE value only — before transport damage
+      // ============================================================
+      applyDieAttachDefects(innateValue, baselineMean, baselineSigma) {
+        // --- Die Attach Void ---
+        // Air pocket trapped under die reduces thermal conductivity.
+        // Localized hot spot raises junction temperature → shifts Iread upward.
+        // Probability: 0.3% | Effect: moderate upward parametric shift (+1σ to +3σ)
+        const DIE_VOID_PROB        = 0.003;
+        const DIE_VOID_MIN_SIGMA   = 1.0;
+        const DIE_VOID_MAX_SIGMA   = 3.0;
+
+        // --- Die Tilt ---
+        // Die lands at angle on substrate. Non-uniform epoxy fillet creates
+        // asymmetric mechanical stress → small bidirectional parametric shift.
+        // Probability: 0.5% | Effect: ±0.5σ to ±1.5σ
+        const DIE_TILT_PROB        = 0.005;
+        const DIE_TILT_MIN_SIGMA   = 0.5;
+        const DIE_TILT_MAX_SIGMA   = 1.5;
+
+        // --- Die Crack ---
+        // Mechanical fracture during pick-and-place or cure. Either kills the
+        // die entirely (silicon cleaved) or creates a severe parametric outlier
+        // (partial crack changes current paths).
+        // Probability: 0.05% | Kill: 60% → innate=0 | Outlier: 40% → +6σ to +12σ
+        const DIE_CRACK_PROB       = 0.0005;
+        const DIE_CRACK_KILL_PROB  = 0.60;
+        const DIE_CRACK_MIN_SIGMA  = 6.0;
+        const DIE_CRACK_MAX_SIGMA  = 12.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Evaluate most severe first so we don't double-apply
+        if (rng.next() < DIE_CRACK_PROB) {
+          result.damaged    = true;
+          result.defectType = 'die_crack';
+          if (rng.next() < DIE_CRACK_KILL_PROB) {
+            result.value = 0;  // Die destroyed — open circuit
+          } else {
+            const sigma  = DIE_CRACK_MIN_SIGMA + rng.next() * (DIE_CRACK_MAX_SIGMA - DIE_CRACK_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        if (rng.next() < DIE_VOID_PROB) {
+          result.damaged    = true;
+          result.defectType = 'die_void';
+          const shift = (DIE_VOID_MIN_SIGMA + rng.next() * (DIE_VOID_MAX_SIGMA - DIE_VOID_MIN_SIGMA)) * baselineSigma;
+          result.value = innateValue + shift;  // Thermal hot spot → upward shift
+          return result;
+        }
+
+        if (rng.next() < DIE_TILT_PROB) {
+          result.damaged    = true;
+          result.defectType = 'die_tilt';
+          const direction = rng.next() > 0.5 ? 1 : -1;
+          const shift = (DIE_TILT_MIN_SIGMA + rng.next() * (DIE_TILT_MAX_SIGMA - DIE_TILT_MIN_SIGMA)) * baselineSigma;
+          result.value = innateValue + direction * shift;
+          return result;
+        }
+
+        return result;
+      }
+
+      // ============================================================
+      // Wire Bond Defect Physics
+      // Operates on INNATE value only — after die attach, before transport
+      // ============================================================
+      applyWireBondDefects(innateValue, baselineMean, baselineSigma) {
+        // --- NSOP (Non-Stick On Pad) ---
+        // Wire bonding tool fails to form an intermetallic at the bond pad.
+        // Result: open circuit (zero current path) or high-resistance partial bond.
+        // Probability: 0.10% | Kill: 70% → innate=0 | Outlier: 30% → +4σ to +8σ
+        const NSOP_PROB       = 0.001;
+        const NSOP_KILL_PROB  = 0.70;
+        const NSOP_MIN_SIGMA  = 4.0;
+        const NSOP_MAX_SIGMA  = 8.0;
+
+        // --- Wire Lift ---
+        // Bond formed correctly but lifts off pad after cure due to thermal mismatch
+        // or contamination. Causes partial or intermittent open — moderate outlier.
+        // Probability: 0.20% | Effect: +2σ to +5σ upward shift (current path degraded)
+        const WIRE_LIFT_PROB      = 0.002;
+        const WIRE_LIFT_MIN_SIGMA = 2.0;
+        const WIRE_LIFT_MAX_SIGMA = 5.0;
+
+        // --- Wire Short ---
+        // Wire sags or sweeps during mold flow and touches adjacent wire or metallization.
+        // Creates a direct short between signals — catastrophic or large parametric shift.
+        // Probability: 0.05% | Kill: 50% → innate=0 | Outlier: 50% → +5σ to +10σ
+        const WIRE_SHORT_PROB      = 0.0005;
+        const WIRE_SHORT_KILL_PROB = 0.50;
+        const WIRE_SHORT_MIN_SIGMA = 5.0;
+        const WIRE_SHORT_MAX_SIGMA = 10.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Wire short — most catastrophic, check first
+        if (rng.next() < WIRE_SHORT_PROB) {
+          result.damaged    = true;
+          result.defectType = 'wire_short';
+          if (rng.next() < WIRE_SHORT_KILL_PROB) {
+            result.value = 0;
+          } else {
+            const sigma  = WIRE_SHORT_MIN_SIGMA + rng.next() * (WIRE_SHORT_MAX_SIGMA - WIRE_SHORT_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // NSOP — open/partial bond
+        if (rng.next() < NSOP_PROB) {
+          result.damaged    = true;
+          result.defectType = 'nsop';
+          if (rng.next() < NSOP_KILL_PROB) {
+            result.value = 0;  // Full open — no current path
+          } else {
+            const sigma  = NSOP_MIN_SIGMA + rng.next() * (NSOP_MAX_SIGMA - NSOP_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Wire lift — partial/intermittent degradation
+        if (rng.next() < WIRE_LIFT_PROB) {
+          result.damaged    = true;
+          result.defectType = 'wire_lift';
+          const sigma  = WIRE_LIFT_MIN_SIGMA + rng.next() * (WIRE_LIFT_MAX_SIGMA - WIRE_LIFT_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;  // Degraded path → higher resistance → upward shift
+          return result;
+        }
+
+        return result;
+      }
+
+      // ============================================================
+      // Flip-Chip / Microbump Defect Physics
+      // Operates on INNATE value only — after wire bond, before transport
+      // ============================================================
+      applyFlipChipDefects(innateValue, baselineMean, baselineSigma) {
+        // --- Bump Open ---
+        // Solder bump fails to reflow and wet the substrate pad, or collapses
+        // during reflow leaving a void. Full electrical open or near-open.
+        // Probability: 0.08% | Kill: 65% → innate=0 | Outlier: 35% → +5σ to +10σ
+        const BUMP_OPEN_PROB      = 0.0008;
+        const BUMP_OPEN_KILL_PROB = 0.65;
+        const BUMP_OPEN_MIN_SIGMA = 5.0;
+        const BUMP_OPEN_MAX_SIGMA = 10.0;
+
+        // --- Bump Misalignment ---
+        // Die placement error shifts bumps off pad centers. Partial contact area
+        // increases resistance non-uniformly across the die → parametric spread.
+        // Probability: 0.15% | Effect: bidirectional ±1σ to ±3σ
+        const BUMP_MISALIGN_PROB      = 0.0015;
+        const BUMP_MISALIGN_MIN_SIGMA = 1.0;
+        const BUMP_MISALIGN_MAX_SIGMA = 3.0;
+
+        // --- Bump Resistance Increase ---
+        // Intermetallic compound (IMC) growth or flux residue contamination
+        // raises bump resistance. Subtle upward parametric shift, no kill.
+        // Probability: 0.25% | Effect: +0.5σ to +2σ
+        const BUMP_RESIST_PROB      = 0.0025;
+        const BUMP_RESIST_MIN_SIGMA = 0.5;
+        const BUMP_RESIST_MAX_SIGMA = 2.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Bump open — most severe, check first
+        if (rng.next() < BUMP_OPEN_PROB) {
+          result.damaged    = true;
+          result.defectType = 'bump_open';
+          if (rng.next() < BUMP_OPEN_KILL_PROB) {
+            result.value = 0;  // Full open — no current path through bump
+          } else {
+            const sigma  = BUMP_OPEN_MIN_SIGMA + rng.next() * (BUMP_OPEN_MAX_SIGMA - BUMP_OPEN_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Bump misalignment — partial contact, bidirectional shift
+        if (rng.next() < BUMP_MISALIGN_PROB) {
+          result.damaged    = true;
+          result.defectType = 'bump_misalign';
+          const direction = rng.next() > 0.5 ? 1 : -1;
+          const sigma     = BUMP_MISALIGN_MIN_SIGMA + rng.next() * (BUMP_MISALIGN_MAX_SIGMA - BUMP_MISALIGN_MIN_SIGMA);
+          result.value    = innateValue + direction * sigma * baselineSigma;
+          return result;
+        }
+
+        // Bump resistance increase — subtle parametric shift only
+        if (rng.next() < BUMP_RESIST_PROB) {
+          result.damaged    = true;
+          result.defectType = 'bump_resistance';
+          const sigma  = BUMP_RESIST_MIN_SIGMA + rng.next() * (BUMP_RESIST_MAX_SIGMA - BUMP_RESIST_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;  // Higher R → higher measured voltage
+          return result;
+        }
+
+        return result;
+      }
+
+      // ============================================================
+      // Mold / Encapsulation Defect Physics
+      // Operates on INNATE value only — after flip-chip, before transport
+      // ============================================================
+      applyMoldDefects(innateValue, baselineMean, baselineSigma) {
+        // --- Mold Void ---
+        // Air entrapment during transfer molding creates a gas pocket inside
+        // the package. Under thermal cycling the void acts as a stress concentrator,
+        // causing localized deformation and parametric shift.
+        // Probability: 0.20% | Effect: +0.5σ to +2.5σ upward parametric shift
+        const MOLD_VOID_PROB      = 0.002;
+        const MOLD_VOID_MIN_SIGMA = 0.5;
+        const MOLD_VOID_MAX_SIGMA = 2.5;
+
+        // --- Delamination ---
+        // Mold compound separates from die surface or die paddle due to
+        // moisture absorption (popcorn effect) or poor adhesion.
+        // Creates thermal resistance increase and potential interconnect stress.
+        // Probability: 0.15% | Kill: 15% → catastrophic pop / Shift: 85% → ±1σ to ±4σ
+        const DELAM_PROB       = 0.0015;
+        const DELAM_KILL_PROB  = 0.15;
+        const DELAM_MIN_SIGMA  = 1.0;
+        const DELAM_MAX_SIGMA  = 4.0;
+
+        // --- Package Warpage ---
+        // CTE mismatch between mold compound, die, and substrate causes the
+        // package to bow during cool-down. Mechanical stress on solder joints
+        // and interconnects produces a bidirectional parametric shift.
+        // Probability: 0.30% | Effect: ±0.5σ to ±2σ bidirectional
+        const WARPAGE_PROB      = 0.003;
+        const WARPAGE_MIN_SIGMA = 0.5;
+        const WARPAGE_MAX_SIGMA = 2.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Delamination — most severe, check first (can kill via popcorn)
+        if (rng.next() < DELAM_PROB) {
+          result.damaged    = true;
+          result.defectType = 'delamination';
+          if (rng.next() < DELAM_KILL_PROB) {
+            // Catastrophic popcorn delamination — package rupture
+            result.value = 0;
+          } else {
+            // Thermal resistance increase → junction temperature rise → parametric shift
+            const direction = rng.next() > 0.4 ? 1 : -1;  // More likely upward (hot spot)
+            const sigma     = DELAM_MIN_SIGMA + rng.next() * (DELAM_MAX_SIGMA - DELAM_MIN_SIGMA);
+            result.value    = innateValue + direction * sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Mold void — localized stress, always upward parametric shift
+        if (rng.next() < MOLD_VOID_PROB) {
+          result.damaged    = true;
+          result.defectType = 'mold_void';
+          const sigma  = MOLD_VOID_MIN_SIGMA + rng.next() * (MOLD_VOID_MAX_SIGMA - MOLD_VOID_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;
+          return result;
+        }
+
+        // Package warpage — mechanical stress, bidirectional
+        if (rng.next() < WARPAGE_PROB) {
+          result.damaged    = true;
+          result.defectType = 'pkg_warpage';
+          const direction = rng.next() > 0.5 ? 1 : -1;
+          const sigma     = WARPAGE_MIN_SIGMA + rng.next() * (WARPAGE_MAX_SIGMA - WARPAGE_MIN_SIGMA);
+          result.value    = innateValue + direction * sigma * baselineSigma;
+          return result;
+        }
+
+        return result;
+      }
+
+      // -----------------------------------------------------------------------
+      // STEP 6 — MICROCRACK FORMATION
+      // Mechanical stress during singulation, handling, thermal cycling, and
+      // board-level assembly nucleates cracks in the die bulk, underfill, or
+      // package body.  Microcracks produce large parametric outliers but are
+      // not always immediately catastrophic — they degrade electrical paths
+      // (increased resistance, leakage, reduced current drive) without full
+      // open-circuit failure.
+      //
+      // Surface microcrack  (0.10%) — shallow crack at die edge or mold
+      //   interface; moderate Iread reduction or increase.
+      //   Effect: parametric shift +1σ to +4σ (upward bias from contact resistance).
+      //   Kill: never.
+      //
+      // Subsurface microcrack (0.08%) — crack below the active junction or
+      //   within the silicon bulk; degrades carrier mobility and leakage.
+      //   Effect: +2σ to +6σ; rare kill (10%).
+      //
+      // Propagating crack (0.03%) — crack that has grown through a critical
+      //   structural or electrical path.  Produces a severe outlier or full kill.
+      //   Effect: 60% catastrophic kill (value → 0); 40% extreme outlier +6σ–+12σ.
+      // -----------------------------------------------------------------------
+      applyMicrocracksDefects(innateValue, baselineMean, baselineSigma) {
+        const SURF_CRACK_PROB      = 0.001;
+        const SURF_CRACK_MIN_SIGMA = 1.0;
+        const SURF_CRACK_MAX_SIGMA = 4.0;
+
+        const SUB_CRACK_PROB      = 0.0008;
+        const SUB_CRACK_KILL_PROB = 0.10;
+        const SUB_CRACK_MIN_SIGMA = 2.0;
+        const SUB_CRACK_MAX_SIGMA = 6.0;
+
+        const PROP_CRACK_PROB      = 0.0003;
+        const PROP_CRACK_KILL_PROB = 0.60;
+        const PROP_CRACK_MIN_SIGMA = 6.0;
+        const PROP_CRACK_MAX_SIGMA = 12.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Propagating crack — most severe, evaluated first
+        if (rng.next() < PROP_CRACK_PROB) {
+          result.damaged    = true;
+          result.defectType = 'prop_crack';
+          if (rng.next() < PROP_CRACK_KILL_PROB) {
+            // Critical path severed — full kill
+            result.value = 0;
+          } else {
+            // Severe parametric outlier — extreme upward shift
+            const sigma  = PROP_CRACK_MIN_SIGMA + rng.next() * (PROP_CRACK_MAX_SIGMA - PROP_CRACK_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Subsurface microcrack — moderate severity
+        if (rng.next() < SUB_CRACK_PROB) {
+          result.damaged    = true;
+          result.defectType = 'sub_crack';
+          if (rng.next() < SUB_CRACK_KILL_PROB) {
+            result.value = 0;
+          } else {
+            const sigma  = SUB_CRACK_MIN_SIGMA + rng.next() * (SUB_CRACK_MAX_SIGMA - SUB_CRACK_MIN_SIGMA);
+            result.value = innateValue + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Surface microcrack — shallow, always parametric (never kill)
+        if (rng.next() < SURF_CRACK_PROB) {
+          result.damaged    = true;
+          result.defectType = 'surf_crack';
+          const sigma  = SURF_CRACK_MIN_SIGMA + rng.next() * (SURF_CRACK_MAX_SIGMA - SURF_CRACK_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;
+          return result;
+        }
+
+        return result;
+      }
+
+      // -----------------------------------------------------------------------
+      // STEP 7 — GATE OXIDE LEAKAGE AND EOS EVENTS
+      // Thin gate-oxide degradation and electrical overstress (EOS) are latent
+      // reliability mechanisms that manifest after partial electrical exposure
+      // during wafer probe, assembly handling, or sub-threshold ESD pulses that
+      // did not fully kill the device.  Unlike transport ESD (which is an
+      // external handling event), these defects originate from within the
+      // silicon process itself and are therefore modelled as process defects.
+      //
+      // Gate oxide pinhole (0.06%) — dielectric breakdown nucleated at a
+      //   process-induced weak spot.  Increases leakage current, shifts Vt,
+      //   and elevates Iread.  Rarely catastrophic at first measurement.
+      //   Effect: +1σ to +3σ upward; kill: 5%.
+      //
+      // Partial EOS (0.04%) — a sub-lethal overstress pulse that partially
+      //   damages an interconnect or junction without fully opening it.
+      //   Creates a wide parametric spread; some units survive with moderate
+      //   degradation, others become extreme outliers.
+      //   Effect: +3σ to +8σ; kill: 20%.
+      //
+      // Hard EOS / latch-up (0.015%) — full junction destruction or latch-up
+      //   event from an overstress transient.  Nearly always catastrophic.
+      //   Effect: kill 85%; surviving units land at +8σ–+15σ extreme outlier.
+      // -----------------------------------------------------------------------
+      applyGateOxideDefects(innateValue, baselineMean, baselineSigma) {
+        const PINHOLE_PROB      = 0.0006;
+        const PINHOLE_KILL_PROB = 0.05;
+        const PINHOLE_MIN_SIGMA = 1.0;
+        const PINHOLE_MAX_SIGMA = 3.0;
+
+        const PARTIAL_EOS_PROB      = 0.0004;
+        const PARTIAL_EOS_KILL_PROB = 0.20;
+        const PARTIAL_EOS_MIN_SIGMA = 3.0;
+        const PARTIAL_EOS_MAX_SIGMA = 8.0;
+
+        const HARD_EOS_PROB      = 0.00015;
+        const HARD_EOS_KILL_PROB = 0.85;
+        const HARD_EOS_MIN_SIGMA = 8.0;
+        const HARD_EOS_MAX_SIGMA = 15.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Hard EOS / latch-up — most severe, evaluated first
+        if (rng.next() < HARD_EOS_PROB) {
+          result.damaged    = true;
+          result.defectType = 'hard_eos';
+          if (rng.next() < HARD_EOS_KILL_PROB) {
+            result.value = 0;
+          } else {
+            const sigma  = HARD_EOS_MIN_SIGMA + rng.next() * (HARD_EOS_MAX_SIGMA - HARD_EOS_MIN_SIGMA);
+            result.value = baselineMean + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Partial EOS — moderate severity
+        if (rng.next() < PARTIAL_EOS_PROB) {
+          result.damaged    = true;
+          result.defectType = 'partial_eos';
+          if (rng.next() < PARTIAL_EOS_KILL_PROB) {
+            result.value = 0;
+          } else {
+            const sigma  = PARTIAL_EOS_MIN_SIGMA + rng.next() * (PARTIAL_EOS_MAX_SIGMA - PARTIAL_EOS_MIN_SIGMA);
+            result.value = innateValue + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        // Gate oxide pinhole — parametric degradation, rarely catastrophic
+        if (rng.next() < PINHOLE_PROB) {
+          result.damaged    = true;
+          result.defectType = 'gate_oxide_pinhole';
+          if (rng.next() < PINHOLE_KILL_PROB) {
+            result.value = 0;
+          } else {
+            const sigma  = PINHOLE_MIN_SIGMA + rng.next() * (PINHOLE_MAX_SIGMA - PINHOLE_MIN_SIGMA);
+            result.value = innateValue + sigma * baselineSigma;
+          }
+          return result;
+        }
+
+        return result;
+      }
+
+      // -----------------------------------------------------------------------
+      // STEP 8 — BURN-IN STRESS SCREENING
+      // Burn-in applies elevated voltage (typically 1.1–1.3× Vdd) and elevated
+      // temperature (105–125 °C) for 24–168 hours to accelerate infant-mortality
+      // failures before shipment.  The mechanism is Arrhenius-driven: latent
+      // defects with low activation energies (oxide pinholes, thin wire bonds,
+      // partial delaminations) fail during burn-in instead of in the field.
+      //
+      // This is modelled as a SCREENING step, not a defect injection step.
+      // The stress can do three things to a unit:
+      //
+      // 1. Stress-induced kill of latent-defect units (0.20% base rate, elevated
+      //    to 2.0% for units already carrying a process defect flag):
+      //    Units that would have been field failures are caught here.
+      //    Effect: value → 0 (burn-in kill).
+      //
+      // 2. Stress-induced parametric degradation in marginal survivors (0.15%):
+      //    Elevated temperature and bias accelerate electromigration and hot-carrier
+      //    injection in units that are not yet defective.  Creates a moderate
+      //    upward shift in Iread.
+      //    Effect: +0.5σ to +2σ upward.
+      //
+      // 3. Stress-induced outlier in near-threshold units (0.05%):
+      //    A sub-population of units with near-threshold values experience
+      //    accelerated junction degradation during burn-in, landing as outliers.
+      //    Effect: +3σ to +7σ upward; no kill.
+      // -----------------------------------------------------------------------
+      applyBurnInScreening(innateValue, baselineMean, baselineSigma, alreadyDefective) {
+        // Elevated kill probability for units already carrying a latent defect
+        const BASE_KILL_PROB     = 0.002;
+        const DEFECT_KILL_PROB   = 0.020;
+        const DEGRADE_PROB       = 0.0015;
+        const DEGRADE_MIN_SIGMA  = 0.5;
+        const DEGRADE_MAX_SIGMA  = 2.0;
+        const OUTLIER_PROB       = 0.0005;
+        const OUTLIER_MIN_SIGMA  = 3.0;
+        const OUTLIER_MAX_SIGMA  = 7.0;
+
+        let result = { value: innateValue, damaged: false, defectType: 'none' };
+
+        // Kill screen — higher rate for units with existing latent defects
+        const killProb = alreadyDefective ? DEFECT_KILL_PROB : BASE_KILL_PROB;
+        if (rng.next() < killProb) {
+          result.damaged    = true;
+          result.defectType = 'burnin_kill';
+          result.value      = 0;
+          return result;
+        }
+
+        // Stress-induced outlier — near-threshold junction acceleration
+        if (rng.next() < OUTLIER_PROB) {
+          result.damaged    = true;
+          result.defectType = 'burnin_outlier';
+          const sigma  = OUTLIER_MIN_SIGMA + rng.next() * (OUTLIER_MAX_SIGMA - OUTLIER_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;
+          return result;
+        }
+
+        // Parametric degradation — electromigration / hot-carrier shift
+        if (rng.next() < DEGRADE_PROB) {
+          result.damaged    = true;
+          result.defectType = 'burnin_degrade';
+          const sigma  = DEGRADE_MIN_SIGMA + rng.next() * (DEGRADE_MAX_SIGMA - DEGRADE_MIN_SIGMA);
+          result.value = innateValue + sigma * baselineSigma;
+          return result;
+        }
+
+        return result;
+      }
+
       // Build a single module from components + assembly + firmware
       // testerNode is needed to determine which firmware to use (via graph connections)
       buildModule(moduleIndex, assemblyNode, testerNode, totalModules) {
@@ -5426,6 +6289,118 @@
         // Apply assembly effects
         const assemblyEffect = this.applyAssemblyEffects(components, assemblyNode, moduleIndex);
         moduleValue += assemblyEffect.contribution;
+
+        // ===== DIE ATTACH DEFECTS =====
+        // Applied immediately after assembly — die attach happens as part of
+        // the assembly step, before any transport or test events.
+        const dieAttachResult = this.applyDieAttachDefects(
+          moduleValue, this.params.baselineMean, this.params.baselineSigma
+        );
+        moduleValue = dieAttachResult.value;
+        let isDieAttachDefect   = dieAttachResult.damaged;
+        let dieAttachDefectType = dieAttachResult.defectType;
+
+        // ===== WIRE BOND DEFECTS =====
+        // Applied after die attach — wire bonding is the next process step.
+        // Only evaluated if die attach did not already kill the module.
+        let isWireBondDefect   = false;
+        let wireBondDefectType = 'none';
+        if (!isDieAttachDefect || moduleValue !== 0) {
+          const wireBondResult = this.applyWireBondDefects(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (wireBondResult.damaged) {
+            moduleValue        = wireBondResult.value;
+            isWireBondDefect   = true;
+            wireBondDefectType = wireBondResult.defectType;
+          }
+        }
+
+        // ===== FLIP-CHIP / MICROBUMP DEFECTS =====
+        // Applied after wire bonding — flip-chip attach is a parallel or
+        // subsequent interconnect step. Only evaluated on live modules.
+        let isFlipChipDefect   = false;
+        let flipChipDefectType = 'none';
+        if (moduleValue !== 0) {
+          const flipChipResult = this.applyFlipChipDefects(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (flipChipResult.damaged) {
+            moduleValue        = flipChipResult.value;
+            isFlipChipDefect   = true;
+            flipChipDefectType = flipChipResult.defectType;
+          }
+        }
+
+        // ===== MOLD / ENCAPSULATION DEFECTS =====
+        // Applied after all interconnect steps — molding is the final assembly
+        // operation before singulation. Evaluated on all non-dead modules.
+        let isMoldDefect   = false;
+        let moldDefectType = 'none';
+        if (moduleValue !== 0) {
+          const moldResult = this.applyMoldDefects(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (moldResult.damaged) {
+            moduleValue    = moldResult.value;
+            isMoldDefect   = true;
+            moldDefectType = moldResult.defectType;
+          }
+        }
+
+        // ===== MICROCRACK DEFECTS =====
+        // Applied after encapsulation — singulation and handling stress can
+        // nucleate cracks in die, underfill, or mold compound.
+        // Evaluated on all non-dead modules.
+        let isMicrocracksDefect   = false;
+        let microcracksDefectType = 'none';
+        if (moduleValue !== 0) {
+          const microcracksResult = this.applyMicrocracksDefects(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (microcracksResult.damaged) {
+            moduleValue           = microcracksResult.value;
+            isMicrocracksDefect   = true;
+            microcracksDefectType = microcracksResult.defectType;
+          }
+        }
+
+        // ===== GATE OXIDE LEAKAGE AND EOS DEFECTS =====
+        // Silicon process defects — oxide pinholes and overstress events that
+        // degrade junctions or gate dielectrics. Evaluated after all mechanical
+        // assembly defects on non-dead modules.
+        let isGateOxideDefect   = false;
+        let gateOxideDefectType = 'none';
+        if (moduleValue !== 0) {
+          const gateOxideResult = this.applyGateOxideDefects(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (gateOxideResult.damaged) {
+            moduleValue         = gateOxideResult.value;
+            isGateOxideDefect   = true;
+            gateOxideDefectType = gateOxideResult.defectType;
+          }
+        }
+
+        // ===== BURN-IN STRESS SCREENING =====
+        // Final assembly screening step — elevated voltage + temperature stress.
+        // Kill rate is higher for units already carrying any process defect.
+        // Evaluated on all non-dead modules.
+        let isBurnInDefect   = false;
+        let burnInDefectType = 'none';
+        if (moduleValue !== 0) {
+          const alreadyDefective = isDieAttachDefect || isWireBondDefect ||
+                                   isFlipChipDefect  || isMoldDefect     ||
+                                   isMicrocracksDefect || isGateOxideDefect;
+          const burnInResult = this.applyBurnInScreening(
+            moduleValue, this.params.baselineMean, this.params.baselineSigma, alreadyDefective
+          );
+          if (burnInResult.damaged) {
+            moduleValue      = burnInResult.value;
+            isBurnInDefect   = true;
+            burnInDefectType = burnInResult.defectType;
+          }
+        }
 
         // Select and apply firmware based on graph connections to tester
         let firmwareInfo = null;
@@ -5497,12 +6472,27 @@
 
         // Determine if this is a defective module
         const defectThreshold = this.params.baselineMean + this.params.defectLimit * this.params.baselineSigma;
-        let isDefect = isTransportDamaged ||
+        let isDefect = isTransportDamaged    ||
+                       isDieAttachDefect    ||
+                       isWireBondDefect     ||
+                       isFlipChipDefect     ||
+                       isMoldDefect         ||
+                       isMicrocracksDefect  ||
+                       isGateOxideDefect    ||
+                       isBurnInDefect       ||
                        moduleValue > defectThreshold ||
                        moduleValue < (this.params.baselineMean - this.params.defectLimit * this.params.baselineSigma);
-        let defectType = isTransportDamaged ? transportDamageType : 'none';
+        let defectType = isTransportDamaged   ? transportDamageType
+                       : isDieAttachDefect    ? dieAttachDefectType
+                       : isWireBondDefect     ? wireBondDefectType
+                       : isFlipChipDefect     ? flipChipDefectType
+                       : isMoldDefect         ? moldDefectType
+                       : isMicrocracksDefect  ? microcracksDefectType
+                       : isGateOxideDefect    ? gateOxideDefectType
+                       : isBurnInDefect       ? burnInDefectType
+                       : 'none';
         let isIntermittent = false;
-        let isProcessDefect = isTransportDamaged;
+        let isProcessDefect = isTransportDamaged || isDieAttachDefect || isWireBondDefect || isFlipChipDefect || isMoldDefect || isMicrocracksDefect || isGateOxideDefect || isBurnInDefect;
 
         // Rare process defect (extreme outlier) - if not already damaged
         if (!isTransportDamaged && rng.next() < 0.0001) {
@@ -5743,6 +6733,7 @@
             const lotModules = testerModules.slice(i, i + capacity);
             const units = lotModules.map(m => ({
               value: m.value,
+              innateValue: m.innateValue,
               isDefect: m.isDefect,
               isProcessDefect: m.isProcessDefect,
               isIntermittent: m.isIntermittent,
@@ -6198,6 +7189,97 @@
           let defectType = 'none'; // 'none', 'permanent', 'intermittent', 'process'
           let isTransportDamaged = false;
           let transportDamageType = 'none'; // 'none', 'esd_kill', 'esd_outlier', 'physical_kill', 'physical_outlier'
+
+          // ===== DIE ATTACH DEFECTS =====
+          // Applied per-unit in the lot-based path — same physics as buildModule()
+          // but evaluated statistically for each unit in the lot.
+          const dieAttachResult = this.applyDieAttachDefects(
+            innateValue, this.params.baselineMean, this.params.baselineSigma
+          );
+          if (dieAttachResult.damaged) {
+            innateValue     = dieAttachResult.value;
+            isProcessDefect = true;
+            defectType      = dieAttachResult.defectType;
+          }
+
+          // ===== WIRE BOND DEFECTS =====
+          // Only evaluated if die attach did not kill the unit.
+          if (!isProcessDefect || innateValue !== 0) {
+            const wireBondResult = this.applyWireBondDefects(
+              innateValue, this.params.baselineMean, this.params.baselineSigma
+            );
+            if (wireBondResult.damaged) {
+              innateValue     = wireBondResult.value;
+              isProcessDefect = true;
+              defectType      = wireBondResult.defectType;
+            }
+          }
+
+          // ===== FLIP-CHIP / MICROBUMP DEFECTS =====
+          // Only evaluated on live units — flip-chip attach follows wire bonding.
+          if (innateValue !== 0) {
+            const flipChipResult = this.applyFlipChipDefects(
+              innateValue, this.params.baselineMean, this.params.baselineSigma
+            );
+            if (flipChipResult.damaged) {
+              innateValue     = flipChipResult.value;
+              isProcessDefect = true;
+              defectType      = flipChipResult.defectType;
+            }
+          }
+
+          // ===== MOLD / ENCAPSULATION DEFECTS =====
+          // Applied after all interconnect steps — final assembly operation.
+          if (innateValue !== 0) {
+            const moldResult = this.applyMoldDefects(
+              innateValue, this.params.baselineMean, this.params.baselineSigma
+            );
+            if (moldResult.damaged) {
+              innateValue     = moldResult.value;
+              isProcessDefect = true;
+              defectType      = moldResult.defectType;
+            }
+          }
+
+          // ===== MICROCRACK DEFECTS =====
+          // Singulation and handling stress after encapsulation.
+          if (innateValue !== 0) {
+            const microcracksResult = this.applyMicrocracksDefects(
+              innateValue, this.params.baselineMean, this.params.baselineSigma
+            );
+            if (microcracksResult.damaged) {
+              innateValue     = microcracksResult.value;
+              isProcessDefect = true;
+              defectType      = microcracksResult.defectType;
+            }
+          }
+
+          // ===== GATE OXIDE LEAKAGE AND EOS DEFECTS =====
+          // Silicon process defects — evaluated after all mechanical assembly steps.
+          if (innateValue !== 0) {
+            const gateOxideResult = this.applyGateOxideDefects(
+              innateValue, this.params.baselineMean, this.params.baselineSigma
+            );
+            if (gateOxideResult.damaged) {
+              innateValue     = gateOxideResult.value;
+              isProcessDefect = true;
+              defectType      = gateOxideResult.defectType;
+            }
+          }
+
+          // ===== BURN-IN STRESS SCREENING =====
+          // Final assembly screening — elevated voltage + temperature stress.
+          // Kill rate is elevated for units already carrying a process defect.
+          if (innateValue !== 0) {
+            const burnInResult = this.applyBurnInScreening(
+              innateValue, this.params.baselineMean, this.params.baselineSigma, isProcessDefect
+            );
+            if (burnInResult.damaged) {
+              innateValue     = burnInResult.value;
+              isProcessDefect = true;
+              defectType      = burnInResult.defectType;
+            }
+          }
 
           // ===== TRANSPORT DAMAGE =====
           // Apply ESD and physical damage from transport nodes
@@ -7709,7 +8791,7 @@
           ctx.fillStyle = '#888';
           ctx.font = '8px Inter, sans-serif';
           ctx.textAlign = 'right';
-          ctx.fillText('FW:', padding.left - 5, timelineY + timelineHeight - 3);
+          ctx.fillText('TS:', padding.left - 5, timelineY + timelineHeight - 3);
         }
 
         // Legend
@@ -8098,7 +9180,7 @@
         const fwNodes = this.nodeGraph.nodes.filter(n => n.type === 'firmware');
 
         if (fwNodes.length === 0) {
-          container.innerHTML = '<div style="color:#666; font-size:10px; padding:4px;">No firmware nodes in graph. Add from palette.</div>';
+          container.innerHTML = '<div style="color:#666; font-size:10px; padding:4px;">No Test Software nodes in graph. Add from palette.</div>';
           return;
         }
 
@@ -8188,7 +9270,7 @@
             }
           },
           firmware: {
-            description: 'Firmware Mode Switching',
+            description: 'Test Software Mode Switching',
             nodeParams: {
               material: { meanDeltaSigma: 0.2, noiseSigma: 0.1, driftRate: 0.003, stepShiftProb: 0.01 },
               assembly: { meanDeltaSigma: 0.2, noiseSigma: 0.1, driftRate: 0.003, stepShiftProb: 0.01 },
@@ -8281,6 +9363,8 @@
         runBtn.disabled = false;
         pauseBtn.disabled = true;
         exportBtn.disabled = false;
+        const saveScenBtn = document.getElementById('saveScenarioBtn');
+        if (saveScenBtn) saveScenBtn.disabled = false;
         progressContainer.style.display = 'none';
         statusText.textContent = 'Complete';
         // Status bar buttons
@@ -8347,6 +9431,8 @@
         document.getElementById('runSimBtn').disabled = false;
         document.getElementById('pauseSimBtn').disabled = true;
         document.getElementById('exportBtn').disabled = true;
+        const saveScenBtnR = document.getElementById('saveScenarioBtn');
+        if (saveScenBtnR) saveScenBtnR.disabled = true;
         // Status bar buttons
         document.getElementById('runSimBtn2').disabled = false;
         document.getElementById('pauseSimBtn2').disabled = true;
@@ -8781,9 +9867,1232 @@
       }
     }
 
+    // ============================================================
+    // SIX SIGMA ANALYZER
+    // Computes and renders analysis from simulation results.
+    // Sections: Descriptive Stats, Capability, Histogram,
+    //           Box Plot, Run Chart (X-bar SPC), Pareto.
+    // ============================================================
+    class SixSigmaAnalyzer {
+      // ---- utilities ----
+      mean(a)    { return a.reduce((s,v)=>s+v,0)/a.length; }
+      variance(a){ const m=this.mean(a); return a.reduce((s,v)=>s+(v-m)**2,0)/a.length; }
+      stdDev(a)  { return Math.sqrt(this.variance(a)); }
+      median(a)  {
+        const s=[...a].sort((x,y)=>x-y), m=Math.floor(s.length/2);
+        return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+      }
+      percentile(a,p){
+        const s=[...a].sort((x,y)=>x-y), idx=(p/100)*(s.length-1);
+        const lo=Math.floor(idx),hi=Math.ceil(idx);
+        return lo===hi ? s[lo] : s[lo]*(hi-idx)+s[hi]*(idx-lo);
+      }
+      skewness(a){
+        const m=this.mean(a),sd=this.stdDev(a);
+        if(sd===0)return 0;
+        return a.reduce((s,v)=>s+((v-m)/sd)**3,0)/a.length;
+      }
+      kurtosis(a){
+        const m=this.mean(a),sd=this.stdDev(a);
+        if(sd===0)return 0;
+        return a.reduce((s,v)=>s+((v-m)/sd)**4,0)/a.length - 3;
+      }
+
+      // ---- entry point ----
+      run(results, params) {
+        const units    = results.lots.flatMap(l=>l.units);
+        const measured = units.map(u=>u.value).filter(v=>v!=null && v>0);
+        const innate   = units.map(u=>u.innateValue).filter(v=>v!=null && v>0);
+        const usl = params.baselineMean + params.defectLimit * params.baselineSigma;
+        const lsl = params.baselineMean - params.defectLimit * params.baselineSigma;
+        if(!measured.length) return;
+
+        document.getElementById('analysisEmptyState').style.display = 'none';
+        document.getElementById('analysisContent').style.display    = 'block';
+        document.getElementById('analysisStatus').textContent =
+          `${measured.length.toLocaleString()} units · ${results.lots.length} lots`;
+        document.getElementById('analysisStatus').style.color = '#4aff80';
+
+        this._descStats(measured, innate);
+        this._capability(measured, usl, lsl, results.lots);
+        this._histogram(measured, usl, lsl);
+        this._boxplot(results.lots);
+        this._runChart(results.lots);
+        this._pareto(units);
+      }
+
+      // ---- 1. Descriptive Statistics ----
+      _descStats(measured, innate) {
+        const el = document.getElementById('analysisDescStats');
+        if(!el) return;
+        const s = (a, label) => ({
+          label, n:a.length,
+          mean:this.mean(a), median:this.median(a),
+          sd:this.stdDev(a), variance:this.variance(a),
+          cv:(this.stdDev(a)/Math.abs(this.mean(a)))*100,
+          skew:this.skewness(a), kurt:this.kurtosis(a),
+          min:Math.min(...a), max:Math.max(...a),
+          range:Math.max(...a)-Math.min(...a)
+        });
+        const m=s(measured,'Measured'), i=s(innate,'Innate');
+        const f=(v,d=3)=>typeof v==='number'?v.toFixed(d):'--';
+        el.innerHTML=`<table class="stat-table">
+          <thead><tr><th>Statistic</th><th>MEASURED</th><th>INNATE</th></tr></thead>
+          <tbody>
+            <tr><td>N (samples)</td><td>${m.n.toLocaleString()}</td><td>${i.n.toLocaleString()}</td></tr>
+            <tr><td>Mean</td><td>${f(m.mean)}</td><td>${f(i.mean)}</td></tr>
+            <tr><td>Median</td><td>${f(m.median)}</td><td>${f(i.median)}</td></tr>
+            <tr><td>Std Dev (σ)</td><td>${f(m.sd)}</td><td>${f(i.sd)}</td></tr>
+            <tr><td>Variance</td><td>${f(m.variance)}</td><td>${f(i.variance)}</td></tr>
+            <tr><td>CV (%)</td><td>${f(m.cv,2)}%</td><td>${f(i.cv,2)}%</td></tr>
+            <tr><td>Skewness</td><td>${f(m.skew)}</td><td>${f(i.skew)}</td></tr>
+            <tr><td>Kurtosis (excess)</td><td>${f(m.kurt)}</td><td>${f(i.kurt)}</td></tr>
+            <tr><td>Min</td><td>${f(m.min)}</td><td>${f(i.min)}</td></tr>
+            <tr><td>Max</td><td>${f(m.max)}</td><td>${f(i.max)}</td></tr>
+            <tr><td>Range</td><td>${f(m.range)}</td><td>${f(i.range)}</td></tr>
+          </tbody></table>`;
+      }
+
+      // ---- 2. Process Capability ----
+      _capability(measured, usl, lsl, lots) {
+        const el = document.getElementById('analysisCapability');
+        if(!el) return;
+        const mean  = this.mean(measured);
+        const sigma = this.stdDev(measured);
+        const lotSigmas = lots.map(l=>l.stats.sigma).filter(s=>s>0);
+        const sigmaW = lotSigmas.length ? this.mean(lotSigmas) : sigma;
+        const tol = usl - lsl;
+        const Cp   = sigmaW>0 ? tol/(6*sigmaW)             : 0;
+        const Cpk  = sigmaW>0 ? Math.min((usl-mean)/(3*sigmaW),(mean-lsl)/(3*sigmaW)) : 0;
+        const Pp   = sigma>0  ? tol/(6*sigma)              : 0;
+        const Ppk  = sigma>0  ? Math.min((usl-mean)/(3*sigma),(mean-lsl)/(3*sigma))   : 0;
+        const tgt  = (usl+lsl)/2;
+        const tau  = Math.sqrt(sigma**2+(mean-tgt)**2);
+        const Cpm  = tau>0 ? tol/(6*tau) : 0;
+        const Z    = sigma>0 ? Math.min((usl-mean)/sigma,(mean-lsl)/sigma) : 0;
+        const cls  = v => v>=1.33?'cap-good':v>=1.0?'cap-warn':'cap-bad';
+        const f    = v => v.toFixed(3);
+        el.innerHTML=`<div class="capability-grid">
+          <div class="cap-card"><div class="cap-card-label">Cp</div><div class="cap-card-value ${cls(Cp)}">${f(Cp)}</div></div>
+          <div class="cap-card"><div class="cap-card-label">Cpk</div><div class="cap-card-value ${cls(Cpk)}">${f(Cpk)}</div></div>
+          <div class="cap-card"><div class="cap-card-label">Pp</div><div class="cap-card-value ${cls(Pp)}">${f(Pp)}</div></div>
+          <div class="cap-card"><div class="cap-card-label">Ppk</div><div class="cap-card-value ${cls(Ppk)}">${f(Ppk)}</div></div>
+          <div class="cap-card"><div class="cap-card-label">Cpm</div><div class="cap-card-value ${cls(Cpm)}">${f(Cpm)}</div></div>
+          <div class="cap-card"><div class="cap-card-label">Z (min)</div><div class="cap-card-value ${cls(Z/3)}">${Z.toFixed(2)}</div></div>
+        </div>
+        <p class="cap-legend">Cp / Cpk = within-subgroup (short-term). &nbsp; Pp / Ppk = overall (long-term). &nbsp;
+        <span class="cap-good">&#9632;</span> ≥ 1.33 &nbsp;
+        <span class="cap-warn">&#9632;</span> ≥ 1.00 &nbsp;
+        <span class="cap-bad">&#9632;</span> &lt; 1.00</p>`;
+      }
+
+      // ---- 3. Histogram ----
+      _histogram(measured, usl, lsl) {
+        const canvas = document.getElementById('analysisHistogram');
+        if(!canvas) return;
+        canvas.width = canvas.offsetWidth || 500;
+        canvas.height = 220;
+        const ctx = canvas.getContext('2d');
+        const W=canvas.width, H=canvas.height;
+        const pad={top:24,right:16,bottom:36,left:48};
+        const plotW=W-pad.left-pad.right, plotH=H-pad.top-pad.bottom;
+
+        const nb = Math.min(60,Math.max(20,Math.round(Math.sqrt(measured.length))));
+        const mn=Math.min(...measured), mx=Math.max(...measured);
+        const bw=(mx-mn)/nb;
+        const bins=Array(nb).fill(0);
+        measured.forEach(v=>{ const b=Math.min(nb-1,Math.floor((v-mn)/bw)); bins[b]++; });
+        const maxB=Math.max(...bins);
+        const vx=v=>pad.left+((v-mn)/(mx-mn))*plotW;
+
+        ctx.clearRect(0,0,W,H);
+        bins.forEach((c,i)=>{
+          const x=pad.left+(i/nb)*plotW, bpx=plotW/nb-1;
+          const bh=(c/maxB)*plotH, y=pad.top+plotH-bh;
+          ctx.fillStyle='rgba(74,158,255,0.55)'; ctx.fillRect(x,y,bpx,bh);
+          ctx.strokeStyle='rgba(74,158,255,0.85)'; ctx.lineWidth=0.5; ctx.strokeRect(x,y,bpx,bh);
+        });
+        // USL / LSL
+        [[usl,'#ff4a4a','USL'],[lsl,'#ff9f4a','LSL']].forEach(([v,c,label])=>{
+          if(v<mn||v>mx) return;
+          ctx.strokeStyle=c; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+          ctx.beginPath(); ctx.moveTo(vx(v),pad.top); ctx.lineTo(vx(v),pad.top+plotH); ctx.stroke();
+          ctx.fillStyle=c; ctx.font='9px Inter,sans-serif'; ctx.textAlign='center';
+          ctx.fillText(label, vx(v), pad.top-5);
+        });
+        ctx.setLineDash([]);
+        // Axes
+        ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+plotH);
+        ctx.moveTo(pad.left,pad.top+plotH); ctx.lineTo(pad.left+plotW,pad.top+plotH);
+        ctx.stroke();
+        ctx.fillStyle='#555'; ctx.font='9px Inter,sans-serif';
+        for(let i=0;i<=5;i++){
+          const v=mn+(i/5)*(mx-mn);
+          ctx.textAlign='center'; ctx.fillText(v.toFixed(1),vx(v),pad.top+plotH+12);
+        }
+        ctx.textAlign='right';
+        ctx.fillText('0',pad.left-4,pad.top+plotH);
+        ctx.fillText(maxB,pad.left-4,pad.top+4);
+      }
+
+      // ---- 4. Box Plot by Lot ----
+      _boxplot(lots) {
+        const canvas = document.getElementById('analysisBoxplot');
+        if(!canvas) return;
+        canvas.width = canvas.offsetWidth || 500;
+        canvas.height = 220;
+        const ctx = canvas.getContext('2d');
+        const W=canvas.width, H=canvas.height;
+        const pad={top:16,right:16,bottom:32,left:48};
+        const plotW=W-pad.left-pad.right, plotH=H-pad.top-pad.bottom;
+
+        const maxLots=Math.floor(plotW/7);
+        const step=Math.max(1,Math.ceil(lots.length/maxLots));
+        const sl=lots.filter((_,i)=>i%step===0);
+        const allM=lots.flatMap(l=>l.units.map(u=>u.measuredValue));
+        const gMin=Math.min(...allM), gMax=Math.max(...allM);
+        const vy=v=>pad.top+plotH-((v-gMin)/(gMax-gMin))*plotH;
+        const bw=Math.max(3,Math.min(10,(plotW/sl.length)-2));
+
+        ctx.clearRect(0,0,W,H);
+        ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+plotH);
+        ctx.moveTo(pad.left,pad.top+plotH); ctx.lineTo(pad.left+plotW,pad.top+plotH);
+        ctx.stroke();
+
+        sl.forEach((lot,i)=>{
+          const x=pad.left+(i/(sl.length-1||1))*plotW;
+          const s=lot.stats;
+          // Whisker
+          ctx.strokeStyle='rgba(100,140,255,0.4)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(x,vy(s.min)); ctx.lineTo(x,vy(s.max)); ctx.stroke();
+          // Box
+          const bT=vy(s.q3), bB=vy(s.q1);
+          ctx.fillStyle='rgba(74,158,255,0.25)'; ctx.strokeStyle='rgba(74,158,255,0.7)'; ctx.lineWidth=1;
+          ctx.fillRect(x-bw/2,bT,bw,bB-bT); ctx.strokeRect(x-bw/2,bT,bw,bB-bT);
+          // Median
+          ctx.strokeStyle='#4aff80'; ctx.lineWidth=2;
+          ctx.beginPath(); ctx.moveTo(x-bw/2,vy(s.median)); ctx.lineTo(x+bw/2,vy(s.median)); ctx.stroke();
+        });
+        ctx.fillStyle='#555'; ctx.font='9px Inter,sans-serif'; ctx.textAlign='right';
+        for(let i=0;i<=4;i++){
+          const v=gMin+(i/4)*(gMax-gMin);
+          ctx.fillText(v.toFixed(1),pad.left-4,vy(v)+3);
+        }
+        ctx.textAlign='center'; ctx.fillText('Lot index →',pad.left+plotW/2,pad.top+plotH+22);
+      }
+
+      // ---- 5. SPC Run Chart (X-bar with UCL / LCL) ----
+      _runChart(lots) {
+        const canvas = document.getElementById('analysisRunChart');
+        if(!canvas) return;
+        canvas.width = canvas.offsetWidth || 900;
+        canvas.height = 200;
+        const ctx = canvas.getContext('2d');
+        const W=canvas.width, H=canvas.height;
+        const pad={top:20,right:55,bottom:36,left:52};
+        const plotW=W-pad.left-pad.right, plotH=H-pad.top-pad.bottom;
+
+        const means=lots.map(l=>l.stats.mean);
+        const mr=means.map((v,i)=>i===0?0:Math.abs(v-means[i-1]));
+        const Rbar=this.mean(mr.slice(1));
+        const d2=1.128;
+        const sigMR=Rbar/d2;
+        const xBar=this.mean(means);
+        const UCL=xBar+3*sigMR, LCL=xBar-3*sigMR;
+        const allV=[...means,UCL,LCL];
+        const minV=Math.min(...allV)-sigMR*0.3, maxV=Math.max(...allV)+sigMR*0.3;
+        const xAt=i=>pad.left+(i/(lots.length-1||1))*plotW;
+        const yAt=v=>pad.top+plotH-((v-minV)/(maxV-minV))*plotH;
+
+        ctx.clearRect(0,0,W,H);
+        // UCL/LCL zone fill
+        ctx.fillStyle='rgba(255,74,74,0.04)';
+        ctx.fillRect(pad.left,Math.min(yAt(UCL),pad.top),plotW,
+                     Math.max(yAt(LCL),pad.top+plotH)-Math.min(yAt(UCL),pad.top));
+        // Centre line
+        ctx.strokeStyle='rgba(74,255,128,0.35)'; ctx.lineWidth=1; ctx.setLineDash([6,3]);
+        ctx.beginPath(); ctx.moveTo(pad.left,yAt(xBar)); ctx.lineTo(pad.left+plotW,yAt(xBar)); ctx.stroke();
+        // UCL / LCL
+        ctx.strokeStyle='rgba(255,74,74,0.65)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(pad.left,yAt(UCL)); ctx.lineTo(pad.left+plotW,yAt(UCL)); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad.left,yAt(LCL)); ctx.lineTo(pad.left+plotW,yAt(LCL)); ctx.stroke();
+        ctx.setLineDash([]);
+        // Lot mean line
+        ctx.strokeStyle='#4a9eff'; ctx.lineWidth=1.5;
+        ctx.beginPath();
+        lots.forEach((_,i)=>{ i===0?ctx.moveTo(xAt(i),yAt(means[i])):ctx.lineTo(xAt(i),yAt(means[i])); });
+        ctx.stroke();
+        // Points
+        lots.forEach((_,i)=>{
+          const ooc=means[i]>UCL||means[i]<LCL;
+          ctx.fillStyle=ooc?'#ff4a4a':'#4a9eff';
+          ctx.beginPath(); ctx.arc(xAt(i),yAt(means[i]),ooc?4:2,0,Math.PI*2); ctx.fill();
+        });
+        // Axes
+        ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+plotH);
+        ctx.moveTo(pad.left,pad.top+plotH); ctx.lineTo(pad.left+plotW,pad.top+plotH);
+        ctx.stroke();
+        ctx.fillStyle='#555'; ctx.font='9px Inter,sans-serif'; ctx.textAlign='right';
+        for(let i=0;i<=4;i++){
+          const v=minV+(i/4)*(maxV-minV);
+          ctx.fillText(v.toFixed(1),pad.left-4,yAt(v)+3);
+        }
+        ctx.textAlign='left'; ctx.fillStyle='rgba(255,74,74,0.7)';
+        ctx.fillText('UCL',pad.left+plotW+4,yAt(UCL)+3);
+        ctx.fillText('LCL',pad.left+plotW+4,yAt(LCL)+3);
+        ctx.fillStyle='rgba(74,255,128,0.5)';
+        ctx.fillText('X\u0305',pad.left+plotW+4,yAt(xBar)+3);
+        ctx.textAlign='center'; ctx.fillStyle='#555';
+        ctx.fillText('Lot index \u2192',pad.left+plotW/2,pad.top+plotH+22);
+      }
+
+      // ---- 6. Pareto ----
+      _pareto(units) {
+        const canvas = document.getElementById('analysisPareto');
+        if(!canvas) return;
+        canvas.width = canvas.offsetWidth || 900;
+        canvas.height = 240;
+        const ctx = canvas.getContext('2d');
+        const W=canvas.width, H=canvas.height;
+
+        const counts={};
+        units.forEach(u=>{ if(u.defectType&&u.defectType!=='none'){ counts[u.defectType]=(counts[u.defectType]||0)+1; }});
+        if(!Object.keys(counts).length){
+          ctx.fillStyle='#444'; ctx.font='13px Inter,sans-serif'; ctx.textAlign='center';
+          ctx.fillText('No defects recorded in this run.',W/2,H/2); return;
+        }
+        const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+        const total=sorted.reduce((s,[,v])=>s+v,0);
+        const pad={top:20,right:55,bottom:85,left:52};
+        const plotW=W-pad.left-pad.right, plotH=H-pad.top-pad.bottom;
+        const bw=Math.max(8,(plotW/sorted.length)-4);
+        const maxC=sorted[0][1];
+        const colors=['#4a9eff','#ff9f4a','#4aff80','#ff4a9f','#ffff4a','#9f4aff','#ff4a4a','#4affff'];
+
+        ctx.clearRect(0,0,W,H);
+        let cumPct=0;
+        const pts=[];
+        sorted.forEach(([label,count],i)=>{
+          const cx=pad.left+i*(plotW/sorted.length)+(plotW/sorted.length-bw)/2;
+          const bh=(count/maxC)*plotH, y=pad.top+plotH-bh;
+          ctx.fillStyle=colors[i%colors.length]; ctx.fillRect(cx,y,bw,bh);
+          // Count label
+          ctx.fillStyle='#ccc'; ctx.font='9px Inter,sans-serif'; ctx.textAlign='center';
+          ctx.fillText(count,cx+bw/2,y-4);
+          // X label rotated
+          ctx.save(); ctx.translate(cx+bw/2,pad.top+plotH+8); ctx.rotate(-Math.PI/4);
+          ctx.fillStyle='#888'; ctx.textAlign='right';
+          ctx.fillText(label.replace(/_/g,' '),0,0); ctx.restore();
+          cumPct+=count/total*100;
+          pts.push({x:cx+bw/2,pct:cumPct});
+        });
+        // Cumulative % line
+        ctx.strokeStyle='#ffcc4a'; ctx.lineWidth=2;
+        ctx.beginPath();
+        pts.forEach((p,i)=>{ const y=pad.top+plotH-(p.pct/100)*plotH; i===0?ctx.moveTo(p.x,y):ctx.lineTo(p.x,y); });
+        ctx.stroke();
+        pts.forEach(p=>{
+          const y=pad.top+plotH-(p.pct/100)*plotH;
+          ctx.fillStyle='#ffcc4a'; ctx.beginPath(); ctx.arc(p.x,y,3,0,Math.PI*2); ctx.fill();
+        });
+        // Right axis %
+        ctx.fillStyle='rgba(255,204,74,0.7)'; ctx.font='9px Inter,sans-serif'; ctx.textAlign='left';
+        [25,50,75,100].forEach(p=>{
+          const y=pad.top+plotH-(p/100)*plotH;
+          ctx.fillText(p+'%',pad.left+plotW+6,y+3);
+        });
+        // Left axis count
+        ctx.fillStyle='#555'; ctx.textAlign='right';
+        ctx.fillText(maxC,pad.left-4,pad.top+4); ctx.fillText('0',pad.left-4,pad.top+plotH);
+        // Axes
+        ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+plotH);
+        ctx.moveTo(pad.left,pad.top+plotH); ctx.lineTo(pad.left+plotW,pad.top+plotH);
+        ctx.stroke();
+      }
+    }
+
+    // ============================================================
+    // SCENARIO STORE
+    // Holds up to 3 named simulation snapshots for side-by-side comparison.
+    // ============================================================
+    class ScenarioStore {
+      constructor() { this.slots = [null, null, null]; }
+
+      save(idx, label, results, params) {
+        this.slots[idx] = {
+          label,
+          timestamp: new Date().toLocaleTimeString(),
+          params: { ...params },
+          summary: {
+            totalUnits:       results.totalUnits,
+            totalDefects:     results.totalDefects,
+            totalModules:     results.totalModules,
+            lotCount:         results.lots.length,
+            spatFallout:      results.spatResults.fallout,
+            spatEscape:       results.spatResults.escapes,
+            spatFalseRejects: results.spatResults.falseRejects,
+            spatEscapeCount:  results.spatResults.escapeCount,
+            dpatFallout:      results.dpatResults.fallout,
+            dpatEscape:       results.dpatResults.escapes,
+            dpatFalseRejects: results.dpatResults.falseRejects,
+            dpatEscapeCount:  results.dpatResults.escapeCount,
+          }
+        };
+      }
+
+      clear(idx) { this.slots[idx] = null; }
+      get(idx)   { return this.slots[idx]; }
+      hasAny()   { return this.slots.some(s => s !== null); }
+
+      // Returns delta object for slots[idxA] vs slots[idxB]
+      compare(idxA, idxB) {
+        const a = this.slots[idxA], b = this.slots[idxB];
+        if (!a || !b) return null;
+        const delta = (va, vb, lowerBetter = true) => {
+          const d = vb - va;
+          const pct = va !== 0 ? (d / Math.abs(va)) * 100 : 0;
+          const better = lowerBetter ? d < 0 : d > 0;
+          return { d, pct, better };
+        };
+        return {
+          a, b,
+          spatFallout:      delta(a.summary.spatFallout,      b.summary.spatFallout),
+          spatEscape:       delta(a.summary.spatEscape,       b.summary.spatEscape),
+          spatFalseRejects: delta(a.summary.spatFalseRejects, b.summary.spatFalseRejects),
+          dpatFallout:      delta(a.summary.dpatFallout,      b.summary.dpatFallout),
+          dpatEscape:       delta(a.summary.dpatEscape,       b.summary.dpatEscape),
+          dpatFalseRejects: delta(a.summary.dpatFalseRejects, b.summary.dpatFalseRejects),
+          totalDefects:     delta(a.summary.totalDefects,     b.summary.totalDefects),
+        };
+      }
+    }
+
+    // ============================================================
+    // ECONOMIC ENGINE
+    // Computes Cost of Quality (CoQ) from simulation results.
+    // Four categories: Prevention, Appraisal, Internal Failure, External Failure.
+    // ============================================================
+    class EconomicEngine {
+      _fmt(v) { return v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`; }
+
+      compute(results, simParams, econParams) {
+        const mult    = econParams.escapeCostMult     || 10;
+        const recover = (econParams.falseRejectRecovery || 20) / 100;
+        const prevCPL = econParams.preventionCost     || 5;
+
+        const totalUnits   = results.totalUnits   || 1;
+        const lots         = results.lots.length   || 1;
+        const falseRejects = results.spatResults.falseRejects || 0;
+        const escapeCount  = results.spatResults.escapeCount  || 0;
+        const unitCost     = 7.50; // material($5) + assembly($2) + test($0.50) ≈ $7.50
+
+        const prevention      = lots * prevCPL;
+        const appraisal       = totalUnits * 0.50;
+        const internalFailure = falseRejects * unitCost * (1 - recover);
+        const externalFailure = escapeCount  * unitCost * mult;
+        const totalCoQ        = prevention + appraisal + internalFailure + externalFailure;
+        const coQPct          = totalUnits > 0 ? (totalCoQ / (totalUnits * unitCost)) * 100 : 0;
+
+        return {
+          prevention, appraisal, internalFailure, externalFailure,
+          totalCoQ, coQPct, unitCost, falseRejects, escapeCount,
+          improvements: [
+            { label: 'Reduce tester false rejects 20%',  driverKey: 'tester',    saving: falseRejects * 0.20 * unitCost * (1 - recover), invest: lots * 2 },
+            { label: 'Eliminate firmware mode switching', driverKey: 'firmware',  saving: escapeCount  * 0.50 * unitCost * mult,          invest: lots * 5 },
+            { label: 'Halve transport damage rate',       driverKey: 'transport', saving: (results.totalDefects || 0) * 0.15 * unitCost,  invest: lots * 1 },
+          ]
+        };
+      }
+
+      render(results, simParams, econParams) {
+        const d = this.compute(results, simParams, econParams);
+        const f = this._fmt.bind(this);
+
+        // Cards
+        const cards = document.getElementById('coqCards');
+        if (cards) cards.innerHTML = `
+          <div class="coq-card"><div class="coq-card-label">Prevention</div><div class="coq-card-value coq-prev">${f(d.prevention)}</div><div class="coq-card-sub">PM & calibration</div></div>
+          <div class="coq-card"><div class="coq-card-label">Appraisal</div><div class="coq-card-value coq-appr">${f(d.appraisal)}</div><div class="coq-card-sub">test cost</div></div>
+          <div class="coq-card"><div class="coq-card-label">Internal Failure</div><div class="coq-card-value coq-int">${f(d.internalFailure)}</div><div class="coq-card-sub">${d.falseRejects} false rejects</div></div>
+          <div class="coq-card"><div class="coq-card-label">External Failure</div><div class="coq-card-value coq-ext">${f(d.externalFailure)}</div><div class="coq-card-sub">${d.escapeCount} escapes ×${econParams.escapeCostMult || 10}</div></div>
+        `;
+
+        this._renderChart(d);
+
+        // ROI box — with driver/ROI conflict detection
+        const roi = document.getElementById('roiBox');
+        if (!roi) return;
+
+        const rcDrivers   = window._rcDrivers || [];
+        const topDriver   = rcDrivers[0];                             // highest % driver
+        const driverColors = RootCauseEngine.COLORS;
+
+        // Find highest-ROI improvement (best saving/invest ratio)
+        const sortedByRoi = [...d.improvements]
+          .filter(i => i.invest > 0)
+          .sort((a, b) => (b.saving / b.invest) - (a.saving / a.invest));
+        const topRoi = sortedByRoi[0];
+
+        // Conflict: primary driver ≠ highest ROI lever
+        const hasConflict = topDriver && topRoi && topDriver.key !== topRoi.driverKey;
+
+        const rows = d.improvements.map(imp => {
+          const net    = imp.saving - imp.invest;
+          const roiPct = imp.invest > 0 ? ((imp.saving / imp.invest) - 1) * 100 : 0;
+          const cls    = net > 0 ? 'roi-val-good' : 'roi-val-warn';
+          const sign   = net > 0 ? '+' : '';
+          const color  = driverColors[imp.driverKey] || '#888';
+
+          // Attach driver % badge
+          const rcEntry  = rcDrivers.find(d => d.key === imp.driverKey);
+          const pctBadge = rcEntry
+            ? `<span style="font-size:9px;color:${color};font-weight:700;margin-left:4px;">(${rcEntry.pct.toFixed(0)}% driver)</span>`
+            : '';
+
+          // Role badges when conflict exists
+          let roleBadge = '';
+          if (hasConflict) {
+            if (imp.driverKey === topDriver.key)
+              roleBadge = `<span class="driver-role-badge role-primary">Primary Driver</span>`;
+            else if (imp.driverKey === topRoi.driverKey)
+              roleBadge = `<span class="driver-role-badge role-amplifier">High-Leverage Amplifier</span>`;
+          }
+
+          return `<div class="roi-row" data-driver="${imp.driverKey}">
+            <span class="roi-label">${imp.label}${pctBadge}${roleBadge}</span>
+            <span class="${cls}">${sign}${f(net)} net (${roiPct.toFixed(0)}% ROI)</span>
+          </div>`;
+        }).join('');
+
+        const conflictNote = hasConflict ? `
+          <div class="conflict-note">
+            ⚠ <strong style="color:#ffcc4a;">${topRoi.label.split(' ').slice(0,3).join(' ')}</strong>
+            amplifies <strong style="color:${driverColors[topDriver.key] || '#ccc'};">${topDriver.name}</strong>,
+            making it a high-ROI secondary fix even though it is not the primary variance driver.
+            Address the primary driver first, then apply this lever for compounded return.
+          </div>` : '';
+
+        roi.innerHTML = `
+          <div class="roi-box">
+            <div class="roi-box-title">ROI — Top Improvement Levers</div>
+            <div class="roi-row" style="margin-bottom:6px;">
+              <span class="roi-label">Total Cost of Quality</span>
+              <span style="color:#ffcc4a;font-weight:700;font-size:13px;">${f(d.totalCoQ)} &nbsp;<span style="font-size:10px;font-weight:400;color:#666;">(${d.coQPct.toFixed(1)}% of unit value)</span></span>
+            </div>
+            ${rows}
+            ${conflictNote}
+          </div>`;
+      }
+
+      _renderChart(d) {
+        const canvas = document.getElementById('coqChart');
+        if (!canvas) return;
+        canvas.width = canvas.offsetWidth || 700;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const cats = [
+          { label: 'Prevention',       value: d.prevention,       color: '#4a9eff' },
+          { label: 'Appraisal',        value: d.appraisal,        color: '#ffcc4a' },
+          { label: 'Internal Failure', value: d.internalFailure,  color: '#ff8844' },
+          { label: 'External Failure', value: d.externalFailure,  color: '#ff4a4a' },
+        ];
+        const maxVal = Math.max(...cats.map(c => c.value), 1);
+        const pL = 130, pR = 80, pT = 12, barH = 24, gap = 12;
+        const chartW = W - pL - pR;
+
+        cats.forEach((cat, i) => {
+          const y  = pT + i * (barH + gap);
+          const bw = (cat.value / maxVal) * chartW;
+          ctx.fillStyle   = cat.color + '28';
+          ctx.strokeStyle = cat.color;
+          ctx.lineWidth   = 1;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(pL, y, Math.max(bw, 2), barH, 3);
+          else ctx.rect(pL, y, Math.max(bw, 2), barH);
+          ctx.fill(); ctx.stroke();
+          ctx.fillStyle  = '#666';
+          ctx.font       = '10px Inter, sans-serif';
+          ctx.textAlign  = 'right';
+          ctx.fillText(cat.label, pL - 6, y + barH / 2 + 4);
+          ctx.fillStyle  = cat.color;
+          ctx.textAlign  = 'left';
+          ctx.fillText(this._fmt(cat.value), pL + bw + 6, y + barH / 2 + 4);
+        });
+      }
+    }
+
+    // ============================================================
+    // ROOT CAUSE ENGINE
+    // Decomposes total variance/loss into per-driver contributions using:
+    //  - Between-firmware-variant variance (ANOVA style)
+    //  - Measured vs innate lot-mean variance difference → tester contribution
+    //  - Direct defect counts → transport, assembly
+    //  - Residual innate variance → material
+    // ============================================================
+    class RootCauseEngine {
+      static COLORS = {
+        firmware:  '#ff4a9f',
+        tester:    '#ff9f4a',
+        material:  '#4a9eff',
+        transport: '#88ccff',
+        assembly:  '#9f4aff',
+      };
+
+      analyse(results, simParams) {
+        const lots       = results.lots;
+        const units      = lots.flatMap(l => l.units);
+        const totalUnits = units.length || 1;
+        const bSigma     = simParams.baselineSigma || 1;
+
+        const varOf = arr => {
+          if (arr.length < 2) return 0;
+          const m = arr.reduce((a,b)=>a+b,0) / arr.length;
+          return arr.reduce((s,v) => s + (v-m)**2, 0) / arr.length;
+        };
+        const lotMeans = (lotSlice, field) => lotSlice.map(l => {
+          const v = l.units.map(u => field === 'innate' ? u.innateValue : (u.measuredValue ?? u.value)).filter(x=>x>0);
+          return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null;
+        }).filter(v=>v!==null);
+
+        // === TOPOLOGY DETECTION ===
+        const testerIds = new Set(lots.map(l => l.activeTester?.id).filter(Boolean));
+        const nodeTypeMap = {};   // nodeType -> Set of nodeIds seen across all lots
+        lots.forEach(lot => {
+          Object.values(lot.nodeContributions || {}).forEach(nc => {
+            if (!nodeTypeMap[nc.nodeType]) nodeTypeMap[nc.nodeType] = new Set();
+            nodeTypeMap[nc.nodeType].add(nc.nodeId);
+          });
+        });
+        const isComplex = testerIds.size > 1 ||
+          ['material','assembly','transport'].some(t => (nodeTypeMap[t]?.size || 0) > 1);
+        const topoNotes = [];
+        if (testerIds.size > 1) topoNotes.push(`${testerIds.size} testers`);
+        ['material','assembly','transport'].forEach(t => {
+          const n = nodeTypeMap[t]?.size || 0;
+          if (n > 1) topoNotes.push(`${n} ${t} nodes`);
+        });
+
+        // === 1. FIRMWARE: between-group ANOVA ===
+        const fwGroups = {};
+        lots.forEach(lot => {
+          const fw = lot.conditions?.firmware || 'default';
+          const vals = lot.units.map(u => u.measuredValue ?? u.value).filter(v => v > 0);
+          if (!vals.length) return;
+          if (!fwGroups[fw]) fwGroups[fw] = [];
+          fwGroups[fw].push(vals.reduce((a,b)=>a+b,0)/vals.length);
+        });
+        let fwScore = 0;
+        const fwKeys = Object.keys(fwGroups);
+        if (fwKeys.length > 1) {
+          const allMeans = Object.values(fwGroups).flat();
+          const grand = allMeans.reduce((a,b)=>a+b,0) / allMeans.length;
+          fwScore = fwKeys.reduce((s, k) => {
+            const gm = fwGroups[k].reduce((a,b)=>a+b,0) / fwGroups[k].length;
+            return s + fwGroups[k].length * (gm - grand)**2;
+          }, 0) / allMeans.length;
+        }
+
+        // === 2. PER-TESTER attribution ===
+        // Multi-tester: split attribution by tester ID; single-tester: global delta
+        const rawDrivers = [];
+
+        if (testerIds.size > 1) {
+          testerIds.forEach(tid => {
+            const tLots = lots.filter(l => l.activeTester?.id === tid);
+            if (!tLots.length) return;
+            const tName = tLots[0].activeTester?.name || tid;
+            const score = Math.max(0, varOf(lotMeans(tLots,'measured')) - varOf(lotMeans(tLots,'innate')) - fwScore);
+            if (score > 0.0001) rawDrivers.push({ key:'tester', name:`Tester: ${tName}`, rawScore:score, nodeId:tid });
+          });
+        } else {
+          const score = Math.max(0, varOf(lotMeans(lots,'measured')) - varOf(lotMeans(lots,'innate')) - fwScore);
+          const singleName = lots.find(l=>l.activeTester)?.activeTester?.name;
+          if (score > 0.0001) rawDrivers.push({ key:'tester', name: singleName ? `Tester: ${singleName}` : 'Tester Drift', rawScore:score });
+        }
+
+        // === 3. PER-NODE material attribution using observed innate lot means ===
+        // Group lots by which material node was active (via nodeContributions).
+        // Score = within-group innate variance + per-node share of between-group mean offset.
+        // This correctly attributes bimodal distributions caused by two suppliers with
+        // different means (e.g. μ=0.0 vs μ=2.3) that nc.sigma alone would miss.
+        const matNodeGroups = {}; // nodeId -> { name, color, lots[] }
+        lots.forEach(lot => {
+          Object.entries(lot.nodeContributions || {}).forEach(([nid, nc]) => {
+            if (nc.nodeType !== 'material') return;
+            if (!matNodeGroups[nid]) matNodeGroups[nid] = { name:nc.nodeName, color:nc.nodeColor, lots:[] };
+            matNodeGroups[nid].lots.push(lot);
+          });
+        });
+
+        const matGroupKeys = Object.keys(matNodeGroups);
+        if (matGroupKeys.length > 0) {
+          // Between-group variance: ANOVA on innate group means (captures supplier mean offsets)
+          let matBetweenVar = 0;
+          if (matGroupKeys.length > 1) {
+            const groupMeans = matGroupKeys.map(nid => {
+              const m = lotMeans(matNodeGroups[nid].lots, 'innate');
+              return m.length ? m.reduce((a,b)=>a+b,0)/m.length : null;
+            }).filter(v=>v!==null);
+            if (groupMeans.length > 1) {
+              const grand = groupMeans.reduce((a,b)=>a+b,0)/groupMeans.length;
+              matBetweenVar = groupMeans.reduce((s,gm) => s + (gm-grand)**2, 0) / groupMeans.length;
+            }
+          }
+
+          const multiMat = matGroupKeys.length > 1;
+          matGroupKeys.forEach(nid => {
+            const ng = matNodeGroups[nid];
+            // Within-group lot-to-lot innate variance (node's own process sigma)
+            const withinVar = varOf(lotMeans(ng.lots, 'innate'));
+            // Each node gets an equal share of the between-group mean offset variance
+            const betweenShare = matGroupKeys.length > 1 ? matBetweenVar / matGroupKeys.length : 0;
+            const score = withinVar * 0.6 + betweenShare;
+            if (score > 0.0001) rawDrivers.push({
+              key: 'material',
+              name: multiMat ? `Material: ${ng.name}` : 'Material Variation',
+              rawScore: score, nodeId: nid
+            });
+          });
+        } else {
+          // No nodeContributions material data — fallback to global innate variance
+          const score = Math.max(0, varOf(lotMeans(lots,'innate')) * 0.6);
+          if (score > 0.0001) rawDrivers.push({ key:'material', name:'Material Variation', rawScore:score });
+        }
+
+        // === 4. Transport damage — direct count ===
+        const transportDamaged = units.filter(u => u.isTransportDamaged).length;
+        const transportScore   = (transportDamaged / totalUnits) * bSigma * bSigma * 100;
+        if (transportScore > 0.0001) rawDrivers.push({ key:'transport', name:'Transport Damage', rawScore:transportScore });
+
+        // === 5. Assembly defects — direct count ===
+        const processDefects = units.filter(u => u.isProcessDefect && !u.isTransportDamaged).length;
+        const assemblyScore  = (processDefects / totalUnits) * bSigma * bSigma * 80;
+        if (assemblyScore > 0.0001) rawDrivers.push({ key:'assembly', name:'Assembly Defects', rawScore:assemblyScore });
+
+        // Firmware last (already scored)
+        if (fwScore > 0.0001) rawDrivers.push({ key:'firmware', name:'Firmware Switching', rawScore:fwScore });
+
+        // === NORMALIZE & SORT ===
+        const total = rawDrivers.reduce((s,d)=>s+d.rawScore,0) || 1;
+        rawDrivers.forEach(d => { d.pct = (d.rawScore / total) * 100; });
+        rawDrivers.sort((a,b) => b.rawScore - a.rawScore);
+
+        // === PER-DRIVER CONFIDENCE ===
+        const half  = Math.floor(lots.length / 2);
+        const lotsA = lots.slice(0, half);
+        const lotsB = lots.slice(half);
+
+        const halfScore = (lotsSlice, key) => {
+          const u = lotsSlice.flatMap(l => l.units);
+          if (!u.length) return 0;
+          if (key === 'transport') return u.filter(x=>x.isTransportDamaged).length / u.length * bSigma * bSigma * 100;
+          if (key === 'assembly')  return u.filter(x=>x.isProcessDefect && !x.isTransportDamaged).length / u.length * bSigma * bSigma * 80;
+          return varOf(lotMeans(lotsSlice,'measured'));
+        };
+
+        const confFor = (key) => {
+          const lotCount = lots.length;
+          if (lotCount < 10) return { label:'Low',    cls:'conf-low',    note:'Too few lots — signal unreliable' };
+          const sA = halfScore(lotsA, key);
+          const sB = halfScore(lotsB, key);
+          const ratio = sA > 0 && sB > 0 ? Math.max(sA,sB) / Math.min(sA,sB) : 1;
+          const unstable = ratio > 3;
+          if      (lotCount >= 50 && !unstable) return { label:'High',   cls:'conf-high',   note:'Signal consistent across all lots' };
+          else if (lotCount >= 20 || !unstable) return { label:'Medium', cls:'conf-medium', note: unstable ? 'Signal shifted mid-run — verify with more lots' : 'Moderate lot count — increase for higher precision' };
+          else                                  return { label:'Low',    cls:'conf-low',    note:'Unstable signal — results may vary between runs' };
+        };
+
+        rawDrivers.forEach(d => {
+          d.conf  = confFor(d.key);
+          d.color = RootCauseEngine.COLORS[d.key] || '#4aff80';
+        });
+
+        // Attach topology metadata directly on the array
+        rawDrivers.isComplex    = isComplex;
+        rawDrivers.topologyNote = topoNotes.join(' · ');
+        rawDrivers.testerCount  = testerIds.size;
+
+        return rawDrivers;
+      }
+
+      render(results, simParams, econData) {
+        const el = document.getElementById('rootCauseTable');
+        if (!el) return;
+        const drivers  = this.analyse(results, simParams);
+        const totalCoQ = econData?.totalCoQ || 0;
+        const f = v => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`;
+
+        const topoBadge = drivers.isComplex
+          ? `<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+               <span class="conf-badge conf-medium" style="font-size:10px;padding:2px 8px;">Complex Pipeline</span>
+               <span style="font-size:11px;color:#888;">${drivers.topologyNote}</span>
+             </div>`
+          : '';
+
+        el.innerHTML = `
+          ${topoBadge}
+          <table class="rc-table">
+            <thead><tr>
+              <th>Driver</th><th style="min-width:180px;">Contribution</th>
+              <th>Est. Cost Impact</th><th>Confidence</th>
+            </tr></thead>
+            <tbody>
+              ${drivers.map(d => `
+                <tr data-driver="${d.key}">
+                  <td class="rc-driver-name" style="color:${d.color};">${d.name}</td>
+                  <td>
+                    <div class="rc-bar-wrap">
+                      <div class="rc-bar-track">
+                        <div class="rc-bar-fill" style="width:${d.pct.toFixed(1)}%;background:${d.color};"></div>
+                      </div>
+                      <span class="rc-pct" style="color:${d.color};">${d.pct.toFixed(0)}%</span>
+                    </div>
+                  </td>
+                  <td class="rc-cost">${f(totalCoQ * d.pct / 100)}</td>
+                  <td><span class="conf-badge ${d.conf.cls}" title="${d.conf.note}">${d.conf.label}</span></td>
+                </tr>`).join('')}
+            </tbody>
+          </table>`;
+
+        // Expose drivers globally so recommendation engine can use them
+        window._rcDrivers = drivers;
+      }
+    }
+
+    // ============================================================
+    // RECOMMENDATION ENGINE
+    // Analyses CoQ data + simulation results and produces ranked,
+    // actionable fix recommendations with estimated financial impact.
+    // ============================================================
+    class RecommendationEngine {
+      generate(results, simParams, econData) {
+        const recs = [];
+        const f = v => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`;
+        const { internalFailure, externalFailure, totalCoQ, falseRejects, escapeCount, unitCost } = econData;
+        const totalUnits   = results.totalUnits   || 1;
+        const totalDefects = results.totalDefects || 0;
+        const spatFallout  = results.spatResults.fallout       || 0;
+        const dpatFallout  = results.dpatResults.fallout       || 0;
+        const spatEscape   = results.spatResults.escapes       || 0;
+        const dpatEscape   = results.dpatResults.escapes       || 0;
+        const spatFR       = results.spatResults.falseRejects  || 0;
+        const dpatFR       = results.dpatResults.falseRejects  || 0;
+        const mult         = econData.escapeCostMult           || 10;
+        const recover      = (econData.falseRejectRecovery     || 20) / 100;
+        const coqPct       = totalCoQ / (totalUnits * unitCost) * 100;
+
+        // Pull top driver from RootCauseEngine output (set globally after rcEngine.render)
+        const topDriver = (window._rcDrivers || [])[0];
+        const topDriverTag = topDriver
+          ? `<span style="color:${topDriver.color};font-weight:700;">${topDriver.name} (${topDriver.pct.toFixed(0)}%)</span>`
+          : '';
+
+        // --- Rule 1: External failure dominates ---
+        if (externalFailure > 0 && externalFailure > internalFailure * 1.5) {
+          const saving = externalFailure * 0.40;
+          recs.push({
+            priority: 1, driverKey: topDriver?.key || 'tester',
+            cause:     `${topDriverTag} is inflating the measured value distribution`,
+            mechanism: `Wider distribution pushes outlier units past the defect threshold → ${escapeCount} units escape test and reach the customer → external failure cost ${f(externalFailure)}`,
+            action:    'Reduce PAT k-factor by 0.5σ, or switch DPAT to Stratified mode to isolate the driver-specific variance',
+            value:     saving,
+          });
+        }
+
+        // --- Rule 2: Internal failure dominates ---
+        if (internalFailure > 0 && internalFailure > externalFailure * 1.5) {
+          const saving = internalFailure * 0.35;
+          recs.push({
+            priority: 1, driverKey: topDriver?.key || 'tester',
+            cause:     `${topDriverTag} is shifting the process mean or inflating sigma`,
+            mechanism: `Shifted distribution moves good units outside PAT limits → ${falseRejects} good parts scrapped → internal failure cost ${f(internalFailure)}`,
+            action:    'Increase k-factor by 0.5σ, enable SPAT Periodic Requalification, or increase training lots to re-anchor the baseline',
+            value:     saving,
+          });
+        }
+
+        // --- Rule 3: DPAT instability ---
+        if (dpatFallout > spatFallout * 1.3 && spatFallout > 0) {
+          const saving = Math.max(0, dpatFR - spatFR) * unitCost * (1 - recover);
+          recs.push({
+            priority: dpatFallout > spatFallout * 2 ? 1 : 2, driverKey: topDriver?.key || 'firmware',
+            cause:     `${topDriverTag} introduces between-lot distribution shifts`,
+            mechanism: `DPAT rolling window averages shifted and unshifted lots → limits become unstable → DPAT fallout ${dpatFallout.toFixed(1)}% vs SPAT ${spatFallout.toFixed(1)}% (${(dpatFallout/spatFallout).toFixed(1)}×)`,
+            action:    'Enable Stratified DPAT to group lots by condition before computing limits, or increase DPAT window size',
+            value:     saving,
+          });
+        }
+
+        // --- Rule 4: DPAT escapes worse ---
+        if (dpatEscape > spatEscape * 1.2 && spatEscape > 0) {
+          const saving = Math.max(0, results.dpatResults.escapeCount - results.spatResults.escapeCount) * unitCost * mult;
+          recs.push({
+            priority: 2, driverKey: topDriver?.key || 'firmware',
+            cause:     `${topDriverTag} creates bimodal or shifted lot distributions`,
+            mechanism: `DPAT rolling limits widen to include defect-cluster lots → limits open up around real failures → escape rate ${dpatEscape.toFixed(1)}% exceeds SPAT ${spatEscape.toFixed(1)}%`,
+            action:    'Switch to Stratified DPAT or increase SPAT training lots to build a clean, defect-free baseline',
+            value:     saving,
+          });
+        }
+
+        // --- Rule 5: High escape rate ---
+        const escapeRate = totalDefects > 0 ? escapeCount / totalDefects : 0;
+        if (escapeRate > 0.25 && !recs.find(r => r.cause?.includes('threshold'))) {
+          const saving = escapeCount * 0.25 * unitCost * mult;
+          recs.push({
+            priority: 2, driverKey: topDriver?.key || 'tester',
+            cause:     `${topDriverTag} produces a defect signature that overlaps the good-unit distribution`,
+            mechanism: `${(escapeRate*100).toFixed(0)}% of all defects fall within PAT limits → test is not discriminating the failure mode → ${escapeCount} escapes`,
+            action:    'Check for bimodal histogram pattern. Lower k-factor or enable Stratified DPAT to separate the failure mode',
+            value:     saving,
+          });
+        }
+
+        // --- Rule 6: Systemic high CoQ ---
+        if (coqPct > 15 && recs.length < 3) {
+          recs.push({
+            priority: 3, driverKey: topDriver?.key || 'material',
+            cause:     `Multiple variability sources combine to drive total CoQ to ${coqPct.toFixed(1)}% of unit value`,
+            mechanism: `Best-in-class processes target <5% CoQ. Stacked variance from ${topDriver?.name || 'process nodes'} is the primary contributor`,
+            action:    'Use the Pareto chart below to isolate the dominant defect mode, then re-simulate with that node\'s sigma reduced by 50%',
+            value:     totalCoQ * 0.10,
+          });
+        }
+
+        // --- Rule 7: Clean process ---
+        if (recs.length === 0) {
+          recs.push({
+            priority: 3, driverKey: 'material',
+            cause:     'No dominant variability driver detected',
+            mechanism: `CoQ is ${coqPct.toFixed(1)}% of unit value. SPAT and DPAT performing similarly`,
+            action:    'Stress-test with Mix Change Shock or Tester Degradation preset to validate PAT robustness',
+            value:     null,
+          });
+        }
+
+        recs.sort((a, b) => a.priority !== b.priority ? a.priority - b.priority : (b.value||0) - (a.value||0));
+        return recs.slice(0, 4);
+      }
+
+      render(results, simParams, econData) {
+        const el = document.getElementById('recList');
+        if (!el) return;
+        const recs = this.generate(results, simParams, econData);
+        const f    = v => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`;
+        const driverColors = RootCauseEngine.COLORS;
+
+        el.innerHTML = recs.map((rec, i) => {
+          const color    = driverColors[rec.driverKey] || '#4a9eff';
+          // Look up per-driver confidence from root cause analysis
+          const rcEntry  = (window._rcDrivers || []).find(d => d.key === rec.driverKey);
+          const conf     = rcEntry?.conf || { label:'Medium', cls:'conf-medium', note:'Based on simulation results' };
+
+          const valHtml = rec.value != null
+            ? `<div class="rec-impact">
+                ${f(rec.value)}<br>
+                <span style="font-size:9px;font-weight:400;color:#555;">est. saving</span><br>
+                <span class="conf-badge ${conf.cls}" title="${conf.note}" style="margin-top:5px;display:inline-block;">${conf.label}</span>
+               </div>`
+            : `<div class="rec-impact warn" style="text-align:center;">
+                —<br>
+                <span class="conf-badge ${conf.cls}" title="${conf.note}" style="margin-top:5px;display:inline-block;">${conf.label}</span>
+               </div>`;
+
+          return `
+            <div class="rec-card priority-${rec.priority}" data-driver="${rec.driverKey}">
+              <div class="rec-badge p${rec.priority}">${i + 1}</div>
+              <div class="rec-body">
+                <div style="font-size:9px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Cause</div>
+                <div class="rec-title" style="margin-bottom:6px;">${rec.cause}</div>
+                <div style="font-size:9px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Mechanism</div>
+                <div class="rec-why" style="margin-bottom:6px;">${rec.mechanism}</div>
+                <div style="font-size:9px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Action</div>
+                <div class="rec-how">→ ${rec.action}</div>
+              </div>
+              ${valHtml}
+            </div>`;
+        }).join('');
+      }
+    }
+
+    // ============================================================
+    // DRIVER CROSS-LINKING
+    // Hovering any [data-driver] element highlights all other elements
+    // sharing the same driver key — connects root cause ↔ ROI ↔ rec cards.
+    // Uses event delegation on #analysisContent (stable parent).
+    // ============================================================
+    function setupDriverLinking() {
+      const container = document.getElementById('analysisContent');
+      if (!container) return;
+
+      container.addEventListener('mouseover', e => {
+        const target = e.target.closest('[data-driver]');
+        if (!target) return;
+        const key = target.dataset.driver;
+        container.querySelectorAll(`[data-driver="${key}"]`).forEach(el => el.classList.add('driver-lit'));
+      });
+
+      container.addEventListener('mouseout', e => {
+        const target = e.target.closest('[data-driver]');
+        if (!target) return;
+        const key = target.dataset.driver;
+        container.querySelectorAll(`[data-driver="${key}"]`).forEach(el => el.classList.remove('driver-lit'));
+      });
+    }
+
+    // ============================================================
+    // PRIMARY ACTION RENDERER
+    // Auto-selects the highest cost-impact driver and builds one
+    // decisive statement: Action / Why / Impact / Confidence.
+    // ============================================================
+    function renderPrimaryAction(results, simParams, econData) {
+      const el = document.getElementById('primaryActionBlock');
+      if (!el) return;
+
+      const drivers = window._rcDrivers || [];
+      if (!drivers.length) { el.style.display = 'none'; return; }
+
+      // Highest cost-impact driver (already sorted by pct desc in RootCauseEngine)
+      const top = drivers[0];
+      const f   = v => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`;
+
+      // Driver-specific action + mechanism lookup
+      const playbook = {
+        firmware: {
+          action:    'Switch to Stratified DPAT to isolate firmware-variant measurement shifts.',
+          mechanism: 'Multiple test software variants produce different mean offsets → rolling DPAT window averages them together → limits drift toward defect clusters → escapes increase.',
+        },
+        tester: {
+          action:    'Recalibrate testers and increase SPAT training lot count.',
+          mechanism: 'Tester calibration drift accumulates over lots → measured values shift away from true innate values → PAT limits chase the drift → escape and false-reject rates both rise.',
+        },
+        material: {
+          action:    'Increase SPAT training lots to capture full material lot variation.',
+          mechanism: 'Lot-to-lot material variation shifts the innate distribution → DPAT rolling window follows the shift → limits widen → defects escape detection.',
+        },
+        transport: {
+          action:    'Audit transport handling protocols to reduce ESD and physical damage.',
+          mechanism: 'ESD and physical handling damage inject outlier units into the test stream → they inflate the DPAT rolling sigma → limits widen → real defects escape.',
+        },
+        assembly: {
+          action:    'Tighten assembly process controls — reduce yield-loss events per module.',
+          mechanism: 'Assembly defects (die attach, wire bond) add outlier values to each lot → inflate DPAT variance estimate → limits drift outward → escapes increase.',
+        },
+      };
+
+      const pb    = playbook[top.key] || { action: 'Review top driver.', mechanism: 'See root cause table.' };
+      const cost  = econData.totalCoQ * top.pct / 100;
+      const pctRed = top.pct.toFixed(0);
+      const topoBanner = drivers.isComplex
+        ? `<div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+             <span class="conf-badge conf-medium" style="font-size:10px;padding:2px 8px;">Complex Pipeline</span>
+             <span style="font-size:11px;color:#888;">${drivers.topologyNote} — per-node attribution active</span>
+           </div>`
+        : '';
+
+      el.style.display = 'block';
+      el.innerHTML = `
+        ${topoBanner}
+        <div class="pa-label">⚡ Primary Action</div>
+        <div class="pa-action">${pb.action}</div>
+        <div class="pa-grid">
+          <div>
+            <div class="pa-field-label">Why</div>
+            <div class="pa-field-value">
+              <span class="driver-tag" style="color:${top.color};">${top.name}</span>
+              &nbsp;→&nbsp;${pb.mechanism}
+            </div>
+          </div>
+          <div>
+            <div class="pa-field-label">Impact</div>
+            <div class="pa-impact-val">${f(cost)}</div>
+            <div class="pa-impact-sub">est. savings · ${pctRed}% of total CoQ</div>
+          </div>
+          <div>
+            <div class="pa-field-label">Confidence</div>
+            <div class="pa-field-value">
+              <span class="conf-badge ${top.conf.cls}" style="font-size:11px;padding:3px 10px;" title="${top.conf.note}">${top.conf.label}</span>
+              <div style="font-size:10px;color:#555;margin-top:6px;">${top.conf.note}</div>
+              <div style="font-size:10px;color:#444;margin-top:3px;">${results.lots.length} lots · ${(results.totalUnits||0).toLocaleString()} units</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ============================================================
+    // Main tab switching (Simulation ↔ Analysis)
+    // ============================================================
+    function setupMainTabs(controller) {
+      const analyzer   = new SixSigmaAnalyzer();
+      const econEngine = new EconomicEngine();
+      const rcEngine   = new RootCauseEngine();
+      const recEngine  = new RecommendationEngine();
+      const store      = new ScenarioStore();
+
+      // Expose to global so onclick handlers in scenario slots can reach them
+      window._scenarioStore = store;
+      window._controller    = controller;
+      window._renderScenarios = () => renderScenarioUI(store);
+
+      // Wire up economic param sliders (live label update only — values read on tab open)
+      ['escapeCostMult', 'falseRejectRecovery', 'preventionCost'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', () => {
+          const val = el.value;
+          if (id === 'escapeCostMult')       document.getElementById('escapeCostMultValue').textContent     = val + '×';
+          else if (id === 'falseRejectRecovery') document.getElementById('falseRejectRecoveryValue').textContent = val + '%';
+          else if (id === 'preventionCost')  document.getElementById('preventionCostValue').textContent    = '$' + val;
+        });
+      });
+
+      // Wire up Save Scenario button
+      const saveBtn = document.getElementById('saveScenarioBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          const r = controller.simulation && controller.simulation.results;
+          if (!r) return;
+          // Find first empty slot
+          const emptyIdx = store.slots.findIndex(s => s === null);
+          if (emptyIdx === -1) {
+            alert('All 3 scenario slots are full. Clear one on the Analysis tab to save a new scenario.');
+            return;
+          }
+          const label = prompt(`Name this scenario (Slot ${String.fromCharCode(65 + emptyIdx)}):`, `Scenario ${String.fromCharCode(65 + emptyIdx)}`);
+          if (!label) return;
+          store.save(emptyIdx, label.trim() || `Scenario ${String.fromCharCode(65 + emptyIdx)}`, r, controller.simulation.params);
+          renderScenarioUI(store);
+        });
+      }
+
+      document.querySelectorAll('.main-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.main-tab-btn').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.dataset.mainTab;
+          const simPanel = document.getElementById('main-tab-simulation');
+          const anaPanel = document.getElementById('main-tab-analysis');
+          if (tab === 'simulation') {
+            simPanel.style.display = '';
+            anaPanel.style.display = 'none';
+          } else {
+            simPanel.style.display = 'none';
+            anaPanel.style.display = 'block';
+            const r = controller.simulation && controller.simulation.results;
+            const p = controller.simulation && controller.simulation.params;
+            if (r && r.lots && r.lots.length) {
+              analyzer.run(r, p);
+              // Economic analysis
+              const econParams = {
+                escapeCostMult:      parseInt(document.getElementById('escapeCostMult')?.value     || 10),
+                falseRejectRecovery: parseInt(document.getElementById('falseRejectRecovery')?.value || 20),
+                preventionCost:      parseInt(document.getElementById('preventionCost')?.value      || 5),
+              };
+              econEngine.render(r, p, econParams);
+              const econData = econEngine.compute(r, p, econParams);
+              econData.escapeCostMult      = econParams.escapeCostMult;
+              econData.falseRejectRecovery = econParams.falseRejectRecovery;
+              rcEngine.render(r, p, econData);        // populates window._rcDrivers
+              renderPrimaryAction(r, p, econData);   // reads window._rcDrivers
+              recEngine.render(r, p, econData);
+            }
+            // Always render scenario UI (even if no results)
+            renderScenarioUI(store);
+          }
+        });
+      });
+    }
+
+    // Renders scenario slots + comparison table
+    function renderScenarioUI(store) {
+      const slotsEl = document.getElementById('scenarioSlots');
+      if (!slotsEl) return;
+
+      slotsEl.innerHTML = store.slots.map((slot, i) => {
+        const letter = String.fromCharCode(65 + i);
+        const filled = slot !== null;
+        return `
+          <div class="scenario-slot ${filled ? 'filled' : ''}">
+            <div class="scenario-slot-label">Scenario ${letter}</div>
+            <div class="scenario-slot-name">${filled ? slot.label : '—'}</div>
+            <div class="scenario-slot-time">${filled ? slot.timestamp : ''}</div>
+            <div class="scenario-slot-btns">
+              ${filled
+                ? `<button class="scn-btn clear" onclick="window._scenarioStore.clear(${i}); window._renderScenarios()">Clear</button>`
+                : `<button class="scn-btn save" onclick="window._saveCurrentScenario(${i})">Save here</button>`}
+            </div>
+          </div>`;
+      }).join('');
+
+      // Comparison table — first two filled slots
+      const table = document.getElementById('scenarioCompareTable');
+      if (!table) return;
+      const filled = store.slots.map((s, i) => s ? i : -1).filter(i => i >= 0);
+      if (filled.length < 2) {
+        table.innerHTML = `<p style="font-size:11px;color:#444;text-align:center;padding:12px 0;">Save at least 2 scenarios to see a comparison.</p>`;
+        return;
+      }
+
+      const comp = store.compare(filled[0], filled[1]);
+      if (!comp) return;
+
+      const dc = (delta) => {
+        if (delta.d === 0) return `<td class="d-neu">—</td>`;
+        const sign = delta.d > 0 ? '+' : '';
+        const cls  = delta.better ? 'd-pos' : 'd-neg';
+        return `<td class="${cls}">${sign}${delta.d.toFixed(2)} (${sign}${delta.pct.toFixed(1)}%)</td>`;
+      };
+      const fn = v => (v != null ? v.toFixed(2) : '--');
+
+      table.innerHTML = `
+        <table class="compare-table">
+          <thead><tr>
+            <th>Metric</th>
+            <th>${comp.a.label}</th>
+            <th>${comp.b.label}</th>
+            <th>Delta (B − A)</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>SPAT Fallout %</td><td>${fn(comp.a.summary.spatFallout)}%</td><td>${fn(comp.b.summary.spatFallout)}%</td>${dc(comp.spatFallout)}</tr>
+            <tr><td>SPAT Escape %</td><td>${fn(comp.a.summary.spatEscape)}%</td><td>${fn(comp.b.summary.spatEscape)}%</td>${dc(comp.spatEscape)}</tr>
+            <tr><td>SPAT False Rejects</td><td>${comp.a.summary.spatFalseRejects}</td><td>${comp.b.summary.spatFalseRejects}</td>${dc(comp.spatFalseRejects)}</tr>
+            <tr><td>DPAT Fallout %</td><td>${fn(comp.a.summary.dpatFallout)}%</td><td>${fn(comp.b.summary.dpatFallout)}%</td>${dc(comp.dpatFallout)}</tr>
+            <tr><td>DPAT Escape %</td><td>${fn(comp.a.summary.dpatEscape)}%</td><td>${fn(comp.b.summary.dpatEscape)}%</td>${dc(comp.dpatEscape)}</tr>
+            <tr><td>DPAT False Rejects</td><td>${comp.a.summary.dpatFalseRejects}</td><td>${comp.b.summary.dpatFalseRejects}</td>${dc(comp.dpatFalseRejects)}</tr>
+            <tr><td>Total Defects</td><td>${comp.a.summary.totalDefects}</td><td>${comp.b.summary.totalDefects}</td>${dc(comp.totalDefects)}</tr>
+            <tr><td>Total Units</td><td>${comp.a.summary.totalUnits}</td><td>${comp.b.summary.totalUnits}</td><td class="d-neu">—</td></tr>
+            <tr><td>Lots</td><td>${comp.a.summary.lotCount}</td><td>${comp.b.summary.lotCount}</td><td class="d-neu">—</td></tr>
+          </tbody>
+        </table>`;
+    }
+
+    // Called by Save-here buttons in scenario slots
+    window._saveCurrentScenario = function(idx) {
+      const r = window._controller && window._controller.simulation && window._controller.simulation.results;
+      if (!r) { alert('No simulation results yet. Run the simulation first.'); return; }
+      const letter = String.fromCharCode(65 + idx);
+      const label  = prompt(`Name this scenario (Slot ${letter}):`, `Scenario ${letter}`);
+      if (!label) return;
+      window._scenarioStore.save(idx, label.trim() || `Scenario ${letter}`, r, window._controller.simulation.params);
+      window._renderScenarios();
+    };
+
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
-      new MainController();
+      const ctrl = new MainController();
+      setupMainTabs(ctrl);
+      setupDriverLinking();
     });
   </script>
 

@@ -3,12 +3,374 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Decoded with Viren - Breaking down tech topics for everyone, from beginners to professionals">
-  <title>Podcast - Viren Patel</title>
+  <meta name="description" content="Decoded with Viren — How breakthrough ideas become real industries. The unglamorous journey from sample to sale to scale.">
+  <title>Decoded with Viren - Podcast</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+
+  <style>
+    /* ─── Page layout ──────────────────────────────────────────── */
+    #podcast {
+      min-height: 100vh;
+      padding: 110px 0 6rem;
+    }
+
+    .podcast-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 5%;
+    }
+
+    /* ─── Hero: artwork + identity ─────────────────────────────── */
+    .podcast-hero {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 3.5rem;
+      align-items: center;
+      padding: 2rem 0 4rem;
+    }
+
+    /* Artwork */
+    .podcast-artwork {
+      display: flex;
+      justify-content: center;
+    }
+
+    .podcast-logo {
+      width: 260px;
+      height: 260px;
+      border-radius: 22px;
+      object-fit: contain;
+      display: block;
+      background: linear-gradient(135deg, #0d0720 0%, #1a0a3d 100%);
+      padding: 16px;
+      box-shadow:
+        0 0 0 1px rgba(139, 92, 246, 0.4),
+        0 20px 60px rgba(139, 92, 246, 0.45),
+        0 40px 100px rgba(99, 102, 241, 0.25);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .podcast-logo:hover {
+      transform: scale(1.03) rotate(-1deg);
+      box-shadow:
+        0 0 0 1px rgba(139, 92, 246, 0.6),
+        0 30px 80px rgba(139, 92, 246, 0.6),
+        0 60px 120px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Identity column */
+    .podcast-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .podcast-type-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #8b5cf6;
+      margin-bottom: 0.6rem;
+    }
+
+    .podcast-info h1 {
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 0.85rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .podcast-tagline {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Arc: Sample → Sale → Scale */
+    .podcast-arc {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .arc-step {
+      display: inline-block;
+      padding: 0.6rem 1.6rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.35) 0%, rgba(99, 102, 241, 0.28) 100%);
+      border: 1.5px solid rgba(167, 139, 250, 0.7);
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ede9fe;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      box-shadow:
+        0 0 18px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .arc-sep {
+      color: #7c3aed;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    /* Platform buttons (hero CTAs) */
+    .platform-btns {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .platform-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .platform-btn.spotify {
+      background: #1DB954;
+      color: #fff;
+    }
+
+    .platform-btn.spotify:hover {
+      background: #1ed760;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+    }
+
+    .platform-btn.apple {
+      background: linear-gradient(135deg, #fc3c44, #c5306e);
+      color: #fff;
+    }
+
+    .platform-btn.apple:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(252, 60, 68, 0.4);
+    }
+
+    /* ─── About blurb ───────────────────────────────────────────── */
+    .podcast-about {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      padding: 2.5rem 2.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      margin-bottom: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .podcast-about::before {
+      content: '\201C';
+      position: absolute;
+      top: -1rem;
+      left: 1.5rem;
+      font-size: 8rem;
+      line-height: 1;
+      font-family: Georgia, serif;
+      color: rgba(139, 92, 246, 0.14);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .podcast-about p {
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: #94a3b8;
+      position: relative;
+      z-index: 1;
+      margin: 0;
+    }
+
+    /* ─── Episodes section ──────────────────────────────────────── */
+    .episodes-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    /* Episode card */
+    .episode-card {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      padding: 2rem 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .episode-card.featured {
+      border-color: rgba(139, 92, 246, 0.4);
+      background: linear-gradient(135deg,
+        rgba(139, 92, 246, 0.1) 0%,
+        rgba(30, 41, 59, 0.8) 55%);
+    }
+
+    .episode-card.featured:hover {
+      transform: translateY(-3px);
+      border-color: rgba(139, 92, 246, 0.6);
+      box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+    }
+
+    /* Episode meta row */
+    .ep-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.875rem;
+    }
+
+    .ep-badge {
+      display: inline-block;
+      padding: 0.22rem 0.7rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #fff;
+    }
+
+    .ep-num {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .episode-card h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 0.6rem;
+    }
+
+    .ep-desc {
+      color: #94a3b8;
+      font-size: 0.975rem;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Embed placeholder */
+    .embed-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 2.5rem 1.5rem;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1.5px dashed rgba(139, 92, 246, 0.4);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .embed-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .embed-placeholder p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* Listen buttons (inside episode card) */
+    .listen-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .listen-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.6rem 1.3rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .listen-btn.spotify { background: #1DB954; color: #fff; }
+    .listen-btn.spotify:hover {
+      background: #1ed760;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(29, 185, 84, 0.4);
+    }
+
+    .listen-btn.apple {
+      background: linear-gradient(135deg, #fc3c44, #c5306e);
+      color: #fff;
+    }
+    .listen-btn.apple:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(252, 60, 68, 0.4);
+    }
+
+    /* ─── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #podcast { padding: 90px 0 5rem; }
+
+      .podcast-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+        padding: 2rem 0 3rem;
+      }
+
+      .podcast-logo {
+        width: 180px;
+        height: 180px;
+      }
+
+      .podcast-arc,
+      .platform-btns {
+        justify-content: center;
+      }
+
+      .podcast-about { padding: 1.75rem; }
+      .episode-card { padding: 1.5rem; }
+
+      .listen-links { flex-direction: column; }
+      .listen-btn { justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .podcast-logo { width: 150px; height: 150px; }
+      .podcast-about { padding: 1.25rem 1.5rem; }
+      .podcast-about p { font-size: 0.975rem; }
+      .episodes-section h2 { font-size: 1.3rem; }
+    }
+  </style>
 
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMXF1FG10E"></script>
@@ -16,13 +378,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
-    // Your measurement ID
-    gtag('config', 'G-DMXF1FG10E', {
-      // optional advanced settings
-      // 'page_title': document.title,
-      // 'page_path': location.pathname
-    });
+    gtag('config', 'G-DMXF1FG10E');
   </script>
   <!-- End Google Analytics -->
 </head>
@@ -36,11 +392,17 @@
       <div class="logo">
         <a href="index.html">Viren Patel</a>
       </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
-        <!--<li><a href="podcast.html" class="active">Podcast</a></li> -->
+        <li><a href="podcast.html" class="active">Podcast</a></li>
         <li><a href="simulations/index.html">Simulations</a></li>
+        <li><a href="paper/white/index.html">White Papers</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
@@ -49,59 +411,160 @@
   <!-- Podcast Section -->
   <section id="podcast">
     <div class="podcast-container">
-      <h1 class="fade-in">Decoded with Viren</h1>
-      <p class="podcast-subtitle fade-in">Breaking down tech topics for everyone—from beginners to professionals.</p>
 
-      <!-- Podcast Player -->
-      <div class="podcast-player fade-in">
-        <iframe src="https://open.spotify.com/embed/show/YOUR_SHOW_ID" width="100%" height="232" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-      </div>
+      <!-- ── Hero: artwork + identity ────────────────────────── -->
+      <div class="podcast-hero fade-in">
 
-      <!-- Episode List -->
-      <div class="episodes-section fade-in">
-        <h2>Latest Episodes</h2>
-        <div class="episodes-grid">
-          <div class="episode-card">
-            <div class="episode-number">01</div>
-            <div class="episode-content">
-              <h3>Game Theory in Engineering</h3>
-              <p>Exploring how game theory principles can be applied to solve complex engineering problems and optimize decision-making processes.</p>
-              <div class="episode-meta">
-                <span class="duration">45 min</span>
-                <span class="date">Dec 2024</span>
-              </div>
-              <a href="#" class="btn-primary">Listen Now</a>
-            </div>
+        <div class="podcast-artwork">
+          <!--
+            Logo file: assets/images/podcast_without_bg.png (rainbow-gradient brain on transparent bg).
+            To swap the artwork, drop your new square PNG at that same path.
+          -->
+          <img
+            src="assets/images/podcast_without_bg.png"
+            alt="Decoded with Viren — rainbow-gradient circuit-trace brain logo"
+            class="podcast-logo"
+          >
+        </div>
+
+        <div class="podcast-info">
+          <p class="podcast-type-label">Podcast</p>
+          <h1>Decoded<br>with Viren</h1>
+          <p class="podcast-tagline">How breakthrough ideas become real industries</p>
+
+          <div class="podcast-arc" aria-label="Show arc: Sample to Sale to Scale">
+            <span class="arc-step">Sample</span>
+            <span class="arc-sep" aria-hidden="true">→</span>
+            <span class="arc-step">Sale</span>
+            <span class="arc-sep" aria-hidden="true">→</span>
+            <span class="arc-step">Scale</span>
           </div>
 
-          <div class="episode-card">
-            <div class="episode-number">02</div>
-            <div class="episode-content">
-              <h3>Swarm Intelligence Explained</h3>
-              <p>Dive into the fascinating world of swarm intelligence and how simple rules create complex collective behaviors.</p>
-              <div class="episode-meta">
-                <span class="duration">38 min</span>
-                <span class="date">Dec 2024</span>
-              </div>
-              <a href="#" class="btn-primary">Listen Now</a>
-            </div>
-          </div>
-
-          <div class="episode-card">
-            <div class="episode-number">03</div>
-            <div class="episode-content">
-              <h3>The Future of Web Development</h3>
-              <p>Discussing emerging trends in web development and what skills developers need to stay relevant in 2024 and beyond.</p>
-              <div class="episode-meta">
-                <span class="duration">52 min</span>
-                <span class="date">Nov 2024</span>
-              </div>
-              <a href="#" class="btn-primary">Listen Now</a>
-            </div>
+          <!--
+            Platform show-level links (hero CTAs).
+            Replace the href values with your show's page URLs, then delete this comment.
+              Spotify show:       https://open.spotify.com/show/YOUR_SHOW_ID
+              Apple Podcasts:     https://podcasts.apple.com/podcast/SHOW_SLUG/idSHOW_ID
+          -->
+          <div class="platform-btns">
+            <a href="PASTE_SPOTIFY_SHOW_URL_HERE"
+               class="platform-btn spotify"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Listen on Spotify">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+              Spotify
+            </a>
+            <a href="PASTE_APPLE_PODCASTS_SHOW_URL_HERE"
+               class="platform-btn apple"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Listen on Apple Podcasts">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M5.34 0A5.328 5.328 0 000 5.34v13.32A5.328 5.328 0 005.34 24h13.32A5.328 5.328 0 0024 18.66V5.34A5.328 5.328 0 0018.66 0zm6.525 2.568c2.336 0 4.448.902 6.056 2.587 1.224 1.284 1.912 2.837 2.11 4.298.064.48.094.689.094 1.07a8.38 8.38 0 01-2.823 6.267 8.07 8.07 0 01-4.248 2.26c-.185.03-.298-.09-.298-.245v-1.138c0-.135.085-.215.2-.249a6.53 6.53 0 003.367-2.044 6.56 6.56 0 001.686-4.233c0-3.644-2.961-6.605-6.605-6.605S5.858 8.687 5.858 12.33c0 1.672.62 3.23 1.686 4.39a6.476 6.476 0 003.34 1.926c.114.03.199.114.199.25v1.137c0 .16-.12.28-.298.245a8.07 8.07 0 01-4.247-2.26A8.38 8.38 0 013.715 11.523c0-.375.025-.69.089-1.07.197-1.46.886-3.015 2.11-4.299 1.608-1.685 3.72-2.587 5.95-2.587zm.065 3.275a5.07 5.07 0 015.07 5.07c0 1.734-.885 3.352-2.371 4.267-.3.19-.65.09-.65-.285v-.735a.55.55 0 01.085-.285 3.74 3.74 0 001.565-3.06 3.77 3.77 0 00-3.77-3.77 3.77 3.77 0 00-3.77 3.77c0 1.25.609 2.41 1.635 3.107a.55.55 0 01.085.285v.734c0 .375-.35.475-.65.285a5.05 5.05 0 01-2.37-4.267 5.07 5.07 0 015.07-5.07h.07zm-.035 3.11c1.064 0 1.936.87 1.936 1.936 0 .754-.44 1.41-1.075 1.73v4.495a.86.86 0 01-1.72 0v-4.494a1.937 1.937 0 01-.077-3.667z"/>
+              </svg>
+              Apple Podcasts
+            </a>
           </div>
         </div>
+      </div><!-- /podcast-hero -->
+
+      <!-- ── About the show ──────────────────────────────────── -->
+      <div class="podcast-about fade-in" role="region" aria-label="About the show">
+        <p>
+          "Decoded is the story of the people who build the things we depend on — and the work no one
+          ever sees them do. Every product makes a journey almost nobody talks about: from a sample
+          that barely works, to a sale that proves someone wants it, to the brutal scale-up that turns
+          it into an industry. Each stretch demands a completely different kind of brilliance. Some
+          episodes are conversations with founders, engineers, and operators living in that gap; others
+          are just me, working through something I've seen up close."
+        </p>
       </div>
-    </div>
+
+      <!-- ── Episodes ────────────────────────────────────────── -->
+      <div class="episodes-section">
+        <h2 class="fade-in">Episodes</h2>
+
+        <!-- Episode 0 — The Manifesto (Trailer) -->
+        <article class="episode-card featured fade-in">
+
+          <div class="ep-meta">
+            <span class="ep-badge">Now Live</span>
+            <span class="ep-num">Episode 0</span>
+          </div>
+
+          <h3>The Manifesto</h3>
+
+          <p class="ep-desc">
+            A short trailer laying out what the show is and why it exists — the unglamorous middle
+            between invention and industry.
+          </p>
+
+          <!--
+            ══════════════════════════════════════════════════════════════════════════
+            AUDIO EMBED — replace the .embed-placeholder div below with one of these
+            iframes once your episode is on a platform. Delete the placeholder and
+            this comment block after pasting in your embed.
+
+            ── Spotify (replace YOUR_EPISODE_ID) ────────────────────────────────────
+            <iframe style="border-radius:12px"
+              src="https://open.spotify.com/embed/episode/YOUR_EPISODE_ID"
+              width="100%" height="152" frameborder="0" allowfullscreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Decoded with Viren — Episode 0: The Manifesto"></iframe>
+
+            ── Apple Podcasts (replace SHOW_ID and EPISODE_ID) ───────────────────────
+            <iframe
+              allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+              frameborder="0" height="175"
+              style="width:100%;overflow:hidden;border-radius:12px;"
+              sandbox="allow-forms allow-popups allow-same-origin allow-scripts
+                       allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+              src="https://embed.podcasts.apple.com/us/podcast/SHOW_SLUG/idSHOW_ID?i=EPISODE_ID"
+              title="Decoded with Viren — Episode 0: The Manifesto"></iframe>
+            ══════════════════════════════════════════════════════════════════════════
+          -->
+          <div class="embed-placeholder" role="region" aria-label="Audio player — coming soon">
+            <span class="embed-icon" aria-hidden="true">🎙</span>
+            <p>Audio player coming soon — paste your Spotify or Apple Podcasts embed code here</p>
+          </div>
+
+          <!--
+            Replace href values below with your episode-level URLs, then delete this comment.
+              Spotify episode:    https://open.spotify.com/episode/YOUR_EPISODE_ID
+              Apple episode:      https://podcasts.apple.com/podcast/SHOW_SLUG/idSHOW_ID?i=EPISODE_ID
+          -->
+          <div class="listen-links">
+            <a href="PASTE_SPOTIFY_EPISODE_URL_HERE"
+               class="listen-btn spotify"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Listen to Episode 0 on Spotify">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+              Spotify
+            </a>
+            <a href="PASTE_APPLE_PODCASTS_EPISODE_URL_HERE"
+               class="listen-btn apple"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Listen to Episode 0 on Apple Podcasts">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M5.34 0A5.328 5.328 0 000 5.34v13.32A5.328 5.328 0 005.34 24h13.32A5.328 5.328 0 0024 18.66V5.34A5.328 5.328 0 0018.66 0zm6.525 2.568c2.336 0 4.448.902 6.056 2.587 1.224 1.284 1.912 2.837 2.11 4.298.064.48.094.689.094 1.07a8.38 8.38 0 01-2.823 6.267 8.07 8.07 0 01-4.248 2.26c-.185.03-.298-.09-.298-.245v-1.138c0-.135.085-.215.2-.249a6.53 6.53 0 003.367-2.044 6.56 6.56 0 001.686-4.233c0-3.644-2.961-6.605-6.605-6.605S5.858 8.687 5.858 12.33c0 1.672.62 3.23 1.686 4.39a6.476 6.476 0 003.34 1.926c.114.03.199.114.199.25v1.137c0 .16-.12.28-.298.245a8.07 8.07 0 01-4.247-2.26A8.38 8.38 0 013.715 11.523c0-.375.025-.69.089-1.07.197-1.46.886-3.015 2.11-4.299 1.608-1.685 3.72-2.587 5.95-2.587zm.065 3.275a5.07 5.07 0 015.07 5.07c0 1.734-.885 3.352-2.371 4.267-.3.19-.65.09-.65-.285v-.735a.55.55 0 01.085-.285 3.74 3.74 0 001.565-3.06 3.77 3.77 0 00-3.77-3.77 3.77 3.77 0 00-3.77 3.77c0 1.25.609 2.41 1.635 3.107a.55.55 0 01.085.285v.734c0 .375-.35.475-.65.285a5.05 5.05 0 01-2.37-4.267 5.07 5.07 0 015.07-5.07h.07zm-.035 3.11c1.064 0 1.936.87 1.936 1.936 0 .754-.44 1.41-1.075 1.73v4.495a.86.86 0 01-1.72 0v-4.494a1.937 1.937 0 01-.077-3.667z"/>
+              </svg>
+              Apple Podcasts
+            </a>
+          </div>
+
+        </article><!-- /episode-card -->
+
+      </div><!-- /episodes-section -->
+
+    </div><!-- /podcast-container -->
   </section>
 
   <!-- Footer -->
@@ -110,8 +573,8 @@
       <p>&copy; 2025 Viren Patel. All rights reserved.</p>
       <div class="social-links">
         <a href="mailto:virenp.jobs@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank">LinkedIn</a>
-        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank">Schedule Call</a>
+        <a href="https://www.linkedin.com/in/-virenpatel" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://calendly.com/virenp-jobs/new-connection-linkedin" target="_blank" rel="noopener">Schedule Call</a>
       </div>
     </div>
   </footer>
