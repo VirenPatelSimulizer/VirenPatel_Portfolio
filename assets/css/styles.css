@@ -296,6 +296,12 @@ nav {
   border-color: var(--accent-color);
 }
 
+.btn-linkedin:hover {
+  background: rgba(10, 102, 194, 0.15);
+  border-color: #0a66c2;
+  color: #fff;
+}
+
 
 
 
